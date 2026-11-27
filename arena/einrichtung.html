@@ -361,6 +361,9 @@ function hardware(k) {
   } else {
     k.append(el("div", { class: "box info" }, "Keine NVIDIA- oder AMD-Grafikkarte gefunden. Mit Apple-Chip oder einer anderen Karte: wähle den Speicher unten, sonst „keine“."));
   }
+  if ((er.integriert || []).length) k.append(el("div", { class: "box info", style: "margin-top:8px;font-size:14px" },
+    "Außerdem erkannt: ", el("b", {}, er.integriert.map((x) => `${x.name}, ${zahl(x.vram_gb, 0)} GB aus dem Arbeitsspeicher`).join(" · ")),
+    ". Das ist die eingebaute Grafik des Prozessors – Ollama nutzt sie nicht, sie zählt hier deshalb nicht mit."));
   const raster = el("div", { class: "raster", style: "margin-top:14px" });
   const zeichne = () => raster.replaceChildren(...GROESSEN.map((gb) => el("label", { class: "wahl" + (wahl === gb ? " an" : "") },
     el("input", { type: "radio", name: "vram", checked: wahl === gb, hidden: true, onchange: () => { wahl = gb; zeichne(); } }),

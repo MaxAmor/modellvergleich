@@ -68,8 +68,44 @@ def hardware_erkennen(frisch: bool = False) -> dict:
     return _hw_cache["wert"]
 
 
+def _amd_integriert() -> set[str]:
+    """PCI-Adressen eingebauter AMD-Grafik (APU, z. B. Radeon im Ryzen): laut KFD-Topologie ohne eigenen Speicher
+    (local_mem_size 0) – der „VRAM“ ist vom Arbeitsspeicher abgezweigt und Ollama nutzt solche Chips nicht."""
+    aus = set()
+    for p in Path("/sys/class/kfd/kfd/topology/nodes").glob("*/properties"):
+        try:
+            werte = dict(z.split(" ", 1) for z in p.read_text().splitlines() if " " in z)
+            if int(werte.get("simd_count", 0)) > 0 and int(werte.get("local_mem_size", 1)) == 0:
+                loc = int(werte.get("location_id", -1))
+                aus.add(f"{(loc >> 8) & 0xff:02x}:{(loc >> 3) & 0x1f:02x}.{loc & 0x7}")
+        except (OSError, ValueError):
+            pass
+    return aus
+
+
+def _integrierte_grafik() -> list[dict]:
+    """Eingebaute Grafik (nur zur Info im Assistenten): zählt nie als Grafikkarte für Ollama."""
+    integriert, aus = _amd_integriert(), []
+    for d in sorted(Path("/sys/class/drm").glob("card*/device")):
+        try:
+            adresse = d.resolve().name[-7:]   # „0000:05:00.0“ → „05:00.0“
+            if adresse in integriert:
+                gb = int((d / "mem_info_vram_total").read_text()) / 1024**3
+                aus.append({"name": "AMD Radeon (im Prozessor)", "vram_gb": round(gb, 1)})
+        except (OSError, ValueError):
+            pass
+    return aus
+
+
 def _hardware_erkennen() -> dict:
-    """Grafikkarte erkennen: GPU-Server bzw. nvidia-smi (genau), sonst NVIDIA-Treiber (/proc, Speicher geschätzt) oder AMD (sysfs)."""
+    """Grafikkarte erkennen: GPU-Server bzw. nvidia-smi (genau), sonst NVIDIA-Treiber (/proc, Speicher geschätzt) oder AMD (sysfs).
+    Eingebaute Prozessorgrafik wird nie als Grafikkarte gezählt, nur unter „integriert“ gemeldet."""
+    er = _hardware_karte()
+    er["integriert"] = _integrierte_grafik()
+    return er
+
+
+def _hardware_karte() -> dict:
     g = gpu_status()
     if g and g.get("jetzt"):
         j = g["jetzt"]
@@ -87,8 +123,11 @@ def _hardware_erkennen() -> dict:
                     return {"name": name, "vram_gb": vram, "geschaetzt": geschaetzt, "hersteller": "nvidia"}
         except OSError:
             pass
+    integriert = _amd_integriert()
     for d in sorted(Path("/sys/class/drm").glob("card*/device")):
         try:
+            if d.resolve().name[-7:] in integriert:
+                continue   # Prozessorgrafik, kein eigener Grafikspeicher
             gesamt = int((d / "mem_info_vram_total").read_text())
             if gesamt > 2 * 1024**3:
                 return {"name": name or "AMD-Grafikkarte", "vram_gb": round(gesamt / 1024**3), "geschaetzt": False, "hersteller": "amd"}
