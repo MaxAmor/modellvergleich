@@ -30,6 +30,10 @@ button,select,textarea,input{font:inherit;color:inherit}
 h1{font-size:26px;margin:0;letter-spacing:-.02em}
 .kopf p{margin:0;color:var(--ink-2);font-size:15px}
 .kopf a{margin-left:auto}
+.hilfe{background:#fff;border:1px solid var(--kante);font-size:14.5px}
+.hilfe-schritt{display:flex;gap:12px;margin-top:12px}
+.hilfe-schritt b{font-size:14.5px}
+.hilfe-nr{width:24px;height:24px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:#fff;font-size:12.5px;font-weight:700;margin-top:1px}
 .zu-x{margin-left:auto;width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.75);display:grid;place-items:center;cursor:pointer;color:var(--ink-2);flex:none}
 .zu-x:hover{background:#fff;color:var(--ink)}.zu-x svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 html:has(body.eingebettet),body.eingebettet{background:transparent !important;min-height:0}
@@ -344,6 +348,68 @@ const aktuell = () => SUCHE?.kandidaten.find((x) => x.url === E.ollama_url);
 
 /* ---------- 3 Hardware ---------- */
 const stufe = (v) => GROESSEN.filter((g) => g && g <= v + 0.3).pop() || 0;
+/* Grafik laut Browser (WebGL) – funktioniert auch unter Windows/Mac, wo der Container keine Hardware sieht. Bleibt lokal. */
+function browserGrafik() {
+  try {
+    const gl = document.createElement("canvas").getContext("webgl");
+    const ext = gl && gl.getExtension("WEBGL_debug_renderer_info");
+    const roh = String((ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl?.getParameter(gl.RENDERER)) || "");
+    if (!roh || /swiftshader|llvmpipe|software/i.test(roh)) return null;
+    const m = roh.match(/ANGLE \(([^,]+),\s*(.+?)(?:\s*\(0x[0-9a-f]+\))?\s*(?:Direct3D|OpenGL|Vulkan|Metal|,|\)$)/i);
+    const apple = roh.match(/Apple (M\d[\w ]*?)(?:,|\)|$)/);
+    const name = apple ? "Apple " + apple[1].trim() : (m ? m[2] : roh).replace(/\((R|TM)\)/gi, "").replace(/\s*\(.*$/, "").replace(/\s+/g, " ").trim().slice(0, 60);
+    const t = (m ? m[1] + " " + m[2] : roh).toLowerCase();
+    const art = /nvidia|geforce|rtx|quadro/.test(t) ? "nvidia" : /apple|\bm\d/.test(t) ? "apple"
+      : /intel/.test(t) ? (/arc\(?\s*a\d|arc b\d|a770|a750|a580|a380|b580|b570/.test(t) ? "intel-karte" : "intel-igpu")
+      : /amd|radeon/.test(t) ? (/rx\s?\d|radeon pro|w\d{4}/.test(t) ? "amd-karte" : "amd-apu") : "andere";
+    return { name, art };
+  } catch { return null; }
+}
+const GRAFIK_ART = {
+  "amd-apu": "die eingebaute Grafik des Prozessors (Speicher aus dem Arbeitsspeicher). Im Container nutzt Ollama sie nicht; mit Ollama direkt auf dem Rechner können manche neueren AMD-Chips sie nutzen.",
+  "amd-karte": "eine AMD-Grafikkarte. Im Container nutzt Ollama sie nicht; Ollama direkt auf dem Rechner unterstützt viele Radeon-Karten.",
+  "intel-igpu": "die eingebaute Grafik des Prozessors. Ollama nutzt sie meist nicht – die Modelle laufen dann auf dem Prozessor. Kleine Modelle (2–4 B) gehen trotzdem gut.",
+  "intel-karte": "eine Intel-Grafikkarte mit eigenem Speicher. Im Container nutzt Ollama sie nicht; mit Ollama direkt auf dem Rechner je nach Version möglich.",
+  "andere": "eine Grafik, die Ollama im Container nicht nutzt.",
+};
+/* Anleitung mit Knöpfen: Ollama direkt auf dem Rechner installieren, verbinden, GPU testen */
+function grafikHilfe(art) {
+  const ua = navigator.userAgent, os = /Windows/i.test(ua) ? "win" : /Mac/i.test(ua) ? "mac" : "linux";
+  const nurCpu = art === "intel-igpu";
+  const download = { win: ["Ollama für Windows herunterladen", "https://ollama.com/download/windows"],
+                     mac: ["Ollama für Mac herunterladen", "https://ollama.com/download/mac"] }[os];
+  const nachInstall = { win: "Installer ausführen – Ollama startet danach von selbst (Symbol unten rechts in der Taskleiste).",
+                        mac: "Ollama in den Programme-Ordner ziehen und einmal öffnen (Symbol oben in der Menüleiste).",
+                        linux: "Damit der Container Ollama erreicht, muss es im Netz lauschen: OLLAMA_HOST=0.0.0.0 (bei systemd: systemctl edit ollama)." }[os];
+  const ergebnis = el("div");
+  const verbinde = el("button", { class: "knopf primaer klein", onclick: async () => {
+    verbinde.disabled = true; ergebnis.replaceChildren(lade("suche Ollama auf diesem Rechner …"));
+    const kandidaten = SUCHE?.im_container === false ? ["http://localhost:11434"] : ["http://host.docker.internal:11434", "http://localhost:11434"];
+    let t = null;
+    for (const url of kandidaten) { try { const r = await api("/api/einrichtung/ollama", { url }); if (r.ok) { t = r; break; } } catch {} }
+    if (t) {
+      await speichere({ ollama_url: t.url, gpu_status_url: "" });
+      SUCHE = await api("/api/einrichtung/suche").catch(() => SUCHE);
+      ergebnis.replaceChildren(el("div", { class: "box ok", style: "margin-top:8px" }, `Verbunden mit Ollama ${t.version} auf diesem Rechner · ${t.modelle.length} Modell${t.modelle.length === 1 ? "" : "e"} installiert.`));
+    } else ergebnis.replaceChildren(el("div", { class: "box warn", style: "margin-top:8px" },
+      "Noch nicht erreichbar. Ist Ollama installiert und gestartet? " + (os === "win" ? "Unter Windows: Symbol unten rechts in der Taskleiste." : os === "mac" ? "Auf dem Mac: Symbol oben in der Menüleiste." : "Unter Linux: läuft der Dienst und lauscht auf 0.0.0.0?") + " Dann nochmal klicken."));
+    verbinde.disabled = false; } }, "Jetzt verbinden");
+  const testIndex = SCHRITTE.findIndex((x) => x.id === "test");
+  const schritt = (nr, titel, ...inhalt) => el("div", { class: "hilfe-schritt" }, el("span", { class: "hilfe-nr" }, nr), el("div", {}, el("b", {}, titel), ...inhalt));
+  return el("div", { class: "box hilfe", style: "margin-top:8px" },
+    el("b", { style: "font-size:15px" }, nurCpu ? "So geht's am einfachsten – in drei Schritten:" : "So nutzt du diese Grafik – in drei Schritten:"),
+    schritt(1, "Ollama auf diesem Rechner installieren",
+      download ? el("div", { style: "margin-top:6px" }, el("a", { class: "knopf klein install", href: download[1], target: "_blank", rel: "noopener" }, download[0]))
+               : befehl("curl -fsSL https://ollama.com/install.sh | sh"),
+      el("div", { class: "leer", style: "font-size:13.5px;margin-top:4px" }, nachInstall)),
+    schritt(2, "Mit der App verbinden", el("div", { style: "margin-top:6px" }, verbinde), ergebnis),
+    schritt(3, "Prüfen, ob die Grafik genutzt wird",
+      el("div", { style: "margin-top:6px" }, el("button", { class: "knopf klein", onclick: () => { if (EINST) history.replaceState(null, "", "#test"); zeige(testIndex); } }, "GPU-Test öffnen")),
+      el("div", { class: "leer", style: "font-size:13.5px;margin-top:4px" }, nurCpu
+        ? "Läuft es auf dem Prozessor, ist das normal: hier „keine – nur CPU“ lassen, die Vorschläge zeigen dann kleine Modelle (2–4 B). Für Vergleiche reicht das."
+        : "Läuft es auf dem Prozessor, unterstützt deine Ollama-Version diese Grafik nicht – dann hier „keine – nur CPU“ wählen.")));
+}
+
 function hardware(k) {
   const er = E.erkannt || {};
   let wahl = E.vram_gb ? stufe(E.vram_gb) : (er.vram_gb ? stufe(er.vram_gb) : 0);
@@ -359,11 +425,18 @@ function hardware(k) {
   } else if (er.name) {
     k.append(el("div", { class: "box info" }, "Erkannt: ", el("b", {}, er.name), ". Wie viel Grafikspeicher sie hat, weiß ich nicht – wähle ihn bitte unten."));
   } else {
-    k.append(el("div", { class: "box info" }, "Keine NVIDIA- oder AMD-Grafikkarte gefunden. Mit Apple-Chip oder einer anderen Karte: wähle den Speicher unten, sonst „keine“."));
+    const b = browserGrafik();   // Unter Windows/Mac sieht der Container keine Grafik – der Browser schon
+    k.append(el("div", { class: "box info" }, b
+      ? ["Im Container keine Grafikkarte sichtbar. Dein Browser läuft auf: ", el("b", {}, b.name), "."]
+      : "Keine Grafikkarte gefunden. Mit Apple-Chip oder einer anderen Karte: wähle den Speicher unten, sonst „keine – nur CPU“."));
+    if (b?.art === "nvidia") k.append(el("div", { class: "box warn", style: "margin-top:8px;font-size:14px" },
+      "Das ist eine NVIDIA-Karte – die kann Ollama im Container nutzen: im Schritt „GPU-Test“ (bzw. Zahnrad → GPU-Test) den GPU-Modus einschalten."));
+    else if (b && b.art !== "apple") k.append(grafikHilfe(b.art));
   }
-  if ((er.integriert || []).length) k.append(el("div", { class: "box info", style: "margin-top:8px;font-size:14px" },
-    "Außerdem erkannt: ", el("b", {}, er.integriert.map((x) => `${x.name}, ${zahl(x.vram_gb, 0)} GB aus dem Arbeitsspeicher`).join(" · ")),
-    ". Das ist die eingebaute Grafik des Prozessors – Ollama nutzt sie nicht, sie zählt hier deshalb nicht mit."));
+  for (const x of er.weitere || []) k.append(el("div", { class: "box info", style: "margin-top:8px;font-size:14px" },
+    er.vram_gb ? "Außerdem erkannt: " : "Erkannt: ", el("b", {}, x.name + (x.vram_gb ? ` · ${zahl(x.vram_gb, 0)} GB${x.art === "intel-karte" ? "" : " aus dem Arbeitsspeicher"}` : "")),
+    " – " + GRAFIK_ART[x.art]));
+  if (!er.vram_gb && (er.weitere || []).length) k.append(grafikHilfe(er.weitere[0].art));
   const raster = el("div", { class: "raster", style: "margin-top:14px" });
   const zeichne = () => raster.replaceChildren(...GROESSEN.map((gb) => el("label", { class: "wahl" + (wahl === gb ? " an" : "") },
     el("input", { type: "radio", name: "vram", checked: wahl === gb, hidden: true, onchange: () => { wahl = gb; zeichne(); } }),

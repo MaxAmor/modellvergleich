@@ -83,15 +83,30 @@ def _amd_integriert() -> set[str]:
     return aus
 
 
-def _integrierte_grafik() -> list[dict]:
-    """Eingebaute Grafik (nur zur Info im Assistenten): zählt nie als Grafikkarte für Ollama."""
+# Intel-Grafikkarten (Arc) nach PCI-Gerätekennung; alles andere von Intel ist Prozessorgrafik
+INTEL_ARC = {0x56a0: ("Intel Arc A770", 16), 0x56a1: ("Intel Arc A750", 8), 0x56a2: ("Intel Arc A580", 8), 0x56a5: ("Intel Arc A380", 6),
+             0x56a6: ("Intel Arc A310", 4), 0x56a3: ("Intel Arc A380", 6), 0x56a4: ("Intel Arc A310", 4),
+             0xe20b: ("Intel Arc B580", 12), 0xe20c: ("Intel Arc B570", 10)}
+
+
+def _weitere_grafik() -> list[dict]:
+    """Grafik, die Ollama im Container nicht nutzt – nur zur Info im Assistenten:
+    AMD-Prozessorgrafik (APU), Intel-Prozessorgrafik und Intel-Arc-Karten."""
     integriert, aus = _amd_integriert(), []
-    for d in sorted(Path("/sys/class/drm").glob("card*/device")):
+    for d in sorted(Path("/sys/class/drm").glob("card[0-9]*/device")):
         try:
+            hersteller = (d / "vendor").read_text().strip()
             adresse = d.resolve().name[-7:]   # „0000:05:00.0“ → „05:00.0“
-            if adresse in integriert:
+            if hersteller == "0x1002" and adresse in integriert:
                 gb = int((d / "mem_info_vram_total").read_text()) / 1024**3
-                aus.append({"name": "AMD Radeon (im Prozessor)", "vram_gb": round(gb, 1)})
+                aus.append({"name": "AMD Radeon (im Prozessor)", "vram_gb": round(gb, 1), "art": "amd-apu"})
+            elif hersteller == "0x8086":
+                geraet = int((d / "device").read_text().strip(), 16)
+                if geraet in INTEL_ARC:
+                    n, gb = INTEL_ARC[geraet]
+                    aus.append({"name": n, "vram_gb": gb, "art": "intel-karte"})
+                elif not any(x["art"] == "intel-igpu" for x in aus):
+                    aus.append({"name": "Intel-Grafik (im Prozessor)", "vram_gb": None, "art": "intel-igpu"})
         except (OSError, ValueError):
             pass
     return aus
@@ -99,9 +114,9 @@ def _integrierte_grafik() -> list[dict]:
 
 def _hardware_erkennen() -> dict:
     """Grafikkarte erkennen: GPU-Server bzw. nvidia-smi (genau), sonst NVIDIA-Treiber (/proc, Speicher geschätzt) oder AMD (sysfs).
-    Eingebaute Prozessorgrafik wird nie als Grafikkarte gezählt, nur unter „integriert“ gemeldet."""
+    Prozessorgrafik und Intel-Karten werden nie als Grafikkarte gezählt (Ollama im Container nutzt sie nicht), nur unter „weitere“ gemeldet."""
     er = _hardware_karte()
-    er["integriert"] = _integrierte_grafik()
+    er["weitere"] = _weitere_grafik()
     return er
 
 
