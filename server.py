@@ -420,12 +420,6 @@ class Handler(BaseHTTPRequestHandler):
         self._json(403, {"fehler": f"Host „{host}“ nicht erlaubt. Ergänze ihn in ERLAUBTE_HOSTS (Datei .env)."})
         return False
 
-    def _weiter(self, ziel):
-        self.send_response(302)
-        self.send_header("Location", ziel)
-        self.send_header("Content-Length", "0")
-        self.end_headers()
-
     def do_GET(self):
         if not self._host_ok():
             return

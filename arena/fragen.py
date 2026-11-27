@@ -34,13 +34,6 @@ def _schluessel(k: str) -> str:
     return re.sub(r"[\s_\-]+", "", str(k).strip().lower())
 
 
-def _feld(z: dict, namen) -> str | None:
-    for k, v in z.items():
-        if _schluessel(k) in namen and v not in (None, ""):
-            return v
-    return None
-
-
 # ---------------------------------------------------------------- Einlesen
 def lese(name: str, text: str) -> list[dict]:
     """Datei (CSV/TSV, JSONL, JSON) → Liste roher Zeilen (dicts)."""

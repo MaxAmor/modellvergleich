@@ -6,9 +6,7 @@ Nur Standardbibliothek. Die Ollama-Adresse kommt aus den Einstellungen
 from __future__ import annotations
 
 import json
-import os
 import re
-import subprocess
 import time
 import urllib.error
 import urllib.request
@@ -303,27 +301,6 @@ def bewerte_muster(modell: str, e: dict, think: bool = False, bild: bool = False
                     "tokens_aus": r["tokens_aus"], "tokens_ein": r["tokens_ein"], "roh": r["text"]}
     return {"gueltig": False, "versuche": 2, "roh": versuche[-1]["text"],
             "sekunden": round(sum(v["sekunden"] - v["ladezeit"] for v in versuche), 2)}
-
-
-def vram_info(modell: str) -> dict:
-    """VRAM laut Ollama (/api/ps) und – falls lokal möglich – laut nvidia-smi."""
-    info = {}
-    try:
-        for m in _get("/api/ps").get("models", []):
-            if m.get("name") == modell or m.get("model") == modell:
-                info["vram_gb"] = round(m.get("size_vram", 0) / 1024**3, 2)
-                info["gesamt_gb"] = round(m.get("size", 0) / 1024**3, 2)
-                info["komplett_gpu"] = m.get("size_vram", 0) >= m.get("size", 1) * 0.99
-    except Exception as fehler:
-        info["fehler"] = str(fehler)
-    try:
-        out = subprocess.run(["nvidia-smi", "--query-gpu=name,memory.used,memory.total", "--format=csv,noheader,nounits"],
-                             capture_output=True, text=True, timeout=10).stdout.strip().splitlines()[0]
-        name, used, total = [x.strip() for x in out.split(",")]
-        info.update(gpu=name, gpu_belegt_gb=round(int(used) / 1024, 2), gpu_gesamt_gb=round(int(total) / 1024, 2))
-    except Exception:
-        pass
-    return info
 
 
 def entlade_alle():
