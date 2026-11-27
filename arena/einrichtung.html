@@ -30,6 +30,26 @@ button,select,textarea,input{font:inherit;color:inherit}
 h1{font-size:26px;margin:0;letter-spacing:-.02em}
 .kopf p{margin:0;color:var(--ink-2);font-size:15px}
 .kopf a{margin-left:auto}
+.mw-inhalt{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.mw-abschnitt{display:flex;align-items:center;gap:8px;margin-top:6px}.mw-abschnitt b{font-size:15px}
+.mw-raster{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.mw-karte{display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:16px;background:#fff;border:1px solid var(--linie);box-shadow:0 1px 3px rgba(30,40,80,.05);transition:box-shadow .12s,transform .12s}
+.mw-karte:hover{box-shadow:0 6px 18px rgba(30,40,80,.10);transform:translateY(-1px)}
+.mw-karte.da{opacity:.75}
+.mw-kopf{display:flex;align-items:center;gap:10px}
+.mw-av{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;font-size:13px;font-weight:800;color:#fff;background:var(--farbe);flex:none}
+.mw-name{display:flex;flex-direction:column;min-width:0;flex:1}
+.mw-name b{font-size:15px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mw-name small{font-size:12px;color:var(--ink-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mw-marke{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--ink);color:#fff;white-space:nowrap}
+.mw-meta{display:flex;flex-wrap:wrap;gap:4px}
+.mw-meta span{font-size:11.5px;padding:2px 8px;border-radius:999px;background:rgba(20,30,60,.06);color:var(--ink-2)}
+.mw-meta .mw-ampel.ok{background:var(--good-bg);color:#0b7a44}.mw-meta .mw-ampel.warn{background:var(--warn-bg);color:#7a5200}
+.mw-karte p{margin:0;font-size:13px;line-height:1.45;color:var(--ink-2);flex:1}
+.mw-fuss{margin-top:auto}
+.knopf.mw-los{width:100%;justify-content:center;padding:8px}
+.mw-da{display:block;text-align:center;font-size:13.5px;font-weight:700;color:#0b7a44;padding:8px}
+.mw-prozent small{font-size:12.5px;color:var(--ink-2)}
 .hilfe{background:#fff;border:1px solid var(--kante);font-size:14.5px}
 .hilfe-schritt{display:flex;gap:12px;margin-top:12px}
 .hilfe-schritt b{font-size:14.5px}
@@ -405,20 +425,17 @@ function grafikHilfe(art) {
     } else ergebnis.replaceChildren(el("div", { class: "box warn", style: "margin-top:8px" },
       "Noch nicht erreichbar. Ist Ollama installiert und gestartet? " + (os === "win" ? "Unter Windows: Symbol unten rechts in der Taskleiste." : os === "mac" ? "Auf dem Mac: Symbol oben in der Menüleiste." : "Unter Linux: läuft der Dienst und lauscht auf 0.0.0.0?") + " Dann nochmal klicken."));
     verbinde.disabled = false; } }, "Jetzt verbinden");
-  const testIndex = SCHRITTE.findIndex((x) => x.id === "test");
   const schritt = (nr, titel, ...inhalt) => el("div", { class: "hilfe-schritt" }, el("span", { class: "hilfe-nr" }, nr), el("div", {}, el("b", {}, titel), ...inhalt));
   return el("div", { class: "box hilfe", style: "margin-top:8px" },
-    el("b", { style: "font-size:15px" }, nurCpu ? "So geht's am einfachsten – in drei Schritten:" : "So nutzt du diese Grafik – in drei Schritten:"),
+    el("b", { style: "font-size:15px" }, nurCpu ? "So geht's am einfachsten – in zwei Schritten:" : "So nutzt du diese Grafik – in zwei Schritten:"),
     schritt(1, "Ollama auf diesem Rechner installieren",
       download ? el("div", { style: "margin-top:6px" }, el("a", { class: "knopf klein install", href: download[1], target: "_blank", rel: "noopener" }, download[0]))
                : befehl("curl -fsSL https://ollama.com/install.sh | sh"),
       el("div", { class: "leer", style: "font-size:13.5px;margin-top:4px" }, nachInstall)),
     schritt(2, "Mit der App verbinden", el("div", { style: "margin-top:6px" }, verbinde), ergebnis),
-    schritt(3, "Prüfen, ob die Grafik genutzt wird",
-      el("div", { style: "margin-top:6px" }, el("button", { class: "knopf klein", onclick: () => { if (EINST) history.replaceState(null, "", "#test"); zeige(testIndex); } }, "GPU-Test öffnen")),
-      el("div", { class: "leer", style: "font-size:13.5px;margin-top:4px" }, nurCpu
-        ? "Läuft es auf dem Prozessor, ist das normal: hier „keine – nur CPU“ lassen, die Vorschläge zeigen dann kleine Modelle (2–4 B). Für Vergleiche reicht das."
-        : "Läuft es auf dem Prozessor, unterstützt deine Ollama-Version diese Grafik nicht – dann hier „keine – nur CPU“ wählen.")));
+    el("div", { class: "leer", style: "font-size:13.5px;margin-top:10px" }, nurCpu
+      ? "Danach Modelle installieren – der GPU-Test zeigt, ob die Grafik genutzt wird. Läuft es auf dem Prozessor, ist das normal: hier „keine – nur CPU“ lassen, die Vorschläge zeigen dann kleine Modelle (2–4 B)."
+      : "Danach Modelle installieren – der GPU-Test zeigt, ob die Grafik genutzt wird. Wenn nicht, hier „keine – nur CPU“ wählen."));
 }
 
 function hardware(k) {
@@ -471,18 +488,21 @@ function modelle(k) {
   const merke = () => { SUCHE.kandidaten = SUCHE.kandidaten.map((x) => x.url === E.ollama_url ? { ...x, modelle: [...installiert] } : x); if (weiterKnopf) weiterKnopf.textContent = installiert.size ? "Weiter" : "Ohne Modelle weiter"; };
   const istDa = (r) => r.basis ? installiert.has(r.id) : [...installiert].some((t) => t.toLowerCase().startsWith(`hf.co/${r.id}:`.toLowerCase()));
 
-  /* eine Zeile: Basismodell (Ollama-Bibliothek) oder Hugging Face */
+  /* eine Karte wie im Modelle-Fenster der App: Basismodell (Ollama-Bibliothek) oder Hugging Face */
+  const FARBEN = ["#2a78d6", "#eb6834", "#1baf7a", "#e09b00", "#e87ba4", "#6250d6", "#3b9fbf", "#9a6b2f"];
+  const farbeVon = (t) => FARBEN[[...String(t)].reduce((a, c) => a + c.charCodeAt(0), 0) % FARBEN.length];
+  const avatar = (text, f) => el("span", { class: "mw-av", style: `--farbe:${f}` }, (text || "?").replace(/[^A-Za-zÄÖÜ]/g, "").slice(0, 2).toUpperCase() || "KI");
   const zeile = (r) => {
-    const info = el("small", {}, r.info), balken = el("div", { class: "fortschritt", hidden: true }, el("i"));
-    const da = istDa(r);
-    const marke = da ? el("span", { class: "tag ok" }, "installiert") : r.basis ? el("span", { class: "tag " + (r.passt ? "nein" : "warn") }, r.passt ? "passt" : (vram ? "zu groß" : "ohne GPU langsam")) : null;
-    const knopf = el("button", { class: "knopf klein install", disabled: istDa(r), onclick: async () => {
-      knopf.disabled = true; balken.hidden = false; info.replaceChildren(lade("startet …", false));
+    const da = istDa(r), passt = r.passt !== false;
+    const fuss = el("div", { class: "mw-fuss" });
+    const knopf = el("button", { class: "knopf install mw-los", onclick: async () => {
+      const balken = el("div", { class: "fortschritt" }, el("i")), text = el("small", {}, "startet …");
+      fuss.replaceChildren(el("div", { class: "mw-prozent" }, text, balken));
       const fortschritt = (j) => {
         if (j.error || j.fehler) throw new Error(j.error || j.fehler);
-        if (j.total) { balken.firstChild.style.width = Math.round(100 * (j.completed || 0) / j.total) + "%"; info.textContent = `${zahl((j.completed || 0) / 1e9)} von ${zahl(j.total / 1e9)} GB`; }
-        else if (j.status) info.textContent = j.status;
-        if (j.fertig) { installiert.add(j.modell); merke(); knopf.remove(); marke?.remove(); balken.after(el("span", { class: "tag ok", style: "align-self:flex-start;margin-top:4px" }, "installiert")); info.textContent = "fertig"; balken.firstChild.style.width = "100%"; }
+        if (j.total) { const pz = Math.round(100 * (j.completed || 0) / j.total); balken.firstChild.style.width = pz + "%"; text.textContent = `${pz} % · ${zahl((j.completed || 0) / 1e9)} von ${zahl(j.total / 1e9)} GB`; }
+        else if (j.status) text.textContent = j.status;
+        if (j.fertig) { installiert.add(j.modell); merke(); fuss.replaceChildren(el("span", { class: "mw-da" }, "✓ installiert")); karte.classList.add("da"); }
       };
       try {
         if (r.basis) await stream("/api/einrichtung/pull", { modell: r.id }, fortschritt);
@@ -491,24 +511,37 @@ function modelle(k) {
           if (!quant) { const d = await api("/api/hf/dateien?repo=" + encodeURIComponent(r.id)); const f = d.dateien.find((x) => /^Q4_K_M$/i.test(x.quant)) || d.dateien.find((x) => /Q4/i.test(x.quant)) || d.dateien[d.dateien.length - 1]; if (!f) throw new Error("keine passende Datei"); quant = f.quant; }
           await stream("/api/hf/laden", { repo: r.id, quant }, fortschritt);
         }
-      } catch (e) { info.textContent = "Fehler: " + e.message; knopf.disabled = false; }
+      } catch (e) { fuss.replaceChildren(el("div", { class: "box fehler", style: "font-size:13px;padding:8px 10px" }, e.message), knopf); }
     } }, "Installieren");
-    return el("div", { class: "hf-zeile" + (r.basis ? " pin" : "") }, el("span", { class: "t" }, el("b", {}, r.titel), info, r.warum ? el("small", { class: "leer" }, r.warum) : null, balken), marke, da ? null : knopf);
+    fuss.append(da ? el("span", { class: "mw-da" }, "✓ installiert") : knopf);
+    const karte = el("div", { class: "mw-karte" + (da ? " da" : "") },
+      el("div", { class: "mw-kopf" }, avatar(r.hersteller || r.titel, farbeVon(r.id)),
+        el("div", { class: "mw-name" }, el("b", {}, r.titel), el("small", {}, r.hersteller || r.id)),
+        r.basis ? el("span", { class: "mw-marke" }, "Im Vergleich") : ""),
+      el("div", { class: "mw-meta" }, ...(r.meta || []).map((m) => el("span", {}, m)),
+        el("span", { class: "mw-ampel " + (passt ? "ok" : "warn") }, passt ? (vram ? "passt auf deine Karte" : "läuft auch ohne Grafikkarte") : (vram ? "zu groß – langsam" : "ohne Grafikkarte langsam"))),
+      r.warum ? el("p", {}, r.warum) : "", fuss);
+    return karte;
   };
-  const basis = E.modelle_basis.map((m) => ({ basis: true, id: m.tag, titel: m.name, passt: vram ? m.gb_ziel <= vram : m.gb_ziel <= 4, info: `für ${m.klasse} · ${m.tag}` }));
+  const BASIS_INFO = { "qwen3.5:2b": ["Alibaba", "Kleinstes Basismodell, liest Bilder."], "gemma4:e4b": ["Google", "Stark bei wenig Speicher, liest Bilder."],
+    "qwen3.5:9b": ["Alibaba", "Mittelklasse, liest Bilder."], "qwen3:14b": ["Alibaba", "Größtes Basismodell, nur Text."] };
+  const basis = E.modelle_basis.map((m) => ({ basis: true, id: m.tag, titel: m.name, hersteller: (BASIS_INFO[m.tag] || [])[0], warum: (BASIS_INFO[m.tag] || [])[1],
+    meta: [`ab ${m.gb_ziel} GB`], passt: vram ? m.gb_ziel <= vram : m.gb_ziel <= 4 }));
   basis.sort((a, b) => (b.passt - a.passt));
-  const liste = el("div", { class: "hf-liste" });
+  const liste = el("div", { class: "mw-inhalt" });
+  const raster = (karten) => el("div", { class: "mw-raster" }, karten);
   let vorschlaege = null;
-  const gruppe = (titel) => el("div", { class: "gruppe" }, titel);
-  const zeigeStart = () => liste.replaceChildren(gruppe("Angepinnt · die Modelle aus dem Vergleich"), ...basis.map(zeile), gruppe("Vorschläge von Hugging Face"),
-    ...(vorschlaege == null ? [lade("lade Vorschläge …", false)] : vorschlaege.length ? vorschlaege.map(zeile) : [el("p", { class: "klein" }, "Keine Vorschläge, die auf deine Karte passen.")]));
+  const gruppe = (titel) => el("div", { class: "mw-abschnitt" }, el("b", {}, titel));
+  const zeigeStart = () => liste.replaceChildren(gruppe("Die Modelle aus dem Vergleich"), raster(basis.map(zeile)), gruppe("Vorschläge von Hugging Face"),
+    vorschlaege == null ? lade("lade Vorschläge …", false) : vorschlaege.length ? raster(vorschlaege.map(zeile)) : el("p", { class: "klein" }, "Keine Vorschläge, die auf deine Karte passen."));
   const q = el("input", { placeholder: "Hugging Face durchsuchen, z. B. llama, mistral, phi …", style: "flex:1;padding:10px 13px;border-radius:12px;border:1px solid var(--linie);background:#fff" });
   const suche = async () => {
     const wort = q.value.trim(); if (!wort) { zeigeStart(); return; }
     liste.replaceChildren(lade("suche auf Hugging Face …"));
     try { const j = await api("/api/hf/suche?q=" + encodeURIComponent(wort));
-      const treffer = j.treffer.map((t) => ({ id: t.id, titel: t.id, info: [t.parameter && t.parameter + " Parameter", t.q4_gb && zahl(t.q4_gb) + " GB", t.vision && "liest Bilder"].filter(Boolean).join(" · ") }));
-      liste.replaceChildren(gruppe(`Treffer für „${wort}“`), ...(treffer.length ? treffer.map(zeile) : [el("p", { class: "klein" }, "Keine passenden Modelle gefunden.")]),
+      const treffer = j.treffer.map((t) => { const [h, n] = t.id.split("/"); return { id: t.id, titel: (n || t.id).replace(/-GGUF$/i, "").replace(/[-_]/g, " "), hersteller: h,
+        meta: [t.parameter, t.q4_gb && zahl(t.q4_gb) + " GB", t.vision && "liest Bilder"].filter(Boolean), passt: !t.knapp }; });
+      liste.replaceChildren(gruppe(`Treffer für „${wort}“`), treffer.length ? raster(treffer.map(zeile)) : el("p", { class: "klein" }, "Keine passenden Modelle gefunden."),
         j.zu_gross ? el("p", { class: "klein" }, `${j.zu_gross} Treffer ausgeblendet: zu groß für ${zahl(maxGb())} GB.`) : null);
     } catch (e) { liste.replaceChildren(el("div", { class: "box fehler" }, e.message)); } };
   q.onkeydown = (ev) => { if (ev.key === "Enter") suche(); };
@@ -517,8 +550,8 @@ function modelle(k) {
     el("p", { class: "klein", style: "margin:6px 0 0" }, `Es erscheinen nur Modelle, die mit Kontext in ${zahl(maxGb())} GB passen (4-Bit-Version). Download einmalig, je Modell ca. 2–10 GB.`),
     liste);
   zeigeStart();
-  if (E.modelle_verwalten) api("/api/hf/vorschlaege").then((v) => { vorschlaege = v.map((x) => ({ id: x.id, titel: x.hersteller, warum: x.warum, quant: x.q4?.quant,
-      info: [x.parameter && x.parameter + " Parameter", x.q4?.gb && zahl(x.q4.gb) + " GB", x.vision && "liest Bilder"].filter(Boolean).join(" · ") })); if (!q.value.trim()) zeigeStart(); })
+  if (E.modelle_verwalten) api("/api/hf/vorschlaege").then((v) => { vorschlaege = v.map((x) => ({ id: x.id, titel: (x.id.split("/")[1] || x.id).replace(/-GGUF$/i, "").replace(/[-_]/g, " "), hersteller: x.hersteller, warum: x.warum, quant: x.q4?.quant,
+      meta: [x.parameter, x.q4?.gb && zahl(x.q4.gb) + " GB", x.vision && "liest Bilder"].filter(Boolean) })); if (!q.value.trim()) zeigeStart(); })
     .catch(() => { vorschlaege = []; if (!q.value.trim()) zeigeStart(); });
   else vorschlaege = [];
   weiterKnopf = unten(k);
@@ -533,7 +566,13 @@ function test(k) {
   const verbunden = aktuell()?.ok, inst = (aktuell()?.modelle || []);
   const tag = E.modelle_basis.map((m) => m.tag).find((t) => inst.includes(t)) || inst[0];
   const erg = el("div");
-  if (!verbunden || !tag) { k.append(el("div", { class: "box warn" }, verbunden ? "Noch kein Modell installiert (Schritt 4)." : "Ollama ist nicht verbunden (Schritt 2).")); unten(k, { weiter: "Überspringen" }); return; }
+  if (!verbunden || !tag) {
+    const ziel = SCHRITTE.findIndex((x) => x.id === (verbunden ? "modelle" : "verbindung"));
+    k.append(el("div", { class: "box warn zeile", style: "justify-content:space-between" },
+      el("span", {}, verbunden ? "Für den Test brauchst du zuerst ein installiertes Modell." : "Ollama ist noch nicht verbunden."),
+      el("button", { class: "knopf primaer klein", onclick: () => { if (EINST) history.replaceState(null, "", "#" + SCHRITTE[ziel].id); zeige(ziel); } }, verbunden ? "Zu den Modellen" : "Zur Verbindung")));
+    unten(k, { weiter: "Überspringen" }); return;
+  }
   const knopf = el("button", { class: "knopf primaer", onclick: async () => {
     knopf.disabled = true; erg.replaceChildren(lade(`lade ${tag} in den Speicher … (beim ersten Mal bis zu einer Minute)`));
     try { const t = await api("/api/einrichtung/gpu-test", { modell: tag }); TEST = t;
