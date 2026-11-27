@@ -48,8 +48,8 @@ Ohne weitere Schritte läuft Ollama im Container auf der CPU – das funktionier
 |---|---|
 | **Windows + NVIDIA** | aktueller NVIDIA-Treiber + Docker Desktop (WSL2). In der Datei `.env` das `#` vor `COMPOSE_FILE=…` entfernen, dann `docker compose up -d`. |
 | **Linux + NVIDIA** | einmalig das [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) installieren (der Assistent zeigt die Befehle), dann wie bei Windows die Zeile in `.env` aktivieren. |
-| **Intel, AMD, Prozessorgrafik (APU), Mac** | Docker-Container können diese Grafik nicht nutzen. Stattdessen [Ollama direkt installieren](https://ollama.com/download) und im Assistenten „Ollama auf diesem Rechner“ wählen. Der Assistent erkennt die Grafik (unter Windows/Mac über den Browser) und führt mit Knöpfen durch Download, Verbinden und GPU-Test. Unter Linux muss Ollama dafür mit `OLLAMA_HOST=0.0.0.0` laufen. |
-| **Stärkerer Rechner im Netz** | dort Ollama mit `OLLAMA_HOST=0.0.0.0:11434` starten (optional `python3 arena/gpu_status.py --host 0.0.0.0` für die Auslastung, Port 11435) und im Assistenten „GPU-Server im Netz verwenden“ wählen – nur im vertrauenswürdigen Netz. Lokal reicht dann `docker compose up -d app`. |
+| **Intel, AMD, Prozessorgrafik (APU), Mac** | Docker-Container können diese Grafik nicht nutzen. Stattdessen [Ollama direkt installieren](https://ollama.com/download) und im Assistenten „Ollama auf diesem Rechner“ wählen. Der Assistent erkennt die Grafik (unter Windows/Mac über den Browser) und führt mit Knöpfen durch Download, Verbinden und GPU-Test. Unter Linux muss Ollama dafür mit `OLLAMA_HOST=0.0.0.0` laufen. Den mitgelieferten Ollama-Container brauchst du dann nicht: in `.env` das `#` vor `COMPOSE_FILE=compose.yml:compose.ohne-ollama.yml` entfernen – am besten vor dem ersten Start, das spart den Download. |
+| **Stärkerer Rechner im Netz** | dort Ollama mit `OLLAMA_HOST=0.0.0.0:11434` starten (optional `python3 arena/gpu_status.py --host 0.0.0.0` für die Auslastung, Port 11435) und im Assistenten „GPU-Server im Netz verwenden“ wählen – nur im vertrauenswürdigen Netz. Den lokalen Ollama-Container dann wie oben per `.env` weglassen. |
 
 Der Schritt **GPU-Test** im Assistenten prüft, ob die Modelle wirklich auf der Grafikkarte laufen. Mit reiner Prozessorgrafik
 (z. B. Intel Iris Xe) laufen die Modelle meist auf dem Prozessor – kleine Modelle (2–4 B) funktionieren trotzdem gut.
@@ -135,7 +135,7 @@ Namen wie GSM8K, MMLU, Ollama, Qwen oder Gemma gehören ihren Inhabern.
 | `arena/einstellungen.py` | Einstellungen (Docker-Volume `/data`) |
 | `arena/gpu_status.py` | Auslastung über nvidia-smi – auch eigenständig für einen GPU-Server |
 | `daten/`, `vorlagen/` | Demo-Datensatz und Beispieldateien |
-| `compose.yml`, `compose.gpu.yml`, `.env` | Start mit Docker, optional mit NVIDIA-Grafikkarte |
+| `compose.yml`, `compose.gpu.yml`, `compose.ohne-ollama.yml`, `.env` | Start mit Docker, optional mit NVIDIA-Grafikkarte oder ohne Ollama-Container |
 | `werkzeuge/pruefe_leaks.sh` | prüft vor einem Commit auf private Angaben (eigene Begriffe in `.leak-denylist`) |
 
 Ohne Docker: `python3 server.py` (Python 3.10+), Ollama unter `http://localhost:11434`.

@@ -31,7 +31,7 @@ services:
     mem_limit: 2g
     restart: unless-stopped
 
-  ollama:
+  ollama:                                            # mitgeliefertes Ollama – weglassen: siehe compose.ohne-ollama.yml
     image: ollama/ollama:latest
     volumes:
       - ollama:/root/.ollama                         # heruntergeladene Modelle

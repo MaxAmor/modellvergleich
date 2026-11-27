@@ -1,0 +1,7 @@
+# Ergänzung: das mitgelieferte Ollama im Container weglassen – für alle, die Ollama direkt auf dem Rechner nutzen
+# (Intel-/AMD-Grafik, Prozessorgrafik, Mac) oder einen GPU-Server im Netz. Spart den Download des Ollama-Images.
+# Einschalten: in .env die Zeile  COMPOSE_FILE=compose.yml:compose.ohne-ollama.yml  aktivieren (# entfernen),
+# dann  docker compose stop ollama  und  docker compose up -d
+services:
+  ollama:
+    profiles: ["aus"]                                # wird nur mit „--profile aus“ gestartet, also praktisch nie

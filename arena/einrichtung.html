@@ -399,7 +399,9 @@ function grafikHilfe(art) {
     if (t) {
       await speichere({ ollama_url: t.url, gpu_status_url: "" });
       SUCHE = await api("/api/einrichtung/suche").catch(() => SUCHE);
-      ergebnis.replaceChildren(el("div", { class: "box ok", style: "margin-top:8px" }, `Verbunden mit Ollama ${t.version} auf diesem Rechner · ${t.modelle.length} Modell${t.modelle.length === 1 ? "" : "e"} installiert.`));
+      ergebnis.replaceChildren(el("div", { class: "box ok", style: "margin-top:8px" }, `Verbunden mit Ollama ${t.version} auf diesem Rechner · ${t.modelle.length} Modell${t.modelle.length === 1 ? "" : "e"} installiert.`),
+        el("div", { class: "leer", style: "font-size:13.5px;margin-top:6px" }, "Das mitgelieferte Ollama im Container brauchst du jetzt nicht mehr. Optional abschalten: in der Datei ",
+          el("code", {}, ".env"), " das # vor ", el("code", {}, "COMPOSE_FILE=compose.yml:compose.ohne-ollama.yml"), " entfernen, dann im Projektordner ", el("code", {}, "docker compose stop ollama"), "."));
     } else ergebnis.replaceChildren(el("div", { class: "box warn", style: "margin-top:8px" },
       "Noch nicht erreichbar. Ist Ollama installiert und gestartet? " + (os === "win" ? "Unter Windows: Symbol unten rechts in der Taskleiste." : os === "mac" ? "Auf dem Mac: Symbol oben in der Menüleiste." : "Unter Linux: läuft der Dienst und lauscht auf 0.0.0.0?") + " Dann nochmal klicken."));
     verbinde.disabled = false; } }, "Jetzt verbinden");
