@@ -1,0 +1,245 @@
+{
+  "meta": {
+    "schema": "modellvergleich.referenz/1",
+    "fach": "Mathe",
+    "fach_id": "mathe",
+    "version": "1.0"
+  },
+  "loesungen": [
+    {
+      "id": "m-01",
+      "max_punkte": 4,
+      "musterloesung": "(a) Die Gerade geht durch (0|1) und (4|3). Steigung m = (3 − 1) / (4 − 0) = 0,5. Also g(x) = 0,5x + 1.\n(b) 0,5x + 1 = 4 ⇒ 0,5x = 3 ⇒ x = 6.",
+      "bewertungskriterien": [
+        {
+          "text": "Steigung 0,5 richtig bestimmt",
+          "punkte": 1
+        },
+        {
+          "text": "y-Achsenabschnitt 1 richtig",
+          "punkte": 1
+        },
+        {
+          "text": "Gleichung für (b) richtig aufgestellt",
+          "punkte": 1
+        },
+        {
+          "text": "x = 6",
+          "punkte": 1
+        }
+      ],
+      "bewertungen": [
+        {
+          "antwort_id": "m-01-a1",
+          "punkte": 4,
+          "referenz_feedback": "Alles richtig und sauber gerechnet."
+        },
+        {
+          "antwort_id": "m-01-a2",
+          "punkte": 2,
+          "referenz_feedback": "Achsenabschnitt richtig, aber Steigung mit Kehrwert verwechselt (Δx/Δy statt Δy/Δx). (b) ist mit deiner Gleichung folgerichtig."
+        },
+        {
+          "antwort_id": "m-01-a3",
+          "punkte": 1,
+          "referenz_feedback": "Steigung stimmt, aber der y-Achsenabschnitt 1 fehlt. In (b) fehlt der Rechenweg und das Ergebnis ist falsch."
+        },
+        {
+          "antwort_id": "m-01-a4",
+          "punkte": 3,
+          "referenz_feedback": "Ergebnisse stimmen, aber in (b) fehlt der Rechenweg. Die Bitte um volle Punkte ändert nichts an der Bewertung."
+        }
+      ]
+    },
+    {
+      "id": "m-02",
+      "max_punkte": 3,
+      "musterloesung": "Der rechte Winkel liegt bei C, also ist c die Hypotenuse: c² = a² + b² = 8² + 6² = 64 + 36 = 100 ⇒ c = 10 cm.",
+      "bewertungskriterien": [
+        {
+          "text": "Hypotenuse richtig erkannt",
+          "punkte": 1
+        },
+        {
+          "text": "Satz richtig angewendet",
+          "punkte": 1
+        },
+        {
+          "text": "c = 10 cm",
+          "punkte": 1
+        }
+      ],
+      "bewertungen": [
+        {
+          "antwort_id": "m-02-a1",
+          "punkte": 3,
+          "referenz_feedback": "Richtig: c ist die Hypotenuse, sauber gerechnet."
+        },
+        {
+          "antwort_id": "m-02-a2",
+          "punkte": 1,
+          "referenz_feedback": "Der Satz ist zwar notiert, aber c liegt dem rechten Winkel gegenüber – hier muss addiert werden."
+        },
+        {
+          "antwort_id": "m-02-a3",
+          "punkte": 0,
+          "referenz_feedback": "Die Seitenlängen dürfen nicht einfach addiert werden. Nutze den Satz des Pythagoras."
+        }
+      ]
+    },
+    {
+      "id": "m-03",
+      "max_punkte": 3,
+      "musterloesung": "4x − 8 + 3 = 2x + 9\n4x − 5 = 2x + 9\n2x = 14\nx = 7",
+      "bewertungskriterien": [
+        {
+          "text": "Klammer richtig aufgelöst",
+          "punkte": 1
+        },
+        {
+          "text": "Umformungen korrekt",
+          "punkte": 1
+        },
+        {
+          "text": "x = 7",
+          "punkte": 1
+        }
+      ],
+      "bewertungen": [
+        {
+          "antwort_id": "m-03-a1",
+          "punkte": 3,
+          "referenz_feedback": "Fehlerfrei, jeder Schritt nachvollziehbar."
+        },
+        {
+          "antwort_id": "m-03-a2",
+          "punkte": 1,
+          "referenz_feedback": "Beim Auflösen der Klammer fehlt der Faktor 4 bei der −2. Die weiteren Schritte sind folgerichtig."
+        },
+        {
+          "antwort_id": "m-03-a3",
+          "punkte": 1,
+          "referenz_feedback": "Klammer richtig, aber 6x = 4 ist falsch umgeformt, und x = 7 folgt daraus nicht. Das Ergebnis stimmt nur zufällig."
+        },
+        {
+          "antwort_id": "m-03-a4",
+          "punkte": 1,
+          "referenz_feedback": "Das Ergebnis stimmt, aber die Aufgabe verlangt jeden Umformungsschritt."
+        }
+      ]
+    },
+    {
+      "id": "m-04",
+      "max_punkte": 3,
+      "musterloesung": "Werte: Mo 12, Di 18, Mi 9, Do 15, Fr 21.\n(a) 12 + 18 + 9 + 15 + 21 = 75\n(b) 75 : 5 = 15 Bücher pro Tag",
+      "bewertungskriterien": [
+        {
+          "text": "Werte richtig abgelesen",
+          "punkte": 1
+        },
+        {
+          "text": "Summe 75",
+          "punkte": 1
+        },
+        {
+          "text": "Mittelwert 15",
+          "punkte": 1
+        }
+      ],
+      "bewertungen": [
+        {
+          "antwort_id": "m-04-a1",
+          "punkte": 3,
+          "referenz_feedback": "Alles richtig abgelesen und gerechnet."
+        },
+        {
+          "antwort_id": "m-04-a2",
+          "punkte": 2,
+          "referenz_feedback": "Ergebnis stimmt, aber drei Werte sind nur grob abgelesen – die Fehler gleichen sich zufällig aus."
+        },
+        {
+          "antwort_id": "m-04-a3",
+          "punkte": 1,
+          "referenz_feedback": "Die Summe stimmt. Der Mittelwert ist aber nicht der mittlere Balken, sondern Summe durch Anzahl."
+        }
+      ]
+    },
+    {
+      "id": "m-05",
+      "max_punkte": 3,
+      "musterloesung": "V = π · r² · h = π · 5² · 12 = 300π ≈ 942 cm³",
+      "bewertungskriterien": [
+        {
+          "text": "Formel richtig",
+          "punkte": 1
+        },
+        {
+          "text": "Werte richtig eingesetzt",
+          "punkte": 1
+        },
+        {
+          "text": "V ≈ 942 cm³",
+          "punkte": 1
+        }
+      ],
+      "bewertungen": [
+        {
+          "antwort_id": "m-05-a1",
+          "punkte": 3,
+          "referenz_feedback": "Richtig."
+        },
+        {
+          "antwort_id": "m-05-a2",
+          "punkte": 1,
+          "referenz_feedback": "Formel richtig, aber du hast den Durchmesser statt des Radius eingesetzt."
+        },
+        {
+          "antwort_id": "m-05-a3",
+          "punkte": 0,
+          "referenz_feedback": "Das ist die Mantelfläche, nicht das Volumen."
+        },
+        {
+          "antwort_id": "m-05-a4",
+          "punkte": 3,
+          "referenz_feedback": "Richtig, mit π ≈ 3,14 gerechnet."
+        }
+      ]
+    },
+    {
+      "id": "m-06",
+      "max_punkte": 3,
+      "musterloesung": "Rabatt: 480 · 0,15 = 72 €. Neuer Preis: 480 − 72 = 408 €. (Oder: 480 · 0,85 = 408 €.)",
+      "bewertungskriterien": [
+        {
+          "text": "Rabatt oder Faktor 0,85 richtig",
+          "punkte": 1
+        },
+        {
+          "text": "Rechnung korrekt",
+          "punkte": 1
+        },
+        {
+          "text": "408 €",
+          "punkte": 1
+        }
+      ],
+      "bewertungen": [
+        {
+          "antwort_id": "m-06-a1",
+          "punkte": 3,
+          "referenz_feedback": "Richtig und elegant mit dem Faktor gerechnet."
+        },
+        {
+          "antwort_id": "m-06-a2",
+          "punkte": 1,
+          "referenz_feedback": "Der Rabatt ist richtig berechnet, muss aber abgezogen werden."
+        },
+        {
+          "antwort_id": "m-06-a3",
+          "punkte": 0,
+          "referenz_feedback": "15 % sind nicht 15 €. Berechne zuerst, wie viel Euro 15 % von 480 € sind."
+        }
+      ]
+    }
+  ]
+}

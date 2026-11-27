@@ -1,0 +1,42 @@
+# Start:  docker compose up -d   →  http://localhost:8720  (beim ersten Öffnen führt ein Assistent durch die Einrichtung)
+# NVIDIA-GPU: in .env die Zeile COMPOSE_FILE einkommentieren (der Assistent zeigt, wann und wie).
+name: modellvergleich
+
+services:
+  app:
+    build: .
+    image: modellvergleich:latest
+    pull_policy: build                               # immer lokal bauen, nicht online suchen
+    ports:
+      - "${BIND:-127.0.0.1}:${PORT:-8720}:8720"      # Standard: nur auf diesem Rechner erreichbar
+    environment:
+      OLLAMA_URL: ${OLLAMA_URL:-http://ollama:11434}  # Startwert, der Assistent kann ihn ändern
+      ERLAUBTE_HOSTS: ${ERLAUBTE_HOSTS:-localhost,127.0.0.1,[::1]}
+      PRUEFER_API_KEY: ${PRUEFER_API_KEY:-}
+      KAGGLE_USERNAME: ${KAGGLE_USERNAME:-}
+      KAGGLE_KEY: ${KAGGLE_KEY:-}
+      PRUEFER_URL: ${PRUEFER_URL:-}
+      PRUEFER_MODELL: ${PRUEFER_MODELL:-}
+      GPU_STATUS_URL: ${GPU_STATUS_URL:-}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"          # erreicht ein Ollama, das direkt auf dem Rechner läuft
+    volumes:
+      - appdaten:/data                               # Einstellungen + eigene Läufe
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 256
+    mem_limit: 2g
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama:/root/.ollama                         # heruntergeladene Modelle
+    restart: unless-stopped
+
+volumes:
+  appdaten: {}
+  ollama: {}

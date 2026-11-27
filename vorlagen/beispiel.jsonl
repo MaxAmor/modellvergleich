@@ -1,0 +1,4 @@
+{"id": "q1", "question": "What is the capital of Australia?", "answer": "Canberra", "topic": "Geography"}
+{"id": "q2", "question": "Which planet is known as the Red Planet?", "choices": ["Venus", "Mars", "Jupiter", "Saturn"], "answer": "B", "topic": "Astronomy"}
+{"id": "q3", "question": "Wie viele Minuten hat ein Tag?", "answer": "1440", "topic": "Mathe"}
+{"id": "q4", "context": "Der Vertrag beginnt am 1. März und läuft zwölf Monate. Er verlängert sich automatisch um ein Jahr, wenn er nicht drei Monate vor Ablauf gekündigt wird.", "question": "Bis wann muss spätestens gekündigt werden, damit sich der Vertrag nicht verlängert?", "answer": "bis Ende November (drei Monate vor dem Ende am 28./29. Februar)", "topic": "Recht"}

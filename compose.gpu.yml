@@ -1,0 +1,21 @@
+# Ergänzung für NVIDIA-Grafikkarten (braucht das NVIDIA Container Toolkit bzw. Docker Desktop mit WSL2).
+# Einschalten: in .env das # vor COMPOSE_FILE entfernen, dann docker compose up -d   (Windows: ; statt :)
+services:
+  ollama:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+  app:
+    environment:
+      NVIDIA_DRIVER_CAPABILITIES: utility          # nur nvidia-smi: Auslastung anzeigen, nicht rechnen
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [utility]

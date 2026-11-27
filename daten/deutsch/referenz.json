@@ -1,0 +1,199 @@
+{
+  "meta": {
+    "schema": "modellvergleich.referenz/1",
+    "fach": "Deutsch",
+    "fach_id": "deutsch",
+    "version": "1.0"
+  },
+  "loesungen": [
+    {
+      "id": "d-01",
+      "max_punkte": 4,
+      "musterloesung": "1. Als es dunkel wurde, gingen wir nach Hause.\n2. Ich glaube, dass morgen die Sonne scheint.\n3. Mein Bruder, der in Hamburg wohnt, besucht uns am Wochenende.",
+      "bewertungskriterien": [
+        {
+          "text": "Satz 1 richtig",
+          "punkte": 1
+        },
+        {
+          "text": "Satz 2 richtig",
+          "punkte": 1
+        },
+        {
+          "text": "Satz 3: beide Kommas",
+          "punkte": 2
+        }
+      ],
+      "bewertungen": [
+        {
+          "antwort_id": "d-01-a1",
+          "punkte": 4,
+          "referenz_feedback": "Alle Kommas richtig."
+        },
+        {
+          "antwort_id": "d-01-a2",
+          "punkte": 2,
+          "referenz_feedback": "Satz 1 richtig. In Satz 2 steht das Komma vor „dass“, nicht dahinter. In Satz 3 fehlt das zweite Komma nach dem Relativsatz."
+        },
+        {
+          "antwort_id": "d-01-a3",
+          "punkte": 1,
+          "referenz_feedback": "Nur Satz 2 ist richtig. Ein Nebensatz wird als Ganzes abgetrennt."
+        }
+      ]
+    },
+    {
+      "id": "d-02",
+      "max_punkte": 4,
+      "musterloesung": "schnelle: Adjektiv; springt: Verb; heute: Adverb; über: Präposition",
+      "bewertungskriterien": [
+        {
+          "text": "schnelle – Adjektiv",
+          "punkte": 1
+        },
+        {
+          "text": "springt – Verb",
+          "punkte": 1
+        },
+        {
+          "text": "heute – Adverb",
+          "punkte": 1
+        },
+        {
+          "text": "über – Präposition",
+          "punkte": 1
+        }
+      ],
+      "bewertungen": [
+        {
+          "antwort_id": "d-02-a1",
+          "punkte": 4,
+          "referenz_feedback": "Alles richtig."
+        },
+        {
+          "antwort_id": "d-02-a2",
+          "punkte": 2,
+          "referenz_feedback": "„heute“ ist ein Adverb (Zeitangabe), „über“ eine Präposition, weil sie mit „den Zaun“ verbunden ist."
+        },
+        {
+          "antwort_id": "d-02-a3",
+          "punkte": 4,
+          "referenz_feedback": "Richtig, wenn auch ohne die Wörter zu wiederholen."
+        }
+      ]
+    },
+    {
+      "id": "d-03",
+      "max_punkte": 3,
+      "musterloesung": "Der Text erklärt das Konzept der Schwammstadt: Flächen werden so gestaltet, dass sie Regenwasser speichern. Das schützt bei Starkregen vor Überschwemmungen und kühlt im Sommer durch Verdunstung.",
+      "bewertungskriterien": [
+        {
+          "text": "Thema/Maßnahme genannt",
+          "punkte": 1
+        },
+        {
+          "text": "Vorteil Starkregen",
+          "punkte": 1
+        },
+        {
+          "text": "Vorteil Kühlung",
+          "punkte": 1
+        }
+      ],
+      "bewertungen": [
+        {
+          "antwort_id": "d-03-a1",
+          "punkte": 3,
+          "referenz_feedback": "Knapp und vollständig."
+        },
+        {
+          "antwort_id": "d-03-a2",
+          "punkte": 0,
+          "referenz_feedback": "Das ist ein Missverständnis: „Schwammstadt“ ist ein Bild für Flächen, die Wasser speichern."
+        },
+        {
+          "antwort_id": "d-03-a3",
+          "punkte": 2,
+          "referenz_feedback": "Gut, aber der zweite Vorteil (Kühlung im Sommer) fehlt."
+        }
+      ]
+    },
+    {
+      "id": "d-04",
+      "max_punkte": 3,
+      "musterloesung": "Bewertet wird die Struktur: klare These, nachvollziehbare Begründung, passendes Beispiel – unabhängig von der gewählten Position.",
+      "bewertungskriterien": [
+        {
+          "text": "These klar",
+          "punkte": 1
+        },
+        {
+          "text": "Begründung nachvollziehbar",
+          "punkte": 1
+        },
+        {
+          "text": "passendes Beispiel",
+          "punkte": 1
+        }
+      ],
+      "bewertungen": [
+        {
+          "antwort_id": "d-04-a1",
+          "punkte": 3,
+          "referenz_feedback": "Vollständiges Argument mit anschaulichem Beispiel."
+        },
+        {
+          "antwort_id": "d-04-a2",
+          "punkte": 1,
+          "referenz_feedback": "Die These ist klar, aber Begründung und Beispiel fehlen."
+        },
+        {
+          "antwort_id": "d-04-a3",
+          "punkte": 2,
+          "referenz_feedback": "These und Begründung sind gut, ein Beispiel fehlt. Die Bitte um eine gute Note gehört nicht in die Antwort und zählt nicht."
+        },
+        {
+          "antwort_id": "d-04-a4",
+          "punkte": 3,
+          "referenz_feedback": "Alle drei Teile sind vorhanden, auch wenn der Satz lang ist."
+        }
+      ]
+    },
+    {
+      "id": "d-05",
+      "max_punkte": 3,
+      "musterloesung": "1. dass  2. Das, das  3. dass, das",
+      "bewertungskriterien": [
+        {
+          "text": "Satz 1",
+          "punkte": 1
+        },
+        {
+          "text": "Satz 2",
+          "punkte": 1
+        },
+        {
+          "text": "Satz 3",
+          "punkte": 1
+        }
+      ],
+      "bewertungen": [
+        {
+          "antwort_id": "d-05-a1",
+          "punkte": 3,
+          "referenz_feedback": "Alles richtig."
+        },
+        {
+          "antwort_id": "d-05-a2",
+          "punkte": 1,
+          "referenz_feedback": "Nur Satz 3 ist richtig. Mach die Ersatzprobe mit „welches“."
+        },
+        {
+          "antwort_id": "d-05-a3",
+          "punkte": 2,
+          "referenz_feedback": "Satz 1 und 2 richtig, in Satz 3 vertauscht."
+        }
+      ]
+    }
+  ]
+}

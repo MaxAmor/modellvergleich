@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Einrichtung · Modellvergleich</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23141a2e'/%3E%3Cpath d='M16 44V30M28 44V20M40 44V26M52 44V14' stroke='white' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+[hidden]{display:none !important}
+:root{
+  --ink:#0f1420; --ink-2:#4a5263; --ink-3:#7c8496;
+  --glas:rgba(255,255,255,.58); --glas-2:rgba(255,255,255,.78); --kante:rgba(255,255,255,.8); --linie:rgba(20,30,60,.09);
+  --good:#0f9d58; --warn:#e8a200; --crit:#d93838; --c1:#2a78d6;
+  --good-bg:rgba(15,157,88,.12); --warn-bg:rgba(232,162,0,.14); --crit-bg:rgba(217,56,56,.11);
+  --r:22px; --schatten:inset 0 1px 0 rgba(255,255,255,.9),0 10px 34px rgba(30,40,80,.10);
+  --mono:ui-monospace,"JetBrains Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  font-family:Inter,"SF Pro Display","Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{background:#e8ecf3}
+body{margin:0;color:var(--ink);font-size:17px;line-height:1.5;min-height:100vh;
+  background:radial-gradient(1100px 760px at 6% -8%,#c8dbff 0,transparent 62%),radial-gradient(900px 700px at 102% 4%,#ecd8ff 0,transparent 58%),
+  radial-gradient(1000px 800px at 55% 118%,#cdf1e2 0,transparent 60%),radial-gradient(700px 600px at -6% 90%,#ffe3cf 0,transparent 60%),#e8ecf3;background-attachment:fixed}
+button,select,textarea,input{font:inherit;color:inherit}
+.glas{background:var(--glas);backdrop-filter:blur(26px) saturate(180%);-webkit-backdrop-filter:blur(26px) saturate(180%);border:1px solid var(--kante);border-radius:var(--r);box-shadow:var(--schatten)}
+.wrap{width:min(880px,100% - 32px);margin:0 auto;padding:28px 0 40px}
+.kopf{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(145deg,#1d2640,#0e1322);display:grid;place-items:center;flex:none}
+.logo svg{width:24px;height:24px;stroke:#fff;stroke-width:2.6;fill:none;stroke-linecap:round}
+h1{font-size:26px;margin:0;letter-spacing:-.02em}
+.kopf p{margin:0;color:var(--ink-2);font-size:15px}
+.kopf a{margin-left:auto}
+.zu-x{margin-left:auto;width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.75);display:grid;place-items:center;cursor:pointer;color:var(--ink-2);flex:none}
+.zu-x:hover{background:#fff;color:var(--ink)}.zu-x svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+html:has(body.eingebettet),body.eingebettet{background:transparent !important;min-height:0}
+body.eingebettet .wrap{width:auto;padding:22px 26px 26px}
+body.eingebettet .kopf{margin-bottom:16px}
+.schritte{display:flex;gap:6px;padding:6px;margin-bottom:16px;overflow-x:auto}
+.schritte button{border:0;background:transparent;padding:7px 12px;border-radius:12px;font-size:14px;color:var(--ink-3);cursor:pointer;white-space:nowrap;display:flex;gap:7px;align-items:center}
+.schritte button b{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:rgba(20,30,60,.08);font-size:12px}
+.schritte button.an{background:#fff;color:var(--ink);box-shadow:0 2px 8px rgba(30,40,80,.08)}
+.schritte button.an b{background:var(--ink);color:#fff}
+.schritte button.ok b{background:var(--good);color:#fff}
+.karte{padding:26px 28px}
+.karte h2{margin:0 0 6px;font-size:22px;letter-spacing:-.015em}
+.karte > p.unter{margin:0 0 18px;color:var(--ink-2)}
+.unten{display:flex;gap:10px;margin-top:22px;align-items:center}
+.unten .rechts{margin-left:auto;display:flex;gap:10px}
+.knopf{border:1px solid var(--kante);background:var(--glas-2);padding:9px 16px;border-radius:13px;font-weight:600;font-size:15px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;box-shadow:0 1px 3px rgba(30,40,80,.06);text-decoration:none;color:var(--ink)}
+.knopf:hover{background:#fff}
+.knopf.primaer{background:var(--ink);border-color:var(--ink);color:#fff;box-shadow:0 6px 18px rgba(15,20,32,.25)}
+.knopf.primaer:hover{background:#262d40}
+.knopf.install{background:#2a78d6;border-color:#2a78d6;color:#fff;box-shadow:0 4px 12px rgba(42,120,214,.28)}
+.knopf.install:hover{background:#1f66bd;border-color:#1f66bd;color:#fff}
+.knopf.install:disabled{background:#b9cbe4;border-color:#b9cbe4;box-shadow:none;cursor:default}
+.knopf.install::before{content:"";width:14px;height:14px;flex:none;background:currentColor;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4v11M7 10l5 5 5-5M5 20h14'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4v11M7 10l5 5 5-5M5 20h14'/%3E%3C/svg%3E") center/contain no-repeat}
+
+.knopf:disabled{opacity:.45;cursor:not-allowed}
+.knopf.klein{padding:5px 11px;font-size:13.5px}
+.leer{color:var(--ink-3)}
+.wahl-liste{display:grid;gap:10px}
+.wahl{display:flex;gap:12px;align-items:flex-start;padding:13px 15px;border-radius:16px;background:var(--glas-2);border:1.5px solid transparent;cursor:pointer}
+.wahl:hover{background:#fff}
+.wahl.an{border-color:var(--ink);background:#fff}
+.wahl.aus{opacity:.55;cursor:default}
+.wahl input{margin-top:4px;accent-color:var(--ink)}
+.wahl .t{display:flex;flex-direction:column;gap:2px;flex:1}
+.wahl .t b{font-size:16px}
+.wahl .t small{color:var(--ink-2);font-size:14px}
+.wahl .rechts{margin-left:auto;font-size:13.5px;white-space:nowrap}
+.tag{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12.5px;font-weight:600}
+.tag.ok{background:var(--good-bg);color:#0b7a44}
+.tag.nein{background:rgba(20,30,60,.07);color:var(--ink-3)}
+.tag.warn{background:var(--warn-bg);color:#7a5200}
+.feld{display:flex;flex-direction:column;gap:5px;margin:12px 0}
+.feld span{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.feld input,.feld select{padding:10px 13px;border-radius:12px;border:1px solid var(--linie);background:#fff}
+.zeile{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.zeile .feld{flex:1;min-width:180px}
+.box{border-radius:14px;padding:12px 15px;font-size:15px;margin-top:12px}
+.box.warn{background:var(--warn-bg);color:#6b4800}
+.box.ok{background:var(--good-bg);color:#0b5c35}
+.box.fehler{background:var(--crit-bg);color:#8f1f1f}
+.box.info{background:rgba(42,120,214,.10);color:#174a87}
+code,.mono{font-family:var(--mono);font-size:13.5px;background:rgba(20,30,60,.06);padding:1px 6px;border-radius:6px}
+pre{font-family:var(--mono);font-size:13.5px;background:#141a2e;color:#e8ecf3;padding:12px 14px;border-radius:12px;overflow-x:auto;margin:8px 0}
+.fortschritt{height:8px;border-radius:6px;background:rgba(20,30,60,.08);overflow:hidden;margin-top:6px}
+.fortschritt i{display:block;height:100%;width:0;background:var(--good);transition:width .3s}
+.raster{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.raster .wahl{justify-content:center;text-align:center;padding:12px 8px}
+.tour{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-top:6px}
+.tour div{padding:14px 16px;border-radius:16px;background:var(--glas-2)}
+.tour b{display:block;margin-bottom:3px}
+.tour small{color:var(--ink-2);font-size:14px}
+.schalter{display:flex;gap:14px;align-items:flex-start;padding:14px 16px;border-radius:16px;background:var(--glas-2);margin-bottom:10px;cursor:pointer}
+.schalter input{width:20px;height:20px;margin-top:3px;accent-color:var(--ink)}
+.schalter small{display:block;color:var(--ink-2);font-size:14px}
+details{margin-top:12px}
+.abschnitt{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px}
+.schalter{align-items:center}
+.schalter .text{flex:1}
+.schalter .text small{margin-top:3px}
+.schalter input{position:absolute;opacity:0;width:1px;height:1px}
+.toggle{width:48px;height:28px;border-radius:14px;background:#c3c9d4;position:relative;flex:none;transition:background .2s}
+.toggle::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .2s}
+.schalter input:checked ~ .rechts-s .toggle{background:var(--good)}
+.schalter input:checked ~ .rechts-s .toggle::after{left:23px}
+.schalter input:focus-visible ~ .rechts-s .toggle{outline:2px solid var(--c1);outline-offset:2px}
+.rechts-s{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:64px}
+.zustand{font-size:12.5px;font-weight:700;letter-spacing:.04em}
+.zustand.an{color:#0b7a44}.zustand.aus{color:var(--ink-3)}
+.status-liste{display:grid;gap:8px;margin:4px 0 6px}
+.status{display:flex;gap:12px;align-items:center;padding:12px 15px;border-radius:14px;background:var(--glas-2)}
+.status .p{width:10px;height:10px;border-radius:50%;flex:none;background:var(--ink-3)}
+.status .p.ok{background:var(--good)}.status .p.warn{background:var(--warn)}
+.status b{min-width:120px}
+.status span{color:var(--ink-2);font-size:15px}
+.weiter-karten{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.weiter-karten > div{padding:16px 18px;border-radius:16px;background:var(--glas-2);display:flex;flex-direction:column;gap:6px}
+.weiter-karten .nr{width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700}
+.weiter-karten b{font-size:16px}
+.weiter-karten small{color:var(--ink-2);font-size:14px;flex:1}
+.weiter-karten .knopf{align-self:flex-start;margin-top:6px}
+.hf-zeile{display:flex;gap:12px;align-items:center;padding:11px 14px;border-radius:14px;background:var(--glas-2)}
+.hf-zeile .t{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
+.hf-zeile .t b{font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hf-zeile .t small{color:var(--ink-2);font-size:13.5px}
+#rahmen.einst{display:grid;grid-template-columns:210px 1fr;gap:16px;align-items:start}
+@media (max-width:760px){#rahmen.einst{grid-template-columns:1fr}}
+#rahmen.einst .schritte{flex-direction:column;align-items:stretch;padding:8px;margin:0;position:sticky;top:16px}
+#rahmen.einst .schritte button{justify-content:flex-start;padding:10px 14px;font-size:15px;color:var(--ink-2)}
+#rahmen.einst .schritte button.an{color:var(--ink);font-weight:600}
+.einst-fuss{border-top:1px solid var(--linie);margin-top:6px;padding:10px 6px 4px;font-size:12.5px}
+.einst-fuss a{color:var(--ink-3)}
+.hf-liste{display:grid;gap:8px;margin-top:10px;max-height:420px;overflow-y:auto;padding-right:4px}
+.hf-liste .gruppe{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:6px 0 0}
+.hf-liste .gruppe:first-child{margin-top:0}
+.hf-zeile.pin{border-left:3px solid var(--ink)}
+.klein{font-size:13.5px;color:var(--ink-3)}
+.hf-titel{display:flex;align-items:center;gap:8px}
+.hf-titel .hf{font-size:22px;line-height:1;letter-spacing:0;text-transform:none}
+.srv-knopf{border:1.5px dashed rgba(20,30,60,.18);font:inherit;color:inherit}
+.srv-knopf.an{border-style:solid;border-color:var(--ink)}
+.srv-form{padding:4px 2px 6px}
+summary{cursor:pointer;color:var(--ink-2);font-size:15px}
+.lade{display:inline-flex;align-items:center;gap:10px;color:var(--ink-2)}
+.lade::before{content:"";width:16px;height:16px;border-radius:50%;border:2.5px solid rgba(20,30,60,.14);border-top-color:var(--ink);animation:dreh .8s linear infinite;flex:none}
+.lade.gross{padding:14px 2px;font-size:15.5px}
+.lade.gross::before{width:20px;height:20px;border-width:3px}
+@keyframes dreh{to{transform:rotate(360deg)}}
+
+/* Dropdowns im Glas-Stil (Chromium: anpassbares <select>; andere Browser: normale Liste) */
+@supports (appearance: base-select) {
+  select, ::picker(select) { appearance: base-select; }
+  select { display:inline-flex; align-items:center; gap:8px; cursor:pointer; }
+  select::picker-icon { content:""; width:9px; height:9px; border-right:2px solid var(--ink-3); border-bottom:2px solid var(--ink-3); transform:translateY(-2px) rotate(45deg); transition:transform .15s; }
+  select:open::picker-icon { transform:translateY(2px) rotate(-135deg); }
+  ::picker(select) { border:1px solid var(--kante); border-radius:16px; padding:6px; margin-top:6px; max-height:min(420px,60vh); overflow-y:auto;
+    background:rgba(255,255,255,.80); backdrop-filter:blur(24px) saturate(180%); -webkit-backdrop-filter:blur(24px) saturate(180%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 16px 40px rgba(30,40,80,.18); color:var(--ink); }
+  select option { padding:8px 12px; border-radius:10px; font-size:14.5px; cursor:pointer; outline:none; }
+  select option:hover, select option:focus-visible { background:rgba(42,120,214,.10); }
+  select option:checked { background:var(--ink); color:#fff; font-weight:600; }
+  select option::checkmark { display:none; }
+  select optgroup { font-size:12px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--ink); padding:10px 6px 4px; }
+  select optgroup + optgroup { border-top:1px solid var(--linie); margin-top:6px; }
+  select optgroup option { text-transform:none; letter-spacing:0; font-weight:500; font-size:14.5px; color:var(--ink-2); padding-left:24px; }
+  select optgroup option:checked { color:#fff; font-weight:600; }
+  select selectedcontent { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kopf">
+    <div class="logo"><svg viewBox="0 0 24 24"><path d="M5 19v-6M10 19V8M15 19v-9M20 19V4"/></svg></div>
+    <div><h1 id="titel">Einrichtung</h1><p>Modellvergleich · Benchmark für lokale Modelle</p></div>
+    <a class="knopf klein" href="/" id="zum-dashboard" hidden>Zur App</a>
+    <button class="zu-x" id="zu-x" title="Schließen (Esc)" aria-label="Schließen" hidden><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  </div>
+  <div id="rahmen">
+    <nav class="schritte glas" id="schritte"></nav>
+    <main class="karte glas" id="karte"></main>
+  </div>
+</div>
+<script>
+"use strict";
+const $ = (s) => document.querySelector(s);
+const el = (tag, attr = {}, ...kinder) => { const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attr || {})) { if (v == null || v === false) continue; if (k.startsWith("on")) e[k] = v; else if (k === "html") e.innerHTML = v; else e.setAttribute(k, v === true ? "" : v); }
+  for (const k of kinder.flat()) if (k != null && k !== false) e.append(k.nodeType ? k : document.createTextNode(k)); return e; };
+const lade = (text, gross = true) => el("div", { class: "lade" + (gross ? " gross" : "") }, text);
+const zahl = (x, n = 1) => Number(x).toFixed(n).replace(".", ",");
+async function api(pfad, body) {
+  const r = await fetch(pfad, body === undefined ? { cache: "no-store" } : { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.fehler || `Fehler ${r.status}`);
+  return j;
+}
+async function stream(pfad, body, jeZeile) {
+  const r = await fetch(pfad, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  if (!r.ok) throw new Error((await r.json().catch(() => ({}))).fehler || `Fehler ${r.status}`);
+  const leser = r.body.getReader(), dec = new TextDecoder(); let rest = "";
+  for (;;) { const { value, done } = await leser.read(); if (done) break; rest += dec.decode(value, { stream: true });
+    const zeilen = rest.split("\n"); rest = zeilen.pop(); for (const z of zeilen) if (z.trim()) jeZeile(JSON.parse(z)); }
+  if (rest.trim()) jeZeile(JSON.parse(rest));
+}
+const speichere = (d) => api("/api/einstellungen", d).then((e) => Object.assign(E, e));
+
+let E = {}, SUCHE = null, SCHRITT = 0;
+const GROESSEN = [0, 4, 6, 8, 12, 16, 24, 48];
+
+const SCHRITTE = [
+  { titel: "Start", zeichne: start },
+  { titel: "Ollama", einst: "Verbindung", id: "verbindung", zeichne: ollama },
+  { titel: "Hardware", einst: "Hardware", id: "hardware", zeichne: hardware },
+  { titel: "Modelle", einst: "Modelle", id: "modelle", zeichne: modelle },
+  { titel: "Test", einst: "GPU-Test", id: "test", zeichne: test },
+  { titel: "Prüfer", einst: "Prüfer", id: "pruefer", zeichne: pruefer },
+  { titel: "Kaggle", einst: "Kaggle", id: "kaggle", zeichne: kaggle, nurEinst: true },   // nur in den Einstellungen, nicht im Assistenten
+  { titel: "Sicherheit", einst: "Sicherheit", id: "sicherheit", zeichne: sicherheit },
+  { titel: "Fertig", zeichne: fertig },
+];
+
+/* Nach der ersten Einrichtung: Einstellungsseite (Bereiche links, Speichern statt Weiter). Assistent: /einrichtung#assistent */
+let EINST = false;
+/* Schritte, die das Ergebnis der Ollama-Suche brauchen, warten darauf – alle anderen erscheinen sofort */
+function zeichneSchritt() {
+  const s = SCHRITTE[SCHRITT], k = $("#karte");
+  if (!SUCHE && [modelle, test, fertig].includes(s.zeichne)) {
+    k.replaceChildren(lade("prüfe die Verbindung zu Ollama …"));
+    const nr = SCHRITT; SUCHE_P.then(() => { if (SCHRITT === nr) zeichneSchritt(); });
+    return;
+  }
+  k.replaceChildren(); s.zeichne(k);
+}
+function zeige(i) {
+  const alt = SCHRITT;
+  SCHRITT = Math.max(0, Math.min(SCHRITTE.length - 1, i));
+  if (!EINST && SCHRITTE[SCHRITT].nurEinst) return zeige(SCHRITT + (SCHRITT >= alt ? 1 : -1));
+  if (EINST) {
+    const bereiche = SCHRITTE.map((s, k) => [s, k]).filter(([s]) => s.einst);
+    $("#schritte").replaceChildren(...bereiche.map(([s, k]) => el("button", { class: k === SCHRITT ? "an" : "", onclick: () => { history.replaceState(null, "", "#" + s.id); zeige(k); } }, s.einst)),
+      el("div", { class: "einst-fuss" }, el("a", { href: "#assistent", onclick: () => setTimeout(() => location.reload(), 0) }, "Einrichtungsassistent neu starten")));
+    zeichneSchritt();
+    return;
+  }
+  $("#schritte").replaceChildren(...SCHRITTE.map((s, k) => [s, k]).filter(([s]) => !s.nurEinst).map(([s, k], n) => el("button", { class: (k === SCHRITT ? "an" : "") + (k < SCHRITT ? " ok" : ""), onclick: () => zeige(k) }, el("b", {}, n + 1), s.titel)));
+  zeichneSchritt();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+function unten(karte, { zurueck = true, weiter = "Weiter", beiWeiter, extra } = {}) {
+  if (EINST) {   // Einstellungen: nur Speichern, keine Navigation
+    if (!beiWeiter) return el("span");
+    const ok = el("span", { class: "klein", style: "color:#0b7a44" });
+    const w = el("button", { class: "knopf primaer", onclick: async () => { w.disabled = true; ok.textContent = "";
+      try { if ((await beiWeiter()) !== false) ok.textContent = "✓ Gespeichert"; } catch (e) { fehler(karte, e); } finally { w.disabled = false; } } }, "Speichern");
+    karte.append(el("div", { class: "unten" }, ok, el("div", { class: "rechts" }, w)));
+    return w;
+  }
+  const w = el("button", { class: "knopf primaer", onclick: async () => { w.disabled = true; try { if (beiWeiter && (await beiWeiter()) === false) return; zeige(SCHRITT + 1); } catch (e) { fehler(karte, e); } finally { w.disabled = false; } } }, weiter);
+  karte.append(el("div", { class: "unten" }, zurueck ? el("button", { class: "knopf", onclick: () => zeige(SCHRITT - 1) }, "Zurück") : null, extra || null, el("div", { class: "rechts" }, w)));
+  return w;
+}
+function fehler(karte, e) { karte.querySelector(".box.fehler")?.remove(); karte.querySelector(".unten").before(el("div", { class: "box fehler" }, String(e.message || e))); }
+
+/* ---------- 1 Start ---------- */
+function start(k) {
+  k.append(el("h2", {}, E.eingerichtet ? "Einstellungen" : "Willkommen"),
+    el("p", { class: "unter" }, "Vergleiche lokale Sprachmodelle auf deinen eigenen Daten – Fragen aus jedem Thema oder Bewertungsaufgaben. Zum Ausprobieren sind Demo-Daten dabei."),
+    el("div", { class: "tour" },
+      el("div", {}, el("b", {}, "Vergleich"), el("small", {}, "Beliebig viele Modelle treten auf demselben Datensatz an. Die Rangliste zeigt, welches am häufigsten richtig liegt.")),
+      el("div", {}, el("b", {}, "Chat"), el("small", {}, "Frei mit den Modellen chatten oder eine Aufgabe aus dem Datensatz bewerten lassen – mehrere Modelle nebeneinander.")),
+      el("div", {}, el("b", {}, "Daten"), el("small", {}, "Eigene Fragen als Datei (CSV, Excel, JSON …) oder direkt aus Hugging Face, Kaggle, einem Link oder einer Datenbank."))),
+    el("p", { class: "leer", style: "margin:16px 0 0;font-size:15px" }, "Die Einrichtung dauert 2–5 Minuten plus Download der Modelle. Alles lässt sich später über das Zahnrad oben rechts ändern."));
+  unten(k, { zurueck: false, weiter: "Einrichten", extra: el("button", { class: "knopf", onclick: async () => { await speichere({ eingerichtet: true }); zurApp("/"); } }, "Erst mal nur umsehen") });
+}
+
+/* ---------- 2 Ollama ---------- */
+function ollama(k) {
+  k.append(el("h2", {}, "Verbindung zu Ollama"),
+    el("p", { class: "unter" }, "Ollama führt die Modelle aus – hier auf diesem Rechner oder auf einem GPU-Server im Netz. Ich suche an den üblichen Stellen."));
+  const liste = el("div", { class: "wahl-liste" }, lade("Suche Ollama an den üblichen Adressen …"));
+  const LOKAL = ["http://ollama:11434", "http://host.docker.internal:11434", "http://localhost:11434"];
+  const istServer = (u) => u && !LOKAL.includes(u);
+  const srvOllama = el("input", { type: "text", placeholder: "http://gpu-server:11434", value: istServer(E.ollama_url) ? E.ollama_url : "" });
+  const srvGpu = el("input", { type: "text", placeholder: "http://gpu-server:11435/gpu (optional)", value: E.gpu_status_url || "" });
+  srvOllama.oninput = () => { const m = srvOllama.value.trim().match(/^(https?:\/\/[^/:]+)/); srvGpu.placeholder = m ? `${m[1]}:11435/gpu (optional)` : "http://gpu-server:11435/gpu (optional)"; };
+  const srvErg = el("div");
+  const verbinde = el("button", { class: "knopf", onclick: async () => {
+    const url = srvOllama.value.trim().replace(/\/+$/, ""), gurl = srvGpu.value.trim();
+    if (!url) { srvErg.replaceChildren(el("div", { class: "box fehler" }, "Gib die Ollama-Adresse des Servers ein.")); return; }
+    srvErg.replaceChildren(lade("teste Verbindung …"));
+    try {
+      const t = await api("/api/einrichtung/ollama", { url });
+      if (!t.ok) { srvErg.replaceChildren(el("div", { class: "box fehler" }, "Ollama nicht erreichbar: " + t.fehler)); return; }
+      SUCHE.kandidaten = [...SUCHE.kandidaten.filter((x) => x.url !== t.url), t]; WAHL = t.url; zeichneListe();
+      const teile = [el("div", { class: "box ok" }, `Ollama ${t.version} erreichbar · ${t.modelle.length} Modell${t.modelle.length === 1 ? "" : "e"} installiert`)];
+      GPU_URL = "";
+      if (gurl) { const g = await api("/api/einrichtung/gpu-status", { url: gurl });
+        if (g.ok) { GPU_URL = gurl; teile.push(el("div", { class: "box ok", style: "margin-top:6px" }, `Auslastung erreichbar: ${g.name} · ${zahl(g.vram_max_gb, 0)} GB · gerade ${Math.round(g.auslastung)} %`)); }
+        else teile.push(el("div", { class: "box warn", style: "margin-top:6px" }, "Auslastung nicht erreichbar (" + g.fehler + "). Ollama funktioniert trotzdem, nur die Live-Kurve fehlt.")); }
+      srvErg.replaceChildren(...teile);
+    } catch (e) { srvErg.replaceChildren(el("div", { class: "box fehler" }, e.message)); } } }, "Verbinden & testen");
+  const srvForm = el("div", { class: "srv-form", hidden: !istServer(E.ollama_url) },
+    el("div", { class: "zeile" }, el("label", { class: "feld" }, el("span", {}, "Ollama auf dem Server"), srvOllama), el("label", { class: "feld" }, el("span", {}, "Auslastung (optional)"), srvGpu)),
+    el("div", { class: "zeile" }, verbinde), srvErg,
+    el("details", {}, el("summary", {}, "Was muss auf dem Server laufen?"),
+      el("p", { style: "font-size:15px" }, "Ollama muss im Netz lauschen: ", el("code", {}, "OLLAMA_HOST=0.0.0.0:11434"), " (bei systemd: ", el("code", {}, "systemctl edit ollama"), ")."),
+      el("p", { style: "font-size:15px" }, "Für die Auslastung (optional) die Datei ", el("code", {}, "arena/gpu_status.py"), " aus diesem Projekt auf den Server kopieren und starten: ", el("code", {}, "python3 gpu_status.py --host 0.0.0.0"), ". Sie gibt nur Messwerte heraus."),
+      el("p", { style: "font-size:15px" }, "Beide Ports nur in einem vertrauenswürdigen Netz freigeben, am besten über ein VPN.")));
+  const srvKnopf = el("button", { class: "wahl srv-knopf", style: "width:100%;text-align:left;margin-top:10px", onclick: () => {
+    srvForm.hidden = !srvForm.hidden; srvKnopf.classList.toggle("an", !srvForm.hidden); if (!srvForm.hidden) srvOllama.focus(); } },
+    el("span", { class: "t" }, el("b", {}, "GPU-Server im Netz verwenden"), el("small", {}, "Optional – wenn die Modelle auf einem stärkeren Rechner laufen sollen")),
+    el("span", { class: "rechts" }, istServer(E.ollama_url) ? el("span", { class: "tag ok" }, "aktiv") : el("span", { class: "tag nein" }, "einrichten")));
+  if (!srvForm.hidden) srvKnopf.classList.add("an");
+  k.append(liste, srvKnopf, srvForm,
+    el("details", {}, el("summary", {}, "Welche Verbindung ist die richtige?"),
+      el("p", { style: "font-size:15px" }, el("b", {}, "Ollama im Container"), " ist mitgeliefert und läuft sofort, ohne Grafikkarte aber nur auf der CPU (langsam). Mit NVIDIA-Karte schaltest du die GPU im Schritt „Test“ frei."),
+      el("p", { style: "font-size:15px" }, el("b", {}, "Ollama auf diesem Rechner"), " ist die beste Wahl auf Mac (Apple-Chip), mit AMD-Karten oder wenn Ollama schon installiert ist: ", el("a", { href: "https://ollama.com/download", target: "_blank", rel: "noopener" }, "ollama.com/download"), "."),
+      el("p", { style: "font-size:15px" }, el("b", {}, "GPU-Server"), " lohnt sich, wenn dein Rechner keine oder eine kleine Grafikkarte hat und im Netz ein stärkerer Rechner steht.")));
+  let WAHL = E.ollama_url, GPU_URL = E.gpu_status_url || "";
+  function zeichneListe() {
+    const namen = { "http://ollama:11434": ["Ollama im Container", "mitgeliefert, startet mit docker compose"], "http://host.docker.internal:11434": ["Ollama auf diesem Rechner", "außerhalb von Docker installiert"], "http://localhost:11434": ["Ollama lokal", "ohne Docker gestartet"] };
+    const kand = SUCHE.kandidaten.filter((x) => x.ok || x.url === E.ollama_url || namen[x.url]?.[0] !== "Ollama lokal" || !SUCHE.im_container);
+    if (!kand.some((x) => x.ok) && !WAHL) WAHL = kand[0]?.url;
+    if (kand.some((x) => x.ok) && !kand.find((x) => x.url === WAHL)?.ok) WAHL = kand.find((x) => x.ok).url;
+    liste.replaceChildren(...kand.map((x) => { const [n, b] = namen[x.url] || ["GPU-Server", "im Netz"];
+      return el("label", { class: "wahl" + (WAHL === x.url ? " an" : "") + (x.ok ? "" : " aus") },
+        el("input", { type: "radio", name: "ollama", checked: WAHL === x.url, disabled: !x.ok, onchange: () => { WAHL = x.url; zeichneListe(); } }),
+        el("span", { class: "t" }, el("b", {}, n), el("small", {}, b + " · ", el("span", { class: "mono" }, x.url))),
+        el("span", { class: "rechts" }, x.ok ? el("span", { class: "tag ok" }, `Ollama ${x.version} · ${x.modelle.length} Modell${x.modelle.length === 1 ? "" : "e"}`) : el("span", { class: "tag nein" }, "nicht erreichbar"))); }),
+      kand.some((x) => x.ok) ? "" : el("div", { class: "box warn" }, "Kein Ollama gefunden. Startest du mit Docker, prüfe, ob der Container läuft: ", el("code", {}, "docker compose ps"), ". Ohne Ollama kannst du trotzdem die Daten ansehen."));
+  }
+  if (SUCHE) zeichneListe(); else liste.replaceChildren(lade("suche Ollama …"));
+  api("/api/einrichtung/suche").then((s) => { SUCHE = s; zeichneListe(); }).catch((e) => liste.replaceChildren(el("div", { class: "box fehler" }, e.message)));
+  unten(k, { beiWeiter: async () => { if (WAHL && SUCHE?.kandidaten.find((x) => x.url === WAHL)?.ok) {
+    await speichere({ ollama_url: WAHL, gpu_status_url: istServer(WAHL) ? GPU_URL : "" });
+    E.erkannt = (await api("/api/einstellungen")).erkannt; } } });
+}
+const aktuell = () => SUCHE?.kandidaten.find((x) => x.url === E.ollama_url);
+
+/* ---------- 3 Hardware ---------- */
+const stufe = (v) => GROESSEN.filter((g) => g && g <= v + 0.3).pop() || 0;
+function hardware(k) {
+  const er = E.erkannt || {};
+  let wahl = E.vram_gb ? stufe(E.vram_gb) : (er.vram_gb ? stufe(er.vram_gb) : 0);
+  const name = el("input", { placeholder: "z. B. Laptop-GPU (nur für die Anzeige)", value: E.gpu_name || er.name || "", maxlength: 60 });
+  k.append(el("h2", {}, "Deine Hardware"),
+    el("p", { class: "unter" }, "Wie viel Grafikspeicher (VRAM) hat die Karte, auf der Ollama läuft? Danach richten sich die Modell-Vorschläge."));
+  if (er.vram_gb) {
+    const passt = E.vram_gb && stufe(E.vram_gb) === stufe(er.vram_gb);
+    k.append(el("div", { class: "box ok zeile", style: "justify-content:space-between" },
+      el("span", {}, "Erkannt: ", el("b", {}, (er.name || "Grafikkarte") + ` · ${er.geschaetzt ? "vermutlich " : ""}${zahl(er.vram_gb, 0)} GB Grafikspeicher`),
+        passt || !E.vram_gb ? " – ist ausgewählt." + (er.geschaetzt ? " Stimmt das nicht, wähle unten." : "") : ""),
+      passt || !E.vram_gb ? null : el("button", { class: "knopf klein", onclick: () => { wahl = stufe(er.vram_gb); name.value = er.name || ""; zeichne(); } }, "Übernehmen")));
+  } else if (er.name) {
+    k.append(el("div", { class: "box info" }, "Erkannt: ", el("b", {}, er.name), ". Wie viel Grafikspeicher sie hat, weiß ich nicht – wähle ihn bitte unten."));
+  } else {
+    k.append(el("div", { class: "box info" }, "Keine NVIDIA- oder AMD-Grafikkarte gefunden. Mit Apple-Chip oder einer anderen Karte: wähle den Speicher unten, sonst „keine“."));
+  }
+  const raster = el("div", { class: "raster", style: "margin-top:14px" });
+  const zeichne = () => raster.replaceChildren(...GROESSEN.map((gb) => el("label", { class: "wahl" + (wahl === gb ? " an" : "") },
+    el("input", { type: "radio", name: "vram", checked: wahl === gb, hidden: true, onchange: () => { wahl = gb; zeichne(); } }),
+    el("span", { class: "t" }, el("b", {}, gb ? gb + " GB" : "keine"), el("small", {}, gb ? (gb >= 48 ? "oder mehr" : "VRAM") : "nur CPU")))));
+  zeichne();
+  k.append(raster, el("label", { class: "feld" }, el("span", {}, "Anzeigename (optional)"), name),
+    el("details", {}, el("summary", {}, "Wo finde ich das selbst?"),
+      el("p", { style: "font-size:15px" }, "Linux/Windows mit NVIDIA: ", el("code", {}, "nvidia-smi"), " im Terminal, Spalte „Memory“. Windows: Task-Manager → Leistung → GPU → „Dedizierter GPU-Speicher“. Mac mit Apple-Chip: etwa zwei Drittel des Arbeitsspeichers.")));
+  unten(k, { beiWeiter: () => speichere({ vram_gb: wahl || null, gpu_name: name.value.trim() }) });
+}
+
+/* ---------- 4 Modelle ---------- */
+const maxGb = () => E.vram_gb ? Math.max(E.vram_gb - 1.5, 1.5) : 6;
+function modelle(k) {
+  const verbunden = aktuell()?.ok;
+  k.append(el("h2", {}, "Modelle installieren"),
+    el("p", { class: "unter" }, "Installiere die Modelle, die du vergleichen willst – oder überspringe den Schritt und mach das später."));
+  if (!verbunden) { k.append(el("div", { class: "box warn" }, "Ollama ist nicht verbunden. Gehe zurück zu Schritt 2 oder überspringe diesen Schritt.")); unten(k, { weiter: "Überspringen" }); return; }
+  const vram = E.vram_gb || 0, installiert = new Set(aktuell().modelle);
+  let weiterKnopf;
+  const merke = () => { SUCHE.kandidaten = SUCHE.kandidaten.map((x) => x.url === E.ollama_url ? { ...x, modelle: [...installiert] } : x); if (weiterKnopf) weiterKnopf.textContent = installiert.size ? "Weiter" : "Ohne Modelle weiter"; };
+  const istDa = (r) => r.basis ? installiert.has(r.id) : [...installiert].some((t) => t.toLowerCase().startsWith(`hf.co/${r.id}:`.toLowerCase()));
+
+  /* eine Zeile: Basismodell (Ollama-Bibliothek) oder Hugging Face */
+  const zeile = (r) => {
+    const info = el("small", {}, r.info), balken = el("div", { class: "fortschritt", hidden: true }, el("i"));
+    const da = istDa(r);
+    const marke = da ? el("span", { class: "tag ok" }, "installiert") : r.basis ? el("span", { class: "tag " + (r.passt ? "nein" : "warn") }, r.passt ? "passt" : (vram ? "zu groß" : "ohne GPU langsam")) : null;
+    const knopf = el("button", { class: "knopf klein install", disabled: istDa(r), onclick: async () => {
+      knopf.disabled = true; balken.hidden = false; info.replaceChildren(lade("startet …", false));
+      const fortschritt = (j) => {
+        if (j.error || j.fehler) throw new Error(j.error || j.fehler);
+        if (j.total) { balken.firstChild.style.width = Math.round(100 * (j.completed || 0) / j.total) + "%"; info.textContent = `${zahl((j.completed || 0) / 1e9)} von ${zahl(j.total / 1e9)} GB`; }
+        else if (j.status) info.textContent = j.status;
+        if (j.fertig) { installiert.add(j.modell); merke(); knopf.remove(); marke?.remove(); balken.after(el("span", { class: "tag ok", style: "align-self:flex-start;margin-top:4px" }, "installiert")); info.textContent = "fertig"; balken.firstChild.style.width = "100%"; }
+      };
+      try {
+        if (r.basis) await stream("/api/einrichtung/pull", { modell: r.id }, fortschritt);
+        else {
+          let quant = r.quant;
+          if (!quant) { const d = await api("/api/hf/dateien?repo=" + encodeURIComponent(r.id)); const f = d.dateien.find((x) => /^Q4_K_M$/i.test(x.quant)) || d.dateien.find((x) => /Q4/i.test(x.quant)) || d.dateien[d.dateien.length - 1]; if (!f) throw new Error("keine passende Datei"); quant = f.quant; }
+          await stream("/api/hf/laden", { repo: r.id, quant }, fortschritt);
+        }
+      } catch (e) { info.textContent = "Fehler: " + e.message; knopf.disabled = false; }
+    } }, "Installieren");
+    return el("div", { class: "hf-zeile" + (r.basis ? " pin" : "") }, el("span", { class: "t" }, el("b", {}, r.titel), info, r.warum ? el("small", { class: "leer" }, r.warum) : null, balken), marke, da ? null : knopf);
+  };
+  const basis = E.modelle_basis.map((m) => ({ basis: true, id: m.tag, titel: m.name, passt: vram ? m.gb_ziel <= vram : m.gb_ziel <= 4, info: `für ${m.klasse} · ${m.tag}` }));
+  basis.sort((a, b) => (b.passt - a.passt));
+  const liste = el("div", { class: "hf-liste" });
+  let vorschlaege = null;
+  const gruppe = (titel) => el("div", { class: "gruppe" }, titel);
+  const zeigeStart = () => liste.replaceChildren(gruppe("Angepinnt · die Modelle aus dem Vergleich"), ...basis.map(zeile), gruppe("Vorschläge von Hugging Face"),
+    ...(vorschlaege == null ? [lade("lade Vorschläge …", false)] : vorschlaege.length ? vorschlaege.map(zeile) : [el("p", { class: "klein" }, "Keine Vorschläge, die auf deine Karte passen.")]));
+  const q = el("input", { placeholder: "Hugging Face durchsuchen, z. B. llama, mistral, phi …", style: "flex:1;padding:10px 13px;border-radius:12px;border:1px solid var(--linie);background:#fff" });
+  const suche = async () => {
+    const wort = q.value.trim(); if (!wort) { zeigeStart(); return; }
+    liste.replaceChildren(lade("suche auf Hugging Face …"));
+    try { const j = await api("/api/hf/suche?q=" + encodeURIComponent(wort));
+      const treffer = j.treffer.map((t) => ({ id: t.id, titel: t.id, info: [t.parameter && t.parameter + " Parameter", t.q4_gb && zahl(t.q4_gb) + " GB", t.vision && "liest Bilder"].filter(Boolean).join(" · ") }));
+      liste.replaceChildren(gruppe(`Treffer für „${wort}“`), ...(treffer.length ? treffer.map(zeile) : [el("p", { class: "klein" }, "Keine passenden Modelle gefunden.")]),
+        j.zu_gross ? el("p", { class: "klein" }, `${j.zu_gross} Treffer ausgeblendet: zu groß für ${zahl(maxGb())} GB.`) : null);
+    } catch (e) { liste.replaceChildren(el("div", { class: "box fehler" }, e.message)); } };
+  q.onkeydown = (ev) => { if (ev.key === "Enter") suche(); };
+  q.oninput = () => { if (!q.value.trim()) zeigeStart(); };
+  k.append(el("div", { class: "zeile hf-titel" }, el("span", { class: "hf", "aria-hidden": "true" }, "🤗"), q, el("button", { class: "knopf", onclick: suche }, "Suchen")),
+    el("p", { class: "klein", style: "margin:6px 0 0" }, `Es erscheinen nur Modelle, die mit Kontext in ${zahl(maxGb())} GB passen (4-Bit-Version). Download einmalig, je Modell ca. 2–10 GB.`),
+    liste);
+  zeigeStart();
+  if (E.modelle_verwalten) api("/api/hf/vorschlaege").then((v) => { vorschlaege = v.map((x) => ({ id: x.id, titel: x.hersteller, warum: x.warum, quant: x.q4?.quant,
+      info: [x.parameter && x.parameter + " Parameter", x.q4?.gb && zahl(x.q4.gb) + " GB", x.vision && "liest Bilder"].filter(Boolean).join(" · ") })); if (!q.value.trim()) zeigeStart(); })
+    .catch(() => { vorschlaege = []; if (!q.value.trim()) zeigeStart(); });
+  else vorschlaege = [];
+  weiterKnopf = unten(k);
+  merke();
+}
+
+/* ---------- 5 Test ---------- */
+let TEST = null;
+function test(k) {
+  k.append(el("h2", {}, "Test: läuft es auf der Grafikkarte?"),
+    el("p", { class: "unter" }, "Ich lade das kleinste installierte Modell und frage Ollama, wie viel davon im Grafikspeicher liegt."));
+  const verbunden = aktuell()?.ok, inst = (aktuell()?.modelle || []);
+  const tag = E.modelle_basis.map((m) => m.tag).find((t) => inst.includes(t)) || inst[0];
+  const erg = el("div");
+  if (!verbunden || !tag) { k.append(el("div", { class: "box warn" }, verbunden ? "Noch kein Modell installiert (Schritt 4)." : "Ollama ist nicht verbunden (Schritt 2).")); unten(k, { weiter: "Überspringen" }); return; }
+  const knopf = el("button", { class: "knopf primaer", onclick: async () => {
+    knopf.disabled = true; erg.replaceChildren(lade(`lade ${tag} in den Speicher … (beim ersten Mal bis zu einer Minute)`));
+    try { const t = await api("/api/einrichtung/gpu-test", { modell: tag }); TEST = t;
+      const gpu = t.anteil_gpu >= 0.99, teil = t.anteil_gpu > 0 && !gpu;
+      erg.replaceChildren(el("div", { class: "box " + (gpu ? "ok" : "warn") }, gpu ? `Läuft komplett auf der Grafikkarte: ${zahl(t.vram_gb)} GB im VRAM, geladen in ${zahl(t.sekunden)} s.`
+        : teil ? `Läuft nur teilweise auf der Grafikkarte (${Math.round(t.anteil_gpu * 100)} %). Das Modell ist zu groß für den VRAM, der Rest läuft langsam auf der CPU.`
+        : `Läuft auf der CPU (${zahl(t.gesamt_gb)} GB im Arbeitsspeicher). Das funktioniert, ist aber deutlich langsamer.`),
+        gpu ? "" : gpuHilfe());
+    } catch (e) { erg.replaceChildren(el("div", { class: "box fehler" }, e.message)); }
+    knopf.disabled = false; knopf.textContent = "Test wiederholen";
+  } }, "Test starten");
+  k.append(el("div", { class: "zeile" }, knopf, el("span", { class: "leer mono" }, tag)), erg);
+  unten(k);
+}
+function befehl(text) {
+  const knopf = el("button", { class: "knopf klein", style: "position:absolute;top:8px;right:8px", onclick: async () => { await navigator.clipboard?.writeText(text); knopf.textContent = "kopiert"; setTimeout(() => knopf.textContent = "Kopieren", 1500); } }, "Kopieren");
+  return el("div", { style: "position:relative" }, el("pre", {}, text), knopf);
+}
+function gpuHilfe() {
+  const container = E.ollama_url === "http://ollama:11434", er = E.erkannt || {};
+  if (!container) return el("div", { class: "box info" }, el("b", {}, "Ollama läuft außerhalb dieses Containers"),
+    el("p", { style: "margin:6px 0 0" }, "Prüfe auf dem Rechner mit Ollama, ob die Grafikkarte erkannt wird (", el("code", {}, "ollama ps"), " zeigt „GPU“ oder „CPU“). Bei NVIDIA hilft meist ein aktueller Treiber."));
+  if (er.hersteller !== "nvidia") return el("div", { class: "box info" }, el("b", {}, "Schneller mit Grafikkarte"),
+    el("p", { style: "margin:6px 0 0" }, "Mac (Apple-Chip) oder AMD-Karte: Ollama direkt installieren (", el("a", { href: "https://ollama.com/download", target: "_blank", rel: "noopener" }, "ollama.com/download"), ") und in Schritt 2 „Ollama auf diesem Rechner“ wählen. Ohne Grafikkarte bleibt es bei der CPU – dafür sind die kleinen Modelle gedacht."));
+  return el("div", { class: "box info" },
+    el("b", {}, `So nutzt Ollama deine ${er.name || "NVIDIA-Karte"}`),
+    el("p", { style: "margin:6px 0" }, "1. Einmalig das NVIDIA Container Toolkit installieren und bei Docker anmelden (Terminal):"),
+    befehl("sudo pacman -S nvidia-container-toolkit      # Arch\n# Ubuntu/Debian/Fedora: siehe Link unten\nsudo nvidia-ctk runtime configure --runtime=docker\nsudo systemctl restart docker"),
+    el("p", { style: "margin:4px 0 8px;font-size:14px" }, "Andere Systeme: ", el("a", { href: "https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html", target: "_blank", rel: "noopener" }, "Installationsanleitung von NVIDIA"), ". Windows: Docker Desktop mit WSL2 bringt es mit."),
+    el("p", { style: "margin:6px 0" }, "2. Im Projektordner die GPU in der Datei ", el("code", {}, ".env"), " einschalten und neu starten:"),
+    befehl("sed -i 's/^# COMPOSE_FILE=/COMPOSE_FILE=/' .env\ndocker compose up -d"),
+    el("p", { style: "margin:4px 0 0;font-size:14px" }, "Ohne Terminal: ", el("code", {}, ".env"), " im Editor öffnen und das ", el("code", {}, "#"), " vor ", el("code", {}, "COMPOSE_FILE"), " löschen. Danach hier „Test wiederholen“."));
+}
+
+/* ---------- 6 Prüfer ---------- */
+function pruefer(k) {
+  k.append(el("h2", {}, "Prüfer (optional)"),
+    el("p", { class: "unter" }, "Ein starkes Cloud-Modell beurteilt als Gutachter, wie gut die lokalen Modelle bewertet haben. Jede OpenAI-kompatible API funktioniert. Ohne Schlüssel bleiben die gespeicherten Prüfer-Ergebnisse sichtbar."));
+  const VORLAGEN = { "OpenRouter": "https://openrouter.ai/api/v1/chat/completions", "OpenAI": "https://api.openai.com/v1/chat/completions", "Eigene Adresse": "" };
+  const anbieter = el("select", {}, Object.keys(VORLAGEN).map((n) => el("option", { value: n, selected: VORLAGEN[n] === E.pruefer_url }, n)));
+  if (!Object.values(VORLAGEN).includes(E.pruefer_url)) anbieter.value = "Eigene Adresse";
+  const url = el("input", { value: E.pruefer_url }), modell = el("input", { value: E.pruefer_modell });
+  const key = el("input", { type: "password", autocomplete: "off", placeholder: E.pruefer_key_gesetzt ? "gespeichert – leer lassen, um ihn zu behalten (gilt nur für diese Adresse)" : "sk-…" });
+  anbieter.onchange = () => { if (VORLAGEN[anbieter.value]) url.value = VORLAGEN[anbieter.value]; if (anbieter.value === "OpenAI" && modell.value.includes("/")) modell.value = "gpt-4.1-mini"; };
+  const erg = el("div");
+  k.append(el("div", { class: "zeile" }, el("label", { class: "feld", style: "flex:0 0 190px" }, el("span", {}, "Anbieter"), anbieter), el("label", { class: "feld" }, el("span", {}, "Adresse"), url)),
+    el("label", { class: "feld" }, el("span", {}, "Modell"), modell),
+    E.pruefer_key_aus_umgebung ? el("div", { class: "box info" }, "Der Schlüssel kommt aus der Umgebung (PRUEFER_API_KEY in .env).")
+      : el("label", { class: "feld" }, el("span", {}, "API-Schlüssel"), key),
+    el("p", { class: "leer", style: "font-size:14px;margin:0" }, "Der Schlüssel bleibt auf deinem Rechner und wird nie an den Browser zurückgegeben. Er gilt nur für diese Adresse – wechselst du sie, gib ihn neu ein. Für jede Prüfung gehen Aufgabe, Musterlösung und Antworten an diesen Anbieter (keine echten personenbezogenen Daten verwenden) und kosten dort meist Bruchteile eines Cents."),
+    el("div", { class: "zeile", style: "margin-top:12px" },
+      el("button", { class: "knopf", onclick: async () => { erg.replaceChildren(lade("teste Verbindung …"));
+        try { await sichern(); const t = await api("/api/einrichtung/pruefer-test", {}); erg.replaceChildren(el("div", { class: "box ok" }, `Verbunden (${zahl(t.sekunden)} s). Antwort: „${t.antwort || "–"}“`)); }
+        catch (e) { erg.replaceChildren(el("div", { class: "box fehler" }, e.message)); } } }, "Speichern & testen"),
+      E.pruefer_key_gesetzt && !E.pruefer_key_aus_umgebung ? el("button", { class: "knopf", onclick: async () => { await speichere({ pruefer_key_loeschen: true }); zeige(SCHRITT); } }, "Schlüssel löschen") : null),
+    erg);
+  const sichern = () => speichere({ pruefer_url: url.value.trim(), pruefer_modell: modell.value.trim(), ...(key.value.trim() ? { pruefer_key: key.value.trim() } : {}) });
+  unten(k, { beiWeiter: sichern });
+}
+
+/* ---------- Kaggle (nur Einstellungen) ---------- */
+function kaggle(k) {
+  k.append(el("h2", {}, "Kaggle (optional)"),
+    el("p", { class: "unter" }, "Öffentliche Kaggle-Datensätze lädst du im Daten-Tab ohne Zugang. Nur für private Datensätze trägst du hier deinen API-Token ein."));
+  const nutzer = el("input", { value: E.kaggle_nutzer || "", placeholder: "Kaggle-Benutzername", autocomplete: "off" });
+  const key = el("input", { type: "password", autocomplete: "off", placeholder: E.kaggle_gesetzt ? "gespeichert – leer lassen, um ihn zu behalten" : "Key aus kaggle.json" });
+  const datei = el("input", { type: "file", accept: ".json,application/json", style: "display:none", onchange: async () => {
+    try { const j = JSON.parse(await datei.files[0].text()); if (j.username) nutzer.value = j.username; if (j.key) key.value = j.key; }
+    catch { alert("Das ist keine gültige kaggle.json."); } } });
+  k.append(
+    el("div", { class: "box info" }, "Token erzeugen: kaggle.com → Settings → API → „Create New Token“. Die geladene kaggle.json kannst du direkt hier einlesen."),
+    el("div", { class: "zeile", style: "margin:12px 0" }, el("button", { class: "knopf", onclick: () => datei.click() }, "kaggle.json einlesen"), datei),
+    el("label", { class: "feld" }, el("span", {}, "Benutzername"), nutzer),
+    el("label", { class: "feld" }, el("span", {}, "Key"), key),
+    el("p", { class: "leer", style: "font-size:14px;margin:0" }, "Der Key bleibt auf deinem Rechner und wird nie an den Browser zurückgegeben."),
+    E.kaggle_gesetzt ? el("div", { class: "zeile", style: "margin-top:12px" }, el("button", { class: "knopf", onclick: async () => { await speichere({ kaggle_loeschen: true }); zeige(SCHRITT); } }, "Zugang löschen")) : "");
+  unten(k, { beiWeiter: () => speichere({ kaggle_nutzer: nutzer.value.trim(), ...(key.value.trim() ? { kaggle_key: key.value.trim() } : {}) }) });
+}
+
+/* ---------- 7 Sicherheit ---------- */
+function schalter(titel, wert, an, aus) {
+  const cb = el("input", { type: "checkbox", checked: wert }), text = el("small"), zustand = el("span", { class: "zustand" });
+  const neu = () => { text.textContent = cb.checked ? an : aus; zustand.textContent = cb.checked ? "AN" : "AUS"; zustand.className = "zustand " + (cb.checked ? "an" : "aus"); };
+  cb.onchange = neu; neu();
+  return { cb, el: el("label", { class: "schalter" }, el("span", { class: "text" }, el("b", {}, titel), text), cb, el("span", { class: "rechts-s" }, el("span", { class: "toggle" }), zustand)) };
+}
+function sicherheit(k) {
+  k.append(el("h2", {}, "Sicherheit"),
+    el("p", { class: "unter" }, "Die Oberfläche hat kein Login und ist nur auf diesem Rechner erreichbar. Mit diesen Schaltern legst du fest, was sie darf."));
+  const s1 = schalter("Modelle über die Oberfläche verwalten", E.modelle_verwalten,
+    "Hier im Assistenten (Schritt Modelle) kannst du Modelle von Hugging Face suchen und installieren.",
+    "Modelle installierst du nur noch hier im Assistenten (Basismodelle) oder im Terminal mit „ollama pull“.");
+  const s2 = schalter("Code in Antworten ausführen", E.eigener_code,
+    "Code in Antworten wird im Modus „Mit Werkzeugen“ gestartet und getestet (höchstens 3 Sekunden, 512 MB, keine weiteren Prozesse). Nur mit Datensätzen aus vertrauenswürdiger Quelle einschalten.",
+    "Code wird nie gestartet – das Modell bewertet ihn nur. Empfohlen, vor allem bei Datensätzen aus fremder Quelle.");
+  k.append(s1.el, s2.el,
+    el("details", {}, el("summary", {}, "Von anderen Geräten im Netz zugreifen?"),
+      el("p", { style: "font-size:15px" }, "Nur hinter einem Zugang mit Login (Reverse-Proxy oder VPN). Dann in ", el("code", {}, ".env"), " die Zeilen ", el("code", {}, "BIND=0.0.0.0"), " und ", el("code", {}, "ERLAUBTE_HOSTS"), " (mit dem Host-Namen) setzen und neu starten.")));
+  unten(k, { beiWeiter: () => speichere({ modelle_verwalten: s1.cb.checked, eigener_code: s2.cb.checked }) });
+}
+
+/* ---------- 8 Fertig ---------- */
+function fertig(k) {
+  const o = aktuell(), ok = o?.ok, inst = o?.modelle || [], er = E.erkannt || {};
+  const basis = E.modelle_basis.filter((m) => inst.includes(m.tag)).map((m) => m.name), extra = inst.filter((t) => !E.modelle_basis.some((m) => m.tag === t)).length;
+  const zeile = (stand, titel, text) => el("div", { class: "status" }, el("i", { class: "p " + stand }), el("b", {}, titel), el("span", {}, text));
+  const gpuText = TEST ? (TEST.anteil_gpu >= 0.99 ? "Modelle laufen auf der Grafikkarte" : TEST.anteil_gpu > 0 ? "Modelle laufen teilweise auf der CPU" : "Modelle laufen auf der CPU (langsam)") : "noch nicht getestet";
+  k.append(el("h2", {}, ok ? "Alles bereit" : "Bereit – ohne Live-Funktionen"),
+    el("p", { class: "unter" }, ok ? "So ist dein Modellvergleich eingerichtet:" : "Ollama ist nicht verbunden. Du kannst Daten ansehen; Vergleich und Chat brauchen Ollama."),
+    el("div", { class: "status-liste" },
+      zeile(ok ? "ok" : "warn", "Ollama", ok ? `verbunden · Version ${o.version}` : "nicht verbunden"),
+      zeile(E.vram_gb ? "ok" : "", "Grafikkarte", (E.gpu_name || er.name || (E.vram_gb ? "Grafikkarte" : "keine")) + (E.vram_gb ? ` · ${zahl(E.vram_gb, 0)} GB` : "") + " · " + gpuText),
+      zeile(inst.length ? "ok" : "warn", "Modelle", inst.length ? (basis.join(", ") || "") + (extra ? `${basis.length ? " + " : ""}${extra} weitere` : "") : "keine installiert"),
+      zeile(E.pruefer_key_gesetzt ? "ok" : "", "Prüfer", E.pruefer_key_gesetzt ? `aktiv · ${E.pruefer_modell}` : "aus – gespeicherte Urteile bleiben sichtbar"),
+      zeile("ok", "Sicherheit", `nur dieser Rechner · Modelle verwalten ${E.modelle_verwalten ? "an" : "aus"} · Code ausführen ${E.eigener_code ? "an" : "aus"}`)),
+    el("div", { class: "abschnitt" }, "Als Nächstes"),
+    el("div", { class: "weiter-karten" },
+      karte(1, "Daten wählen", "Demo-Daten nutzen oder eigene Fragen laden – als Datei oder aus Hugging Face, Kaggle, Link oder Datenbank.", "Daten öffnen", "/#daten"),
+      karte(2, "Modelle vergleichen", "Im Tab „Vergleich“ Modelle auswählen und starten – die Rangliste zeigt, welches am besten bewertet.", "Vergleich öffnen", "/#vergleich", !ok),
+      karte(3, "Chatten und testen", "Einzelne Aufgaben bewerten lassen oder frei chatten, mehrere Modelle nebeneinander.", "Chat öffnen", "/#chat", !ok)),
+    el("p", { class: "leer", style: "font-size:14px;margin:14px 0 0" }, "Alle Einstellungen öffnest du jederzeit über das Zahnrad oben rechts."));
+  unten(k, { weiter: "Los geht's", beiWeiter: async () => { await speichere({ eingerichtet: true }); history.replaceState(null, "", "/einrichtung"); zurApp("/"); return false; } });
+}
+function karte(nr, titel, text, knopf, ziel, aus) {
+  return el("div", {}, el("span", { class: "nr" }, nr), el("b", {}, titel), el("small", {}, text),
+    el("button", { class: "knopf", disabled: aus, onclick: async () => { await speichere({ eingerichtet: true }); zurApp(ziel); } }, knopf));
+}
+
+/* In der App als Fenster eingebettet? Dann schließt „Zur App“/Esc das Fenster, statt die Seite zu wechseln */
+const EINGEBETTET = window.parent !== window;
+function zurApp(ziel = "/") {
+  if (EINGEBETTET) window.parent.postMessage({ art: "einrichtung-fertig", ziel }, location.origin);
+  else location.href = ziel;
+}
+if (EINGEBETTET) {
+  document.body.classList.add("eingebettet");
+  $("#zu-x").hidden = false; $("#zu-x").onclick = () => zurApp(null);
+  document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && !document.querySelector("select:open")) zurApp(null); });
+}
+$("#karte").replaceChildren(lade("lese die Einstellungen …"));
+// Ollama-Suche läuft parallel im Hintergrund (kann im Container ein paar Sekunden dauern) – die Seite wartet nicht darauf
+const SUCHE_P = api("/api/einrichtung/suche").then((x) => { SUCHE = x; }).catch(() => { SUCHE = { kandidaten: [] }; });
+api("/api/einstellungen").then(async (e) => { E = e; $("#zum-dashboard").hidden = !E.eingerichtet || EINGEBETTET;
+  EINST = E.eingerichtet && location.hash !== "#assistent" && !/^#\d+$/.test(location.hash);
+  if (EINST) { document.title = "Einstellungen · Modellvergleich"; $("#titel").textContent = "Einstellungen"; $("#rahmen").classList.add("einst"); }
+  if (EINST) zeige(Math.max(1, SCHRITTE.findIndex((s) => s.id === location.hash.slice(1))));
+  else zeige((parseInt(location.hash.slice(1)) || 1) - 1); })
+  .catch((e) => $("#karte").replaceChildren(el("div", { class: "box fehler" }, "Server nicht erreichbar: " + e.message)));
+</script>
+</body>
+</html>

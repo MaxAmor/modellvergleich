@@ -1,0 +1,186 @@
+{
+  "meta": {
+    "schema": "modellvergleich.referenz/1",
+    "fach": "Englisch",
+    "fach_id": "englisch",
+    "version": "1.0"
+  },
+  "loesungen": [
+    {
+      "id": "e-01",
+      "max_punkte": 3,
+      "musterloesung": "1. went  2. didn't see  3. Did you enjoy",
+      "bewertungskriterien": [
+        {
+          "text": "went",
+          "punkte": 1
+        },
+        {
+          "text": "didn't see",
+          "punkte": 1
+        },
+        {
+          "text": "Did you enjoy",
+          "punkte": 1
+        }
+      ],
+      "bewertungen": [
+        {
+          "antwort_id": "e-01-a1",
+          "punkte": 3,
+          "referenz_feedback": "All correct."
+        },
+        {
+          "antwort_id": "e-01-a2",
+          "punkte": 0,
+          "referenz_feedback": "„go“ is irregular (went). After „did“ / „didn't“ use the base form: see, enjoy."
+        },
+        {
+          "antwort_id": "e-01-a3",
+          "punkte": 2,
+          "referenz_feedback": "1 and 3 are correct. Negatives need „didn't“ + base form."
+        }
+      ]
+    },
+    {
+      "id": "e-02",
+      "max_punkte": 4,
+      "musterloesung": "Example: On Monday it will be sunny and warm with 24 degrees. On Tuesday it will rain and it will be cooler (16 °C). On Wednesday it will be cloudy with 19 degrees, and on Thursday there will be a storm with only 14 degrees.",
+      "bewertungskriterien": [
+        {
+          "text": "Weather for the days correct",
+          "punkte": 2
+        },
+        {
+          "text": "Temperatures used",
+          "punkte": 1
+        },
+        {
+          "text": "Language mostly correct",
+          "punkte": 1
+        }
+      ],
+      "bewertungen": [
+        {
+          "antwort_id": "e-02-a1",
+          "punkte": 4,
+          "referenz_feedback": "Very good: all days, all temperatures, correct English."
+        },
+        {
+          "antwort_id": "e-02-a2",
+          "punkte": 0,
+          "referenz_feedback": "The task asks for English sentences. The content is right, but it is written in German."
+        },
+        {
+          "antwort_id": "e-02-a3",
+          "punkte": 2,
+          "referenz_feedback": "The weather is right, but temperatures are missing and the sentences have grammar mistakes (On Tuesday it rains / it is cloudy)."
+        }
+      ]
+    },
+    {
+      "id": "e-03",
+      "max_punkte": 4,
+      "musterloesung": "Bewertet werden: Anrede und Schluss (1), Inhalt zum Wochenende in Vergangenheit (2), eine Frage (1).",
+      "bewertungskriterien": [
+        {
+          "text": "greeting + ending",
+          "punkte": 1
+        },
+        {
+          "text": "weekend in past tense",
+          "punkte": 2
+        },
+        {
+          "text": "one question",
+          "punkte": 1
+        }
+      ],
+      "bewertungen": [
+        {
+          "antwort_id": "e-03-a1",
+          "punkte": 4,
+          "referenz_feedback": "Great e-mail: past tense, details, questions, good ending."
+        },
+        {
+          "antwort_id": "e-03-a2",
+          "punkte": 2,
+          "referenz_feedback": "Greeting and ending are there, but you used the present tense and there is no question."
+        },
+        {
+          "antwort_id": "e-03-a3",
+          "punkte": 3,
+          "referenz_feedback": "All parts are there, but the e-mail is much too short (fewer than 20 words)."
+        }
+      ]
+    },
+    {
+      "id": "e-04",
+      "max_punkte": 2,
+      "musterloesung": "1. If it rains tomorrow, we will stay at home.\n2. If you don't hurry, you will miss the bus.",
+      "bewertungskriterien": [
+        {
+          "text": "sentence 1",
+          "punkte": 1
+        },
+        {
+          "text": "sentence 2",
+          "punkte": 1
+        }
+      ],
+      "bewertungen": [
+        {
+          "antwort_id": "e-04-a1",
+          "punkte": 2,
+          "referenz_feedback": "Correct."
+        },
+        {
+          "antwort_id": "e-04-a2",
+          "punkte": 1,
+          "referenz_feedback": "In the if-part there is no „will“ – and the main clause needs „will“."
+        },
+        {
+          "antwort_id": "e-04-a3",
+          "punkte": 0,
+          "referenz_feedback": "Remember: if + simple present (it rains, you don't hurry), main clause with will."
+        }
+      ]
+    },
+    {
+      "id": "e-05",
+      "max_punkte": 3,
+      "musterloesung": "1. False – she has a little brother. 2. True. 3. False – she doesn't like maths, her favourite subject is art.",
+      "bewertungskriterien": [
+        {
+          "text": "1 false + correction",
+          "punkte": 1
+        },
+        {
+          "text": "2 true",
+          "punkte": 1
+        },
+        {
+          "text": "3 false + correction",
+          "punkte": 1
+        }
+      ],
+      "bewertungen": [
+        {
+          "antwort_id": "e-05-a1",
+          "punkte": 3,
+          "referenz_feedback": "Correct."
+        },
+        {
+          "antwort_id": "e-05-a2",
+          "punkte": 2,
+          "referenz_feedback": "The answers are right, but the false statements must be corrected."
+        },
+        {
+          "antwort_id": "e-05-a3",
+          "punkte": 1,
+          "referenz_feedback": "1 is wrong: Emma has a brother, not a sister."
+        }
+      ]
+    }
+  ]
+}

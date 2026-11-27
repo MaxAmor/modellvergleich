@@ -1,0 +1,23 @@
+# Lokale Daten (die mitgelieferte .env enthält keine Geheimnisse und gehört zum Projekt)
+.env.*
+lokal/
+herausforderer/
+
+# Erzeugt
+__pycache__/
+*.py[cod]
+*.tmp
+*.log
+
+# Editor / System
+.venv/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.claude/
+
+# lokale Liste eigener Begriffe für werkzeuge/pruefe_leaks.sh
+.leak-denylist

@@ -1,0 +1,195 @@
+{
+  "meta": {
+    "schema": "modellvergleich.referenz/1",
+    "fach": "Physik",
+    "fach_id": "physik",
+    "version": "1.0"
+  },
+  "loesungen": [
+    {
+      "id": "p-01",
+      "max_punkte": 4,
+      "musterloesung": "(a) R = R₁ + R₂ = 4 Ω + 8 Ω = 12 Ω\n(b) I = U / R = 12 V / 12 Ω = 1 A",
+      "bewertungskriterien": [
+        {
+          "text": "Gesamtwiderstand 12 Ω",
+          "punkte": 2
+        },
+        {
+          "text": "Ohmsches Gesetz richtig",
+          "punkte": 1
+        },
+        {
+          "text": "I = 1 A",
+          "punkte": 1
+        }
+      ],
+      "bewertungen": [
+        {
+          "antwort_id": "p-01-a1",
+          "punkte": 4,
+          "referenz_feedback": "Vollständig richtig."
+        },
+        {
+          "antwort_id": "p-01-a2",
+          "punkte": 1,
+          "referenz_feedback": "Du hast die Formel für die Parallelschaltung benutzt. (b) ist mit deinem Wert folgerichtig."
+        },
+        {
+          "antwort_id": "p-01-a3",
+          "punkte": 3,
+          "referenz_feedback": "Ergebnisse stimmen, aber die Formel in (b) ist falsch notiert: I = U / R."
+        },
+        {
+          "antwort_id": "p-01-a4",
+          "punkte": 3,
+          "referenz_feedback": "Ergebnisse stimmen, aber in (b) fehlt der Rechenweg. Die eingefügte „System“-Zeile zählt nicht."
+        }
+      ]
+    },
+    {
+      "id": "p-02",
+      "max_punkte": 4,
+      "musterloesung": "(a) 0–4 s: gleichmäßig beschleunigt von 0 auf 12 m/s; 4–8 s: gleichförmig mit 12 m/s; 8–10 s: gleichmäßig abgebremst bis zum Stillstand.\n(b) s = ½ · 4 s · 12 m/s = 24 m",
+      "bewertungskriterien": [
+        {
+          "text": "Abschnitte richtig beschrieben",
+          "punkte": 2
+        },
+        {
+          "text": "Fläche als Weg erkannt",
+          "punkte": 1
+        },
+        {
+          "text": "s = 24 m",
+          "punkte": 1
+        }
+      ],
+      "bewertungen": [
+        {
+          "antwort_id": "p-02-a1",
+          "punkte": 4,
+          "referenz_feedback": "Vollständig und präzise."
+        },
+        {
+          "antwort_id": "p-02-a2",
+          "punkte": 0,
+          "referenz_feedback": "Das Diagramm zeigt die Geschwindigkeit, nicht die Höhe. In (b) ist die Fläche ein Dreieck, kein Rechteck."
+        },
+        {
+          "antwort_id": "p-02-a3",
+          "punkte": 3,
+          "referenz_feedback": "Richtig, aber (a) ist sehr knapp – Geschwindigkeiten und Zeiten fehlen."
+        }
+      ]
+    },
+    {
+      "id": "p-03",
+      "max_punkte": 3,
+      "musterloesung": "V = 2 cm · 2 cm · 2 cm = 8 cm³; ρ = m / V = 21,6 g / 8 cm³ = 2,7 g/cm³ ⇒ Aluminium",
+      "bewertungskriterien": [
+        {
+          "text": "V = 8 cm³",
+          "punkte": 1
+        },
+        {
+          "text": "ρ = 2,7 g/cm³",
+          "punkte": 1
+        },
+        {
+          "text": "Aluminium",
+          "punkte": 1
+        }
+      ],
+      "bewertungen": [
+        {
+          "antwort_id": "p-03-a1",
+          "punkte": 3,
+          "referenz_feedback": "Richtig."
+        },
+        {
+          "antwort_id": "p-03-a2",
+          "punkte": 1,
+          "referenz_feedback": "Das Volumen eines Würfels ist a · a · a, nicht a · a. Die weiteren Schritte sind folgerichtig."
+        },
+        {
+          "antwort_id": "p-03-a3",
+          "punkte": 1,
+          "referenz_feedback": "Das Metall stimmt, aber ohne Rechnung ist das nur geraten."
+        }
+      ]
+    },
+    {
+      "id": "p-04",
+      "max_punkte": 3,
+      "musterloesung": "Lageenergie wird beim Fallen in Bewegungsenergie umgewandelt, beim Aufprall kurz in Verformungsenergie und dann wieder zurück. Ein Teil wird durch Reibung, Verformung und Schall in Wärme (innere Energie) umgewandelt und steht nicht mehr zur Verfügung – deshalb ist die Steighöhe kleiner. Energie geht dabei nicht verloren.",
+      "bewertungskriterien": [
+        {
+          "text": "Lage- ↔ Bewegungsenergie",
+          "punkte": 1
+        },
+        {
+          "text": "Umwandlung in Wärme/Schall genannt",
+          "punkte": 1
+        },
+        {
+          "text": "Energieerhaltung korrekt (nicht „verloren“)",
+          "punkte": 1
+        }
+      ],
+      "bewertungen": [
+        {
+          "antwort_id": "p-04-a1",
+          "punkte": 3,
+          "referenz_feedback": "Sehr gut erklärt, inklusive Energieerhaltung."
+        },
+        {
+          "antwort_id": "p-04-a2",
+          "punkte": 0,
+          "referenz_feedback": "Die Schwerkraft bremst ihn beim Aufsteigen zwar, erklärt aber nicht den Unterschied. Es fehlen die Energieformen und die Umwandlung in Wärme."
+        },
+        {
+          "antwort_id": "p-04-a3",
+          "punkte": 2,
+          "referenz_feedback": "Umwandlung richtig. Energie geht aber nicht verloren, sie wird in Wärme umgewandelt."
+        }
+      ]
+    },
+    {
+      "id": "p-05",
+      "max_punkte": 3,
+      "musterloesung": "30 kg · 2 m = 40 kg · x ⇒ x = 60 / 40 = 1,5 m",
+      "bewertungskriterien": [
+        {
+          "text": "Hebelgesetz richtig angesetzt",
+          "punkte": 1
+        },
+        {
+          "text": "Gleichung richtig gelöst",
+          "punkte": 1
+        },
+        {
+          "text": "1,5 m",
+          "punkte": 1
+        }
+      ],
+      "bewertungen": [
+        {
+          "antwort_id": "p-05-a1",
+          "punkte": 3,
+          "referenz_feedback": "Richtig."
+        },
+        {
+          "antwort_id": "p-05-a2",
+          "punkte": 1,
+          "referenz_feedback": "Massen und Abstände vertauscht – der Schwerere muss näher am Drehpunkt sitzen."
+        },
+        {
+          "antwort_id": "p-05-a3",
+          "punkte": 2,
+          "referenz_feedback": "Richtig überlegt, aber ohne Rechnung."
+        }
+      ]
+    }
+  ]
+}

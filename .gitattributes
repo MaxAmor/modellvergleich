@@ -1,0 +1,3 @@
+# einheitliche Zeilenenden, damit Skripte und .env auch nach einem Checkout unter Windows funktionieren
+* text=auto eol=lf
+*.png binary

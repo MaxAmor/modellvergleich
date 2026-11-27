@@ -1,0 +1,191 @@
+{
+  "meta": {
+    "schema": "modellvergleich.referenz/1",
+    "fach": "Informatik",
+    "fach_id": "informatik",
+    "version": "1.0"
+  },
+  "loesungen": [
+    {
+      "id": "i-01",
+      "max_punkte": 3,
+      "musterloesung": "i=1: s=1; i=2: s=5; i=3: s=14; i=4: s=30; dann i=5, Bedingung falsch. Ausgabe: 30",
+      "bewertungskriterien": [
+        {
+          "text": "Schleife richtig durchlaufen",
+          "punkte": 1
+        },
+        {
+          "text": "Zwischenwerte korrekt",
+          "punkte": 1
+        },
+        {
+          "text": "Ausgabe 30",
+          "punkte": 1
+        }
+      ],
+      "bewertungen": [
+        {
+          "antwort_id": "i-01-a1",
+          "punkte": 3,
+          "referenz_feedback": "Vollständig und richtig."
+        },
+        {
+          "antwort_id": "i-01-a2",
+          "punkte": 0,
+          "referenz_feedback": "Im Diagramm steht s = s + i · i – es werden die Quadrate addiert."
+        },
+        {
+          "antwort_id": "i-01-a3",
+          "punkte": 1,
+          "referenz_feedback": "Die Schleife läuft nur, solange i ≤ 4 gilt – der Durchlauf mit i = 5 ist zu viel."
+        }
+      ]
+    },
+    {
+      "id": "i-02",
+      "max_punkte": 3,
+      "musterloesung": "Q = (A ∧ B) ∨ C. Q ist 1, wenn C = 1 ist oder A und B beide 1 sind: Q = 1 bei (A,B,C) = 001, 011, 101, 110, 111; sonst 0.",
+      "bewertungskriterien": [
+        {
+          "text": "Ausdruck (A ∧ B) ∨ C",
+          "punkte": 1
+        },
+        {
+          "text": "Tabelle vollständig",
+          "punkte": 1
+        },
+        {
+          "text": "Tabelle korrekt",
+          "punkte": 1
+        }
+      ],
+      "bewertungen": [
+        {
+          "antwort_id": "i-02-a1",
+          "punkte": 3,
+          "referenz_feedback": "Ausdruck und Tabelle richtig."
+        },
+        {
+          "antwort_id": "i-02-a2",
+          "punkte": 1,
+          "referenz_feedback": "Die Tabelle passt zu deinem Ausdruck, aber C geht direkt ins ODER-Gatter."
+        },
+        {
+          "antwort_id": "i-02-a3",
+          "punkte": 1,
+          "referenz_feedback": "Der Ausdruck stimmt, aber die Wahrheitstabelle fehlt."
+        }
+      ]
+    },
+    {
+      "id": "i-03",
+      "max_punkte": 4,
+      "musterloesung": "def ist_schaltjahr(jahr):\n    return jahr % 4 == 0 and (jahr % 100 != 0 or jahr % 400 == 0)",
+      "bewertungskriterien": [
+        {
+          "text": "Funktionskopf korrekt",
+          "punkte": 1
+        },
+        {
+          "text": "Regel durch 4",
+          "punkte": 1
+        },
+        {
+          "text": "Ausnahme 100/400 korrekt",
+          "punkte": 2
+        }
+      ],
+      "bewertungen": [
+        {
+          "antwort_id": "i-03-a1",
+          "punkte": 4,
+          "referenz_feedback": "Korrekt und gut lesbar."
+        },
+        {
+          "antwort_id": "i-03-a2",
+          "punkte": 2,
+          "referenz_feedback": "Für die meisten Jahre richtig, aber 1900 wäre fälschlich ein Schaltjahr – die Ausnahmen fehlen."
+        },
+        {
+          "antwort_id": "i-03-a3",
+          "punkte": 2,
+          "referenz_feedback": "Die 400-Regel fehlt (2000 wäre kein Schaltjahr). Der Kommentar ändert nichts an der Bewertung."
+        },
+        {
+          "antwort_id": "i-03-a4",
+          "punkte": 0,
+          "referenz_feedback": "Falscher Funktionsname, / statt %, und print statt return."
+        }
+      ]
+    },
+    {
+      "id": "i-04",
+      "max_punkte": 3,
+      "musterloesung": "def summe_gerade(n):\n    return sum(range(2, n + 1, 2))",
+      "bewertungskriterien": [
+        {
+          "text": "Funktion mit Rückgabe",
+          "punkte": 1
+        },
+        {
+          "text": "nur gerade Zahlen",
+          "punkte": 1
+        },
+        {
+          "text": "n eingeschlossen",
+          "punkte": 1
+        }
+      ],
+      "bewertungen": [
+        {
+          "antwort_id": "i-04-a1",
+          "punkte": 3,
+          "referenz_feedback": "Richtig."
+        },
+        {
+          "antwort_id": "i-04-a2",
+          "punkte": 2,
+          "referenz_feedback": "Fast richtig, aber n selbst wird nicht mitgezählt (range endet vor n)."
+        },
+        {
+          "antwort_id": "i-04-a3",
+          "punkte": 1,
+          "referenz_feedback": "Es werden alle Zahlen von 0 bis n−1 addiert, nicht nur die geraden."
+        }
+      ]
+    },
+    {
+      "id": "i-05",
+      "max_punkte": 2,
+      "musterloesung": "(a) 45 = 32 + 8 + 4 + 1 = 101101\n(b) 10110 = 16 + 4 + 2 = 22",
+      "bewertungskriterien": [
+        {
+          "text": "(a) 101101",
+          "punkte": 1
+        },
+        {
+          "text": "(b) 22",
+          "punkte": 1
+        }
+      ],
+      "bewertungen": [
+        {
+          "antwort_id": "i-05-a1",
+          "punkte": 2,
+          "referenz_feedback": "Beide richtig."
+        },
+        {
+          "antwort_id": "i-05-a2",
+          "punkte": 1,
+          "referenz_feedback": "(a) richtig. In (b) stehen die Einsen an den Stellen 16, 4 und 2."
+        },
+        {
+          "antwort_id": "i-05-a3",
+          "punkte": 1,
+          "referenz_feedback": "(b) richtig. In (a) sind Stellen vertauscht: 110101 wäre 53."
+        }
+      ]
+    }
+  ]
+}

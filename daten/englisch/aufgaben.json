@@ -1,0 +1,136 @@
+{
+  "meta": {
+    "schema": "modellvergleich.aufgaben/1",
+    "fach": "Englisch",
+    "fach_id": "englisch",
+    "sprache": "de",
+    "version": "1.0",
+    "lizenz": "CC BY 4.0",
+    "hinweis": "Ausgedachte Demo-Daten. Alle Personen und Antworten sind erfunden."
+  },
+  "aufgaben": [
+    {
+      "id": "e-01",
+      "thema": "Simple past",
+      "klasse": "7-8",
+      "aufgabentyp": "kurz",
+      "aufgabe": "Put the verbs into the simple past:\n1. Yesterday I (go) to the cinema.\n2. We (not / see) the beginning of the film.\n3. (you / enjoy) the popcorn?",
+      "hinweis": "Watch out for irregular verbs and questions with did.",
+      "max_punkte": 3,
+      "schuelerantworten": [
+        {
+          "id": "e-01-a1",
+          "antwort": "1. went 2. didn't see 3. Did you enjoy the popcorn?"
+        },
+        {
+          "id": "e-01-a2",
+          "antwort": "1. goed 2. didn't saw 3. Did you enjoyed"
+        },
+        {
+          "id": "e-01-a3",
+          "antwort": "1. went 2. not saw 3. Did you enjoy"
+        }
+      ]
+    },
+    {
+      "id": "e-02",
+      "thema": "Describing a picture",
+      "klasse": "7-8",
+      "aufgabentyp": "text",
+      "aufgabe": "Look at the weather forecast in the picture. Write three to four sentences in English about the weather this week.",
+      "hinweis": "Use the days and temperatures from the picture.",
+      "max_punkte": 4,
+      "abbildungen": [
+        {
+          "id": "abb1",
+          "datei": "bilder/e-02-1.png",
+          "beschreibung": "Wettervorhersage mit vier Karten nebeneinander: Monday – Sonne, 24 °C; Tuesday – graue Wolke mit Regentropfen, 16 °C; Wednesday – graue Wolke, 19 °C; Thursday – graue Wolke mit gelbem Blitz, 14 °C."
+        }
+      ],
+      "schuelerantworten": [
+        {
+          "id": "e-02-a1",
+          "antwort": "On Monday it is sunny and 24 degrees. On Tuesday it rains and it is 16 degrees. Wednesday is cloudy with 19 degrees. On Thursday there is a thunderstorm and it is only 14 degrees."
+        },
+        {
+          "id": "e-02-a2",
+          "antwort": "Am Montag ist es sonnig und 24 Grad, am Dienstag regnet es, am Mittwoch ist es bewölkt und am Donnerstag gibt es ein Gewitter.",
+          "falle": "falsche Sprache"
+        },
+        {
+          "id": "e-02-a3",
+          "antwort": "The weather is good on Monday. On Tuesday is rain. Wednesday is cloud. Thursday storm."
+        }
+      ]
+    },
+    {
+      "id": "e-03",
+      "thema": "Short e-mail",
+      "klasse": "8-9",
+      "aufgabentyp": "text",
+      "aufgabe": "Write a short e-mail (50–70 words) to your English pen friend Sam. Tell Sam about your last weekend and ask one question.",
+      "hinweis": "Greeting, what you did, a question, ending.",
+      "max_punkte": 4,
+      "schuelerantworten": [
+        {
+          "id": "e-03-a1",
+          "antwort": "Hi Sam,\nlast weekend I visited my grandparents in the mountains. We went hiking on Saturday and on Sunday we made a big barbecue. It was really fun, but my legs hurt a lot! What did you do at the weekend? Did you play football again?\nBest wishes,\nJonas"
+        },
+        {
+          "id": "e-03-a2",
+          "antwort": "Hello Sam, I go to the swimming pool on Saturday and I play computer games on Sunday. Bye"
+        },
+        {
+          "id": "e-03-a3",
+          "antwort": "Dear Sam, last weekend I watched a film. How are you? See you, Mia"
+        }
+      ]
+    },
+    {
+      "id": "e-04",
+      "thema": "If-clauses (type 1)",
+      "klasse": "8-9",
+      "aufgabentyp": "kurz",
+      "aufgabe": "Complete the sentences (if-clause type 1):\n1. If it (rain) tomorrow, we (stay) at home.\n2. If you (not hurry), you (miss) the bus.",
+      "hinweis": "If + simple present, will + infinitive",
+      "max_punkte": 2,
+      "schuelerantworten": [
+        {
+          "id": "e-04-a1",
+          "antwort": "1. If it rains tomorrow, we will stay at home. 2. If you don't hurry, you will miss the bus."
+        },
+        {
+          "id": "e-04-a2",
+          "antwort": "1. If it will rain tomorrow, we stay at home. 2. If you don't hurry, you will miss the bus."
+        },
+        {
+          "id": "e-04-a3",
+          "antwort": "1. If it rain, we will stay 2. If you not hurry, you miss"
+        }
+      ]
+    },
+    {
+      "id": "e-05",
+      "thema": "Reading: true or false",
+      "klasse": "7-8",
+      "aufgabentyp": "kurz",
+      "aufgabe": "Read the text and decide: true or false? Correct the false statements.\nText: „Emma lives in Leeds with her parents and her little brother. She goes to school by bus. Her favourite subject is art, but she doesn't like maths.“\n1. Emma has a sister.\n2. Emma goes to school by bus.\n3. Emma likes maths.",
+      "hinweis": "Correct the false sentences with information from the text.",
+      "max_punkte": 3,
+      "schuelerantworten": [
+        {
+          "id": "e-05-a1",
+          "antwort": "1. false – she has a brother 2. true 3. false – she doesn't like maths"
+        },
+        {
+          "id": "e-05-a2",
+          "antwort": "1. false 2. true 3. false"
+        },
+        {
+          "id": "e-05-a3",
+          "antwort": "1. true 2. true 3. false – she likes art"
+        }
+      ]
+    }
+  ]
+}

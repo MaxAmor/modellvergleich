@@ -1,0 +1,1969 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Modellvergleich</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23141a2e'/%3E%3Cpath d='M16 44V30M28 44V20M40 44V26M52 44V14' stroke='white' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+[hidden]{display:none !important}
+:root{
+  --ink:#0f1420; --ink-2:#4a5263; --ink-3:#7c8496;
+  --glas:rgba(255,255,255,.58); --glas-2:rgba(255,255,255,.78); --kante:rgba(255,255,255,.8); --linie:rgba(20,30,60,.09);
+  --good:#0f9d58; --warn:#e8a200; --crit:#d93838; --c1:#2a78d6;
+  --good-bg:rgba(15,157,88,.12); --warn-bg:rgba(232,162,0,.14); --crit-bg:rgba(217,56,56,.11);
+  --r:22px; --schatten:inset 0 1px 0 rgba(255,255,255,.9),0 10px 34px rgba(30,40,80,.10);
+  --mono:ui-monospace,"JetBrains Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  font-family:Inter,"SF Pro Display","Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{background:#e8ecf3}
+body{margin:0;color:var(--ink);font-size:16px;line-height:1.45;min-height:100vh;
+  background:radial-gradient(1100px 760px at 6% -8%,#c8dbff 0,transparent 62%),radial-gradient(900px 700px at 102% 4%,#ecd8ff 0,transparent 58%),
+  radial-gradient(1000px 800px at 55% 118%,#cdf1e2 0,transparent 60%),radial-gradient(700px 600px at -6% 90%,#ffe3cf 0,transparent 60%),#e8ecf3;background-attachment:fixed}
+button,select,textarea,input{font:inherit;color:inherit}
+svg.i{width:1.1em;height:1.1em;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none;vertical-align:-.18em}
+.glas{background:var(--glas);backdrop-filter:blur(26px) saturate(180%);-webkit-backdrop-filter:blur(26px) saturate(180%);border:1px solid var(--kante);border-radius:var(--r);box-shadow:var(--schatten)}
+.wrap{width:min(1600px,100% - 40px);margin:0 auto}
+header{padding:14px 0 16px}
+.leiste{display:flex;align-items:center;gap:12px;flex-wrap:nowrap}
+.leiste > *{flex:none}.leiste > .gruppe{flex:0 1 auto;min-width:0}
+.ds-wahl{min-width:0;display:flex;align-items:center;gap:8px}
+#ds{padding-right:14px}
+.leiste h1{font-size:22px}
+.leiste .logo{width:40px;height:40px;border-radius:12px}
+.leiste .tabs{padding:4px}
+.leiste .tab{padding:8px 16px;font-size:15px}
+.titel{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;margin-right:6px}
+.leiste .rechts{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:nowrap}
+.gruppe{display:flex;align-items:center;gap:10px;padding:4px 14px 4px 14px;border-radius:999px;font-size:13.5px;color:var(--ink-2);min-height:46px;white-space:nowrap}
+.gruppe .trenner,.gpu .trenner{width:1px;height:22px;background:var(--linie);flex:none}
+.gruppe.sys{padding-right:16px}
+.gruppe.sys b{color:var(--ink)}
+.gpu{display:inline-flex;align-items:center;gap:10px;white-space:nowrap}
+.rund{width:46px;height:46px;flex:none;border-radius:50%;display:grid;place-items:center;color:var(--ink-2);text-decoration:none}
+.rund:hover{color:var(--ink);background:#fff}
+.rund svg{width:20px;height:20px}
+.zwei.einzeln{grid-template-columns:1fr}
+.zwei.einzeln > :last-child{display:none}
+.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(145deg,#1d2640,#0e1322);display:grid;place-items:center;flex:none}
+.logo svg{width:24px;height:24px;stroke:#fff;stroke-width:2.6;fill:none;stroke-linecap:round}
+h1{font-size:26px;margin:0;letter-spacing:-.02em}
+.chips{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.punkt{width:9px;height:9px;border-radius:50%;background:var(--ink-3)}
+.punkt.an{background:var(--good)}.punkt.aus{background:var(--crit)}
+.schalter{display:inline-flex;align-items:center;gap:9px;cursor:pointer;user-select:none}
+.schalter input{position:absolute;opacity:0;width:1px;height:1px}
+.toggle{width:40px;height:23px;border-radius:12px;background:#c3c9d4;position:relative;flex:none;transition:background .2s}
+.toggle::after{content:"";position:absolute;top:2.5px;left:2.5px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .2s}
+.schalter input:checked + .toggle,.wz-schalter input:checked + .toggle{background:var(--good)}
+.schalter input:checked + .toggle::after,.wz-schalter input:checked + .toggle::after{left:19.5px}
+.schalter input:focus-visible + .toggle,.wz-schalter input:focus-visible + .toggle{outline:2px solid var(--c1);outline-offset:2px}
+.tabs{display:flex;gap:4px;padding:5px}
+.tab{border:0;background:transparent;padding:9px 18px;border-radius:14px;font-weight:650;font-size:16px;cursor:pointer;color:var(--ink-2)}
+.tab[aria-selected=true]{background:var(--ink);color:#fff}
+.ds-wahl{display:flex;align-items:center;gap:10px}
+.ds-wahl span{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
+.ds-wahl select{border:0;background:rgba(255,255,255,.75);border-radius:999px;padding:6px 10px;max-width:260px;cursor:pointer;font-size:14px}
+select,input[type=text],input[type=search],input[type=number],input[type=url],input[type=password],textarea{padding:9px 12px;border-radius:12px;border:1px solid var(--linie);background:#fff;font-size:15px}
+.knopf{border:1px solid var(--kante);background:var(--glas-2);padding:8px 14px;border-radius:13px;font-weight:600;font-size:15px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;box-shadow:0 1px 3px rgba(30,40,80,.06);text-decoration:none;color:var(--ink)}
+.knopf:hover{background:#fff}
+.knopf.primaer{background:var(--ink);border-color:var(--ink);color:#fff;box-shadow:0 6px 18px rgba(15,20,32,.25)}
+.knopf.primaer:hover{background:#262d40}
+.knopf:disabled{opacity:.45;cursor:not-allowed}
+.knopf.klein{padding:5px 10px;font-size:13.5px}
+.leer{color:var(--ink-3)}
+.etikett{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:12px 0 6px}
+.etikett:first-child{margin-top:0}
+.klein{font-size:13.5px;color:var(--ink-3)}
+.box{border-radius:14px;padding:10px 14px;font-size:14.5px}
+.box.warn{background:var(--warn-bg);color:#6b4800}.box.ok{background:var(--good-bg);color:#0b5c35}.box.fehler{background:var(--crit-bg);color:#8f1f1f}.box.info{background:rgba(42,120,214,.10);color:#174a87}
+.swatch{width:11px;height:11px;border-radius:4px;background:var(--farbe,#999);display:inline-block;flex:none}
+.seite{display:none}.seite.aktiv{display:block}
+.zwei{display:grid;grid-template-columns:minmax(300px,380px) 1fr;gap:16px;align-items:start}
+@media (max-width:1000px){.zwei{grid-template-columns:1fr}}
+.panel{padding:18px 20px}
+.chips-w{display:flex;flex-wrap:wrap;gap:6px}
+.wchip{display:inline-flex;gap:7px;align-items:center;padding:6px 12px;border-radius:999px;background:var(--glas-2);border:1.5px solid transparent;font-size:14px;cursor:pointer;user-select:none}
+.wchip.an{border-color:var(--ink);background:#fff;font-weight:600}
+.wchip input{display:none}
+.fortschritt{height:8px;border-radius:5px;background:rgba(20,30,60,.08);overflow:hidden;margin-top:6px}
+.fortschritt i{display:block;height:100%;background:var(--good);transition:width .3s}
+.leerzustand{padding:40px 24px;text-align:center;color:var(--ink-2)}
+.leerzustand b{display:block;font-size:19px;color:var(--ink);margin-bottom:6px}
+/* Rangliste */
+table.rang{width:100%;border-collapse:collapse;font-size:15px;font-variant-numeric:tabular-nums}
+.rang th,.rang td{padding:9px 10px;border-bottom:1px solid var(--linie);text-align:right;white-space:nowrap}
+.rang th:nth-child(-n+2),.rang td:nth-child(-n+2){text-align:left}
+.rang th{color:var(--ink-3);font-weight:600;font-size:13px}
+.nm{display:inline-flex;align-items:center;gap:7px}
+.marke{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:rgba(20,30,60,.07);color:var(--ink-3)}
+.marke.vorl{background:var(--warn-bg);color:#7a5200}
+.balken{display:inline-flex;align-items:center;gap:8px;justify-content:flex-end}
+.balken i{display:inline-block;height:8px;border-radius:4px;background:var(--good)}
+.weg{border:0;background:none;cursor:pointer;color:var(--ink-3);padding:2px 4px}
+.weg:hover{color:var(--crit)}
+/* Chat */
+.chat{display:flex;flex-direction:column;height:calc(100vh - 150px);min-height:520px;padding:0;overflow:hidden}
+.verlauf{flex:1;overflow-y:auto;padding:20px 22px;display:flex;flex-direction:column;gap:14px}
+.eingabe{border-top:1px solid var(--linie);padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.eingabe .zeile{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.eingabe textarea{flex:1;resize:none;min-height:46px;max-height:200px}
+.blase{max-width:860px;padding:12px 15px;border-radius:16px;font-size:15.5px;white-space:pre-wrap;word-wrap:break-word}
+.blase.du{align-self:flex-end;background:var(--ink);color:#fff;border-bottom-right-radius:6px}
+.blase.ki{align-self:flex-start;background:#fff;border-bottom-left-radius:6px;box-shadow:0 1px 3px rgba(30,40,80,.06)}
+.ki-kopf{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:700;color:var(--ink-2);margin-bottom:4px;white-space:normal}
+.ki-kopf .rechts{margin-left:auto;font-weight:500;color:var(--ink-3)}
+.gedanken{font-size:13.5px;color:var(--ink-3);border-left:3px solid rgba(20,30,60,.12);padding-left:9px;margin-bottom:6px;max-height:160px;overflow-y:auto}
+.vergleich{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;align-self:stretch}
+.vergleich .blase{max-width:none}
+.bewertung{align-self:stretch;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.bw{background:#fff;border-radius:16px;padding:12px 15px;box-shadow:0 1px 3px rgba(30,40,80,.06);font-size:14.5px;display:flex;flex-direction:column;gap:6px}
+.bw .note{display:flex;align-items:baseline;gap:10px}
+.bw .note b{font-size:28px;letter-spacing:-.02em}
+.urteil{font-size:12.5px;font-weight:700;padding:2px 9px;border-radius:999px}
+.urteil.ok{background:var(--good-bg);color:#0b7a44}.urteil.fast{background:var(--warn-bg);color:#7a5200}.urteil.nein{background:var(--crit-bg);color:#a62828}
+.schritte{font-size:12.5px;color:var(--ink-3)}
+.auftrag{align-self:stretch;background:rgba(42,120,214,.08);border-radius:16px;padding:12px 15px;font-size:14.5px;white-space:pre-wrap}
+.auftrag b{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#174a87;margin-bottom:4px}
+.antw-liste{display:flex;flex-direction:column;gap:6px;max-height:300px;overflow-y:auto}
+.antw{display:flex;gap:9px;padding:9px 11px;border-radius:12px;background:var(--glas-2);border:1.5px solid transparent;cursor:pointer;font-size:14px}
+.antw.an{border-color:var(--ink);background:#fff}
+.antw input{margin-top:3px;accent-color:var(--ink)}
+.antw .t{flex:1;white-space:pre-wrap;max-height:66px;overflow:hidden}
+.antw small{color:var(--ink-3);white-space:nowrap}
+.aufgabentext{font-size:14px;background:var(--glas-2);border-radius:12px;padding:10px 12px;white-space:pre-wrap;max-height:180px;overflow-y:auto}
+/* Daten */
+.abb{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.abb figure{margin:0;flex:1 1 140px;max-width:260px;background:#fff;border-radius:12px;padding:6px;border:1px solid var(--linie)}
+.abb img{width:100%;max-height:170px;object-fit:contain;border-radius:8px;cursor:zoom-in;display:block}
+.abb.kompakt figure{max-width:none;padding:4px}
+.abb.kompakt img{max-height:150px}
+.abb figcaption{font-size:11.5px;color:var(--ink-3);margin-top:4px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;white-space:normal}
+.ablage{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;padding:22px 14px;border-radius:16px;border:2px dashed rgba(20,30,60,.18);background:rgba(255,255,255,.55);cursor:pointer;transition:all .15s;min-height:128px}
+.ablage:hover,.ablage:focus-visible{border-color:var(--c1);background:rgba(42,120,214,.06);outline:none}
+.ablage.drueber{border-color:var(--c1);background:rgba(42,120,214,.12);transform:scale(1.01)}
+.ablage .ab-ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:rgba(42,120,214,.12);color:var(--c1);margin-bottom:4px}
+.ablage .ab-ic svg{width:20px;height:20px}
+.ablage b{font-size:15px}.ablage small{font-size:13px;color:var(--ink-3)}
+.status-karte{display:flex;flex-direction:column;gap:8px;margin-top:10px;padding:13px 14px;border-radius:14px;font-size:14px}
+.status-karte b{font-size:15px}
+.status-karte small{font-size:13px;opacity:.85}
+.status-karte.warn{background:var(--warn-bg);color:#6b4800;border:1px solid rgba(232,162,0,.35)}
+.status-karte.ok{background:var(--good-bg);color:#0b5c35;border:1px solid rgba(15,157,88,.3)}
+.status-karte.fehler{background:var(--crit-bg);color:#8f1f1f;border:1px solid rgba(217,56,56,.3)}
+.warte-z{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.warte-z .fach{font-weight:700;margin-right:auto}
+.tag-k.fehlt{background:#fff;color:#a62828;border:1px dashed rgba(217,56,56,.5)}
+.tag-k{font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,.7);color:var(--ink-3)}
+.tag-k.ok{color:#0b7a44}
+.format{margin-top:14px}.format summary{cursor:pointer;font-size:13.5px;color:var(--ink-2);font-weight:600}
+.ds-karten{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.ds-k{padding:14px 16px;border-radius:16px;background:var(--glas-2);border:1.5px solid transparent;cursor:pointer;display:flex;flex-direction:column;gap:4px}
+.ds-k.an{border-color:var(--ink);background:#fff}
+.ds-k small{color:var(--ink-2)}
+.aufgabe-k{padding:14px 16px;border-radius:16px;background:var(--glas-2);margin-bottom:8px}
+.aufgabe-k summary{cursor:pointer;display:flex;gap:10px;align-items:center;list-style:none}
+.aufgabe-k summary::-webkit-details-marker{display:none}
+.aufgabe-k summary .id{font-family:var(--mono);font-size:13px;color:var(--ink-3)}
+.aufgabe-k .inhalt{margin-top:10px;display:grid;gap:8px;font-size:14.5px}
+.feld-t{white-space:pre-wrap;background:#fff;border-radius:12px;padding:9px 12px}
+.feld-t b{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin-bottom:3px}
+code{font-family:var(--mono);font-size:13px;background:rgba(20,30,60,.06);padding:1px 6px;border-radius:6px}
+main{padding-bottom:20px}
+.gpu svg{width:90px;height:22px}
+@media (max-width:1760px){.gpu svg,.gpu .trenner{display:none}.ds-wahl > span{display:none}}
+@media (max-width:1480px){.leiste .titel h1{display:none}#ds selectedcontent .ds-n{display:none}}
+@media (max-width:1240px){.leiste .tab{padding:8px 11px;font-size:14px}.leiste{gap:8px}#gpu-text .zusatz{display:none}}
+@media (max-width:1000px){.leiste{flex-wrap:wrap}}
+.gpu .ln{fill:none;stroke:var(--good);stroke-width:1.6}.gpu .fl{fill:rgba(15,157,88,.13)}.gpu .vr{fill:none;stroke:var(--c1);stroke-width:1.4;stroke-dasharray:3 2}
+.gpu b{font-variant-numeric:tabular-nums}
+.drei{display:grid;grid-template-columns:330px minmax(0,1fr) 290px;gap:16px;align-items:start}
+@media (max-width:1350px){.drei{grid-template-columns:320px minmax(0,1fr)}.drei .ablauf{grid-column:1/-1}}
+@media (max-width:900px){.drei{grid-template-columns:1fr}}
+.links,.ablauf{height:calc(100vh - 150px);min-height:520px;overflow-y:auto}
+.links{display:flex;flex-direction:column;padding:0;overflow:hidden}
+.cl-kopf{display:flex;align-items:center;gap:6px;padding:12px 12px;border-bottom:1px solid var(--linie)}
+.cl-select{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-height:40px}
+.cl-select selectedcontent{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
+.cl-select{flex:1;min-width:0;border:0;background:rgba(255,255,255,.85);border-radius:12px;padding:9px 10px;font-weight:600;font-size:14.5px;cursor:pointer}
+.cl-pfeil{width:34px;height:34px;flex:none;border:0;border-radius:10px;background:rgba(255,255,255,.7);font-size:20px;line-height:1;cursor:pointer;color:var(--ink-2)}
+.cl-pfeil:hover{background:#fff;color:var(--ink)}
+.cl-mitte{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.cl-meta{display:flex;align-items:center;font-size:12.5px;font-weight:600;color:var(--ink-3);letter-spacing:.02em}
+.cl-text{white-space:pre-wrap;font-size:15px;line-height:1.5;max-height:9.2em;overflow:hidden;-webkit-mask-image:linear-gradient(#000 70%,transparent)}
+.cl-text.offen{max-height:none;-webkit-mask-image:none}
+.cl-link{border:0;background:none;padding:0;color:var(--c1);font-weight:600;font-size:13px;cursor:pointer;align-self:flex-start}
+.cl-hinweis summary{cursor:pointer;font-size:13px;color:var(--ink-2);font-weight:600}
+.cl-hinweis div{font-size:13.5px;color:var(--ink-2);margin-top:4px}
+.cl-titel{font-size:13px;font-weight:700;color:var(--ink-2);margin-top:6px}
+.cl-antworten{display:flex;flex-direction:column;gap:6px}
+.cl-noten{display:grid;grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:6px}
+.cl-note{display:flex;flex-direction:column;align-items:flex-start;gap:1px;border:1.5px solid transparent;border-radius:12px;padding:8px 10px;cursor:pointer;text-align:left;background:rgba(255,255,255,.7)}
+.cl-note small{font-size:11.5px;color:var(--ink-3)}
+.cl-note b{font-size:14.5px}
+.cl-note.n1 b{color:#0b7a44}.cl-note.n3 b{color:#8a5d00}.cl-note.n5 b{color:#a62828}
+.cl-note .falle{color:#a62828;font-weight:700}
+.cl-note:hover{background:#fff}
+.cl-note.an{border-color:var(--ink);background:#fff}
+.cl-antw{display:flex;align-items:flex-start;gap:10px;text-align:left;width:100%;border:1.5px solid transparent;background:rgba(255,255,255,.7);border-radius:12px;padding:10px 11px;cursor:pointer;font-size:14px}
+.cl-antw:hover{background:#fff}
+.cl-antw.an{background:#fff;border-color:var(--ink)}
+.cl-antw .t{flex:1;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.cl-radio{width:16px;height:16px;border-radius:50%;border:2px solid rgba(20,30,60,.25);flex:none;margin-top:2px}
+.cl-antw.an .cl-radio{border:5px solid var(--ink)}
+.cl-ref{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.cl-ref.n1{background:var(--good-bg);color:#0b7a44}.cl-ref.n3{background:var(--warn-bg);color:#7a5200}.cl-ref.n5{background:var(--crit-bg);color:#a62828}
+.cl-fuss{padding:12px 14px 14px;border-top:1px solid var(--linie);display:flex;flex-direction:column;gap:9px;background:rgba(255,255,255,.45)}
+.cl-los{width:100%;justify-content:center;padding:11px}
+.drei.ohne-links{grid-template-columns:minmax(0,1fr) 290px}
+.drei.ohne-links .links{display:none}
+@media (max-width:1350px){.drei.ohne-links{grid-template-columns:1fr}.links,.ablauf{height:auto;max-height:none}}
+.fach-chips{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.fach-chips button{border:0;background:var(--glas-2);padding:4px 11px;border-radius:999px;font-size:13px;cursor:pointer;color:var(--ink-2)}
+.fach-chips button.an{background:var(--ink);color:#fff}
+.aufg-liste{display:flex;flex-direction:column;gap:3px;max-height:190px;overflow-y:auto;padding:2px}
+.aufg{display:flex;flex-direction:column;align-items:flex-start;gap:1px;border:0;background:transparent;text-align:left;padding:7px 10px;border-radius:11px;cursor:pointer}
+.aufg:hover{background:var(--glas-2)}
+.aufg.an{background:#fff;box-shadow:0 1px 4px rgba(30,40,80,.10)}
+.aufg b{font-size:14px;font-weight:600}.aufg small{font-size:12px;color:var(--ink-3);font-family:var(--mono)}
+.aufg-karte{background:#fff;border-radius:14px;padding:11px 13px;margin-top:8px;font-size:14px}
+.aufg-karte .txt{white-space:pre-wrap;max-height:150px;overflow-y:auto}
+.badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px}
+.badge{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:rgba(20,30,60,.07);color:var(--ink-2)}
+.antw-k{display:flex;flex-direction:column;gap:5px;padding:9px 11px;border-radius:13px;background:var(--glas-2);border:1.5px solid transparent;cursor:pointer;font-size:14px;text-align:left;width:100%}
+.antw-k:hover{background:#fff}
+.antw-k.an{border-color:var(--ink);background:#fff}
+.antw-k .t{white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.antw-k .kopf{display:flex;gap:6px;align-items:center}
+.ref{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;margin-left:auto}
+.ref.n1{background:var(--good-bg);color:#0b7a44}.ref.n3{background:var(--warn-bg);color:#7a5200}.ref.n5{background:var(--crit-bg);color:#a62828}
+.seg{display:flex;background:rgba(20,30,60,.06);border-radius:12px;padding:3px;gap:2px}
+.seg button{flex:1;border:0;background:transparent;padding:7px 6px;border-radius:9px;font-size:13px;font-weight:600;color:var(--ink-2);cursor:pointer}
+.seg button.an{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(30,40,80,.12)}
+.ablauf h3{margin:0 0 2px;font-size:16px}
+.ablauf .kopfzeile{display:flex;align-items:center;gap:7px;font-size:13.5px;color:var(--ink-2);margin:2px 0 6px}
+.steckbrief{display:flex;flex-wrap:wrap;gap:4px;margin:0 0 12px}
+.steckbrief span{font-size:11.5px;padding:2px 8px;border-radius:999px;background:rgba(20,30,60,.07);color:var(--ink-2)}
+.flow{display:flex;flex-direction:column;padding:4px 6px 4px 0}
+.knoten{position:relative;background:#fff;border:1.5px solid rgba(20,30,60,.10);border-radius:14px;padding:10px 12px;box-shadow:0 2px 10px rgba(30,40,80,.06);animation:auf .35s ease both}
+.knoten .reihe{display:flex;align-items:center;gap:10px}
+.knoten .ic{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;flex:none;background:color-mix(in srgb,var(--nf) 14%,white);color:var(--nf)}
+.knoten .ic svg{width:17px;height:17px}
+.knoten .t{flex:1;min-width:0}
+.knoten b{font-size:14px;display:block;line-height:1.25}
+.knoten .sub{font-size:12.5px;color:var(--ink-2);overflow-wrap:anywhere}
+.knoten .sek{font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap;align-self:flex-start;margin-top:2px}
+.knoten.laeuft{border-color:var(--c1);animation:auf .35s ease both,puls 1.6s ease-in-out infinite}
+.knoten.fehler{border-color:var(--crit)}
+.knoten.aus{background:transparent;box-shadow:none;border-style:dashed;opacity:.6;padding:7px 12px}
+.knoten.aus .ic{width:24px;height:24px;border-radius:7px}.knoten.aus .ic svg{width:13px;height:13px}
+.knoten.fertig::after{content:"";position:absolute;top:-7px;right:-7px;width:18px;height:18px;border-radius:50%;background:var(--good) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/11px no-repeat;box-shadow:0 0 0 2px #fff}
+.knoten.fehler::after{content:"!";position:absolute;top:-7px;right:-7px;width:18px;height:18px;border-radius:50%;background:var(--crit);color:#fff;font-size:12px;font-weight:800;display:grid;place-items:center;box-shadow:0 0 0 2px #fff}
+.knoten.klickbar{cursor:pointer;transition:transform .12s,box-shadow .12s}
+.knoten.klickbar:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(30,40,80,.12)}
+.knoten .pfeil{color:var(--ink-3);font-size:18px;line-height:1;opacity:0;transition:opacity .12s;align-self:center}
+.knoten.klickbar:hover .pfeil{opacity:1}
+.fenster{border:0;padding:0;border-radius:22px;width:min(680px,92vw);max-height:86vh;background:rgba(255,255,255,.92);backdrop-filter:blur(26px) saturate(180%);-webkit-backdrop-filter:blur(26px) saturate(180%);box-shadow:0 24px 70px rgba(15,20,40,.30);color:var(--ink)}
+.fenster::backdrop{background:rgba(15,20,40,.28);backdrop-filter:blur(3px)}
+.fenster[open]{animation:auf .2s ease both;display:flex;flex-direction:column}
+.fenster .f-kopf{display:flex;align-items:center;gap:12px;padding:18px 20px 12px;border-bottom:1px solid var(--linie)}
+.fenster .f-kopf .ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--nf) 14%,white);color:var(--nf)}
+.fenster .f-kopf .ic svg{width:20px;height:20px}
+.fenster h2{margin:0;font-size:19px}
+.fenster .f-kopf small{color:var(--ink-2);font-size:13.5px}
+.fenster .zu{margin-left:auto;border:0;background:rgba(20,30,60,.06);width:34px;height:34px;border-radius:50%;cursor:pointer;display:grid;place-items:center;color:var(--ink-2)}
+.fenster .zu:hover{background:rgba(20,30,60,.12);color:var(--ink)}
+.fenster .f-inhalt{padding:16px 20px 20px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+.fenster .kv{font-size:14px;padding:10px 14px;gap:5px 16px}
+.fenster pre{font-family:var(--mono);font-size:12.5px;background:#141a2e;color:#e8ecf3;padding:12px 14px;border-radius:12px;max-height:340px;overflow:auto;white-space:pre-wrap;margin:6px 0 0}
+.im-quellen{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.kg-logo{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:6px;background:#20beff;color:#fff;font-weight:800;font-size:13px;line-height:1}
+.ew-kopf{display:flex;align-items:baseline;gap:12px;margin-bottom:12px}.ew-kopf h2{margin:0;font-size:20px}
+.ew-leiste{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:12px;padding:8px 12px;margin-bottom:10px;border-radius:14px;background:rgba(255,255,255,.85);backdrop-filter:blur(12px);border:1px solid var(--linie);transition:background .15s,border-color .15s}
+.ew-leiste.aktiv{background:#eef5ff;border-color:rgba(42,120,214,.35)}
+.ew-suche{flex:0 1 300px;min-width:140px;padding:7px 12px !important;font-size:14px !important;border-radius:10px !important}
+.ew-info{display:flex;align-items:center;gap:10px;margin-left:auto;font-size:14px;white-space:nowrap}
+.ew-info b{color:var(--c1)}.ew-info .cl-link{align-self:center}
+.ew-suche:focus{outline:none;border-color:var(--c1) !important;box-shadow:0 0 0 3px rgba(42,120,214,.15)}
+.ew-loeschen{display:inline-flex;align-items:center;gap:6px;color:#a62828}.ew-loeschen svg{width:15px;height:15px}
+.ew-loeschen:hover{background:var(--crit-bg);border-color:var(--crit)}
+.ew-cb{width:18px;height:18px;flex:none;accent-color:var(--c1);cursor:pointer;margin:0}
+.ew-liste{display:flex;flex-direction:column;gap:8px}
+.ew-zeile > summary{display:flex;align-items:center;gap:10px}
+.ew-titel{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.ew-rechts{margin-left:auto;white-space:nowrap;padding-left:10px}
+.ew-zeile.gewaehlt{background:#eef5ff;box-shadow:inset 0 0 0 1.5px rgba(42,120,214,.45)}
+.ew-mehr{align-self:center;margin-top:6px}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:14px;padding:11px 12px 11px 18px;border-radius:14px;background:#14192b;color:#fff;font-size:14.5px;box-shadow:0 12px 32px rgba(10,15,40,.3);animation:toast-ein .2s ease-out}
+.toast button{border:0;background:none;color:#7fb6ff;font:inherit;font-weight:700;cursor:pointer;padding:4px 6px;border-radius:8px}
+.toast button:hover{background:rgba(255,255,255,.1)}
+.toast .toast-zu{color:rgba(255,255,255,.6);display:grid;place-items:center}.toast .toast-zu svg{width:15px;height:15px}
+@keyframes toast-ein{from{opacity:0;transform:translate(-50%,10px)}}
+.ds-weg{margin-left:auto;width:30px;height:30px;border-radius:9px;border:1px solid transparent;background:none;display:grid;place-items:center;cursor:pointer;color:var(--ink-3)}
+.ds-weg svg{width:16px;height:16px}
+.ds-k:hover .ds-weg{border-color:var(--linie);background:#fff}
+.ds-weg:hover{color:var(--crit) !important;border-color:var(--crit) !important;background:var(--crit-bg) !important}
+.ds-entfernen{margin-left:auto;display:inline-flex;align-items:center;gap:6px;color:var(--ink-2)}
+.ds-entfernen svg{width:15px;height:15px}
+.ds-entfernen:hover{color:var(--crit);border-color:var(--crit);background:var(--crit-bg)}
+.ds-frage-fuss{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
+.knopf.rot{background:var(--crit);color:#fff;border-color:var(--crit)}.knopf.rot:hover{filter:brightness(.92)}
+.einst-fenster{width:min(1120px,95vw);height:min(820px,92vh);max-width:none;max-height:none;padding:0;border:1px solid rgba(255,255,255,.7);border-radius:28px;overflow:hidden;
+  background:linear-gradient(135deg,rgba(225,235,255,.82),rgba(240,232,255,.78) 55%,rgba(225,245,238,.8));backdrop-filter:blur(28px) saturate(1.4);
+  box-shadow:0 30px 80px rgba(20,30,70,.35),inset 0 1px 0 rgba(255,255,255,.9);animation:einst-ein .22s cubic-bezier(.2,.8,.2,1)}
+.einst-fenster::backdrop{background:rgba(20,28,55,.28);backdrop-filter:blur(8px)}
+.einst-fenster iframe{display:block;width:100%;height:100%;border:0;background:transparent}
+@keyframes einst-ein{from{opacity:0;transform:translateY(14px) scale(.98)}}
+.ma-kopf{display:flex;align-items:center;gap:8px;margin:2px 0 8px}
+.ma-zahl{font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;background:rgba(20,30,60,.07);color:var(--ink-2)}
+.ma-alle{margin-left:auto;display:flex;gap:2px}
+.ma-alle button{border:0;background:none;font:inherit;font-size:12.5px;font-weight:600;color:var(--c1);padding:3px 7px;border-radius:7px;cursor:pointer}
+.ma-alle button:hover{background:rgba(42,120,214,.08)}
+.ma-liste{display:flex;flex-direction:column;gap:6px}
+.ma-zeile{display:flex;align-items:center;gap:10px;padding:9px 12px 9px 10px;border-radius:14px;background:rgba(255,255,255,.7);border:1px solid var(--linie);cursor:pointer;transition:background .12s,border-color .12s,box-shadow .12s}
+.ma-zeile:hover{background:#fff}
+.ma-zeile.an{background:#fff;border-color:rgba(42,120,214,.5);box-shadow:0 0 0 3px rgba(42,120,214,.10)}
+.ma-zeile.gesperrt{cursor:default;opacity:.75}
+.ma-zeile input{position:absolute;opacity:0;pointer-events:none}
+.ma-haken{width:20px;height:20px;flex:none;border-radius:50%;border:1.5px solid rgba(20,30,60,.25);display:grid;place-items:center;color:transparent;transition:all .12s}
+.ma-haken svg{width:13px;height:13px;stroke-width:3}
+.ma-zeile.an .ma-haken{background:var(--c1);border-color:var(--c1);color:#fff}
+.ma-zeile input:focus-visible ~ .ma-haken{box-shadow:0 0 0 3px rgba(42,120,214,.3)}
+.ma-av{width:32px;height:32px;flex:none;border-radius:10px;display:grid;place-items:center;font-size:12px;font-weight:800;color:#fff;background:var(--farbe)}
+.ma-text{display:flex;flex-direction:column;min-width:0;flex:1}
+.ma-text b{font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ma-text small{font-size:12px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ma-stand{flex:none;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:rgba(20,30,60,.06);color:var(--ink-2);font-variant-numeric:tabular-nums}
+.ma-stand.fertig{background:var(--good-bg);color:#0b7a44}
+.ma-neu{display:flex;align-items:center;gap:10px;padding:9px 12px 9px 10px;border-radius:14px;border:1.5px dashed rgba(42,120,214,.35);background:transparent;color:var(--c1);font:inherit;font-size:14px;font-weight:600;cursor:pointer;text-align:left}
+.ma-neu span{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:rgba(42,120,214,.1);font-size:15px;line-height:1}
+.ma-neu:hover{background:rgba(42,120,214,.06);border-color:var(--c1)}
+.ma-ds{padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.7);border:1px solid var(--linie)}
+.ma-ds-kopf{display:flex;align-items:baseline;gap:8px}.ma-ds-kopf b{font-size:15px}.ma-ds-kopf span{font-size:13px;color:var(--ink-3);margin-left:auto;white-space:nowrap}
+.ma-ds-chips{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-top:8px}
+.ma-ds-chips small{font-size:12px;color:var(--ink-3);margin-right:2px}
+.ma-ds-chips span{font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;background:rgba(42,120,214,.09);color:#1f5fae}
+.ds-av{background:rgba(42,120,214,.12);color:var(--c1)}.ds-av.bew{background:rgba(124,77,214,.12);color:#6a3fc4}.ds-av svg{width:16px;height:16px}
+.ma-zeile.ds .ma-av{width:30px;height:30px;border-radius:9px}
+.rang-scroll{overflow-x:auto}
+.rang td.ref-zelle{color:var(--ink-3)}
+.wz-liste{display:flex;flex-direction:column;gap:10px}
+.wz-karte{padding:14px 16px;border-radius:16px;background:#fff;border:1px solid var(--linie)}
+.wz-karte.an{border-color:rgba(42,120,214,.45);box-shadow:0 0 0 3px rgba(42,120,214,.08)}
+.wz-karte.warn.an{border-color:rgba(217,56,56,.45);box-shadow:0 0 0 3px rgba(217,56,56,.08)}
+.wz-kopf{display:flex;align-items:center;gap:12px}
+.wz-ic{width:38px;height:38px;flex:none;border-radius:11px;display:grid;place-items:center;background:rgba(42,120,214,.1);color:var(--c1)}
+.wz-karte.warn .wz-ic{background:rgba(217,56,56,.1);color:#b3261e}.wz-ic svg{width:19px;height:19px}
+.wz-titel{flex:1;min-width:0}.wz-titel b{font-size:16px}
+.wz-fuer{display:flex;gap:5px;margin-top:3px}
+.wz-fuer span{font-size:11.5px;font-weight:600;padding:1px 8px;border-radius:999px;background:rgba(20,30,60,.06);color:var(--ink-2)}
+.wz-status{font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--warn-bg,#fff4dc);color:#7a5200}
+.wz-schalter{display:flex;align-items:center;gap:8px;cursor:pointer}
+.wz-schalter input{position:absolute;opacity:0;pointer-events:none}
+.wz-zustand{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3);width:26px}
+.wz-karte p{margin:10px 0 8px;font-size:14px;line-height:1.5;color:var(--ink-2)}
+.wz-karte dl{display:grid;grid-template-columns:92px 1fr;gap:5px 10px;margin:0;font-size:13px}
+.wz-karte dt{font-weight:700;color:var(--ink-3)}.wz-karte dd{margin:0;color:var(--ink-2)}
+.wz-karte code{font-size:12px}
+.mo-gruppe{font-size:12px;font-weight:700;color:var(--ink-3);margin:8px 2px 6px}
+.mo-raster{display:flex;flex-direction:column;gap:6px}
+.mo-karte{position:relative;display:flex;align-items:center;gap:10px;padding:8px 12px 8px 10px;border-radius:14px;background:rgba(255,255,255,.7);border:1px solid var(--linie);cursor:pointer;transition:background .12s,border-color .12s,box-shadow .12s}
+.mo-karte:hover{background:#fff}
+.mo-karte.an{background:#fff;border-color:rgba(42,120,214,.5);box-shadow:0 0 0 3px rgba(42,120,214,.10)}
+.mo-karte.gesperrt{cursor:default;opacity:.75}
+.mo-karte input{position:absolute;opacity:0;pointer-events:none}
+.mo-ic{width:28px;height:28px;flex:none;border-radius:9px;display:grid;place-items:center;background:rgba(20,30,60,.05);color:var(--ink-3)}
+.mo-ic svg{width:15px;height:15px}
+.mo-karte.an .mo-ic{background:rgba(42,120,214,.12);color:var(--c1)}
+.mo-text{display:flex;flex-direction:column;min-width:0;flex:1}
+.mo-text b{font-size:14px;line-height:1.25}.mo-text small{font-size:12px;color:var(--ink-3);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mo-haken{flex:none;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;color:transparent;border:1.5px solid rgba(20,30,60,.2)}
+.mo-haken svg{width:12px;height:12px;stroke-width:3.2}
+.mo-karte.an .mo-haken{background:var(--c1);border-color:var(--c1);color:#fff}
+.ma-summe{margin-top:16px;font-size:13.5px;color:var(--ink-3);text-align:center}.ma-summe b{color:var(--ink);font-size:15px}
+.f-zurueck{flex:none;border:1px solid var(--linie);background:#fff;font:inherit;font-size:13.5px;font-weight:600;color:var(--ink-2);padding:7px 12px;border-radius:999px;cursor:pointer;margin-right:2px}
+.f-zurueck:hover{color:var(--c1);border-color:var(--c1)}
+.f-kopf .kg-logo{width:28px;height:28px;font-size:17px;border-radius:8px}
+.im-dateien{display:flex;flex-direction:column;gap:6px}
+.im-datei{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--linie);background:#fff;font:inherit;cursor:pointer;text-align:left}
+.im-datei:hover:not(:disabled){border-color:var(--c1);box-shadow:0 4px 14px rgba(30,40,80,.08)}
+.im-datei span{color:var(--c1);display:grid}.im-datei b{flex:1;font-size:14px;font-weight:600}.im-datei small{color:var(--ink-3);font-size:12.5px}
+.im-datei.aus{opacity:.45;cursor:not-allowed}
+.kg-suche{display:flex;align-items:center;gap:10px}.kg-suche input{flex:1;border:0;background:transparent;font-size:15.5px;outline:none;padding:4px 0}
+.kg-raster{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;max-height:52vh;overflow:auto;padding:2px}
+.kg-karte{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;padding:12px 14px;border-radius:14px;border:1px solid var(--linie);background:#fff;cursor:pointer;font:inherit}
+.kg-karte:hover{border-color:#20beff;box-shadow:0 4px 14px rgba(30,40,80,.08)}
+.kg-karte b{font-size:14.5px;line-height:1.3}
+.kg-karte small{font-size:12.5px;color:var(--ink-2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.kg-meta{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.kg-meta span{font-size:11px;padding:1px 7px;border-radius:999px;background:rgba(20,30,60,.05);color:var(--ink-3)}
+.kg-tipp{font-style:normal;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--good-bg);color:#0b7a44}
+.kg-kopf{display:flex;flex-direction:column;gap:12px}
+.kg-ergebnis{display:flex;flex-direction:column;gap:12px}
+.kg-schritte{display:flex;gap:6px;flex-wrap:wrap}
+.kg-schritte span{display:inline-flex;align-items:center;gap:7px;padding:5px 12px 5px 6px;border-radius:999px;font-size:13px;font-weight:600;color:var(--ink-3);background:rgba(20,30,60,.04)}
+.kg-schritte i{font-style:normal;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:11.5px;background:rgba(20,30,60,.08)}
+.kg-schritte .an{color:var(--ink);background:#fff;box-shadow:0 1px 4px rgba(30,40,80,.1)}.kg-schritte .an i{background:#20beff;color:#fff}
+.kg-schritte .ok{color:#0b7a44}.kg-schritte .ok i{background:var(--good-bg);color:#0b7a44}
+.kg-ds{display:flex;align-items:center;gap:12px}.kg-ds div{display:flex;flex-direction:column}.kg-ds b{font-size:16px}.kg-ds small{font-size:12px;color:var(--ink-3)}
+.kg-empf{display:flex;align-items:center;gap:16px;padding:16px 18px;border-radius:16px;background:linear-gradient(135deg,rgba(32,190,255,.10),rgba(32,190,255,.03));border:1px solid rgba(32,190,255,.35)}
+.kg-empf-text{flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:3px}.kg-empf-text b{font-size:16px}.kg-empf-text small{font-size:13px;color:var(--ink-2)}
+.zo-zusammen{display:flex;flex-direction:column;gap:10px}
+.zo-titel{display:flex;align-items:center;gap:12px}
+.zo-titel b{font-size:17px}.zo-titel small{display:block;font-size:12.5px;color:var(--ink-3);margin-top:2px}
+.zo-ok{width:34px;height:34px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--good-bg);color:#0b7a44}.zo-ok svg{width:18px;height:18px}
+.zo-bsp{padding:12px 14px;border-radius:14px;background:#fff;border:1px solid var(--linie)}
+.zo-bsp p{margin:0 0 8px;font-size:14.5px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.zo-opts{display:flex;flex-wrap:wrap;gap:6px}
+.zo-opts span{display:inline-flex;gap:6px;align-items:baseline;font-size:13px;padding:4px 10px;border-radius:10px;background:rgba(20,30,60,.04);color:var(--ink-2);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.zo-opts span b{color:var(--ink-3)}
+.zo-opts span.richtig{background:var(--good-bg);color:#0b5c35;font-weight:600}.zo-opts span.richtig b{color:#0b7a44}
+.zo-soll{display:inline-flex;gap:8px;align-items:baseline;font-size:13.5px;padding:4px 10px;border-radius:10px;background:var(--good-bg);color:#0b5c35;font-weight:600}
+.zo-soll small{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:#0b7a44}
+.zo-manuell summary{cursor:pointer;font-size:13.5px;font-weight:600;color:var(--ink-2);padding:2px 0}
+.zo-felder{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.zo-fuss{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;padding-top:12px;border-top:1px solid var(--linie)}
+.zo-fuss .im-feld:first-child{flex:1}
+.zo-anzahl{display:flex;padding:3px;border-radius:12px;background:rgba(20,30,60,.06);gap:2px}
+.zo-anzahl button{border:0;background:none;font:inherit;font-size:14px;font-weight:600;padding:7px 13px;border-radius:9px;cursor:pointer;color:var(--ink-2)}
+.zo-anzahl button.an{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(30,40,80,.12)}
+.zo-los{padding:11px 22px;font-size:15px}
+.kg-andere summary{cursor:pointer;font-size:13.5px;font-weight:600;color:var(--ink-2);padding:4px 0}
+.kg-andere .im-dateien{margin-top:6px}
+.kg-meta .kg-gross{background:var(--warn-bg,#fff4dc);color:#7a5200}
+.kg-karte code{font-size:11px;color:var(--ink-3);margin-top:auto}
+.im-quelle{display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap;padding:9px 6px;border-radius:12px;border:1px solid var(--linie);background:rgba(255,255,255,.8);font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;color:var(--ink)}
+.im-quelle:hover{background:#fff;border-color:var(--c1);color:var(--c1)}
+.im-unterstuetzt{display:flex;flex-direction:column;gap:6px;margin-top:10px;padding:10px 12px;border-radius:12px;background:rgba(20,30,60,.04)}
+.im-unterstuetzt div{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.im-unterstuetzt small{font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);width:62px}
+.im-unterstuetzt span{font-size:11.5px;padding:2px 8px;border-radius:999px;background:#fff;color:var(--ink-2);border:1px solid var(--linie)}
+.im-zeile{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+.im-feld{display:flex;flex-direction:column;gap:4px;flex:1;min-width:140px}
+.im-feld span{font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--ink-3)}
+.im-feld input,.im-feld select,.im-feld textarea{width:100%}
+.im-feld textarea{font-family:var(--mono);font-size:13px}
+.im-vorlagen{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.im-vorlage{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:11px 12px;border-radius:14px;border:1px solid var(--linie);background:#fff;cursor:pointer;font:inherit}
+.im-vorlage:hover{border-color:var(--c1);box-shadow:0 4px 14px rgba(30,40,80,.08)}
+.im-vorlage b{font-size:14.5px}.im-vorlage small{font-size:12px;color:var(--ink-2)}.im-vorlage code{font-size:11px;margin-top:auto;padding-top:4px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.im-tabelle{overflow:auto;max-height:260px;border-radius:12px;border:1px solid var(--linie);background:#fff}
+.im-tabelle table{border-collapse:collapse;font-size:12.5px;min-width:100%}
+.im-tabelle th,.im-tabelle td{padding:6px 10px;border-bottom:1px solid var(--linie);text-align:left;vertical-align:top;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.im-tabelle th{position:sticky;top:0;background:#f6f8fc;font-weight:700;color:var(--ink-2)}
+.im-tabelle th small{display:block;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.im-tabelle th.im-rolle{background:#eaf2ff;color:#174a87}.im-tabelle th.im-rolle.frage{background:#e6f6ee;color:#0b5c35}.im-tabelle th.im-rolle.antwort{background:#fff4dc;color:#7a5200}
+.fenster.breit{width:min(860px,94vw)}
+.md-kopf{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.md-liste{display:flex;flex-direction:column;gap:6px}
+.md-zeile{display:grid;grid-template-columns:minmax(220px,2.2fr) 1fr .7fr 1fr 1.6fr 120px;align-items:center;gap:14px;padding:12px 16px;border-radius:16px;background:#fff;border:1px solid var(--linie);transition:box-shadow .12s}
+.md-zeile:not(.md-titel):hover{box-shadow:0 6px 18px rgba(30,40,80,.09)}
+.md-titel{background:transparent;border:0;padding:0 16px 2px;font-size:11.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
+.md-modell{display:flex;align-items:center;gap:12px;min-width:0}
+.md-aktiv{display:inline-flex;align-items:center;gap:5px;color:#0b7a44 !important;font-weight:600}
+.md-aktiv i{width:7px;height:7px;border-radius:50%;background:var(--good);box-shadow:0 0 0 3px var(--good-bg)}
+.md-zahl{display:flex;flex-direction:column;font-variant-numeric:tabular-nums}
+.md-zahl b{font-size:15px}.md-zahl small{font-size:12px;color:var(--ink-3)}
+.md-kann{display:flex;gap:6px}
+.md-kann span{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:rgba(20,30,60,.04);color:rgba(20,30,60,.22)}
+.md-kann span.an{background:rgba(42,120,214,.10);color:var(--c1)}
+.md-kann svg{width:15px;height:15px}
+.md-treffer{display:flex;align-items:center;gap:8px;font-variant-numeric:tabular-nums}
+.md-treffer small{font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px;background:rgba(20,30,60,.06);color:var(--ink-3)}
+.md-treffer small.leer{background:none;padding:0;font-weight:500;font-size:12.5px}
+.md-aktionen{display:flex;gap:4px;justify-content:flex-end}
+.md-ak{width:34px;height:34px;border-radius:10px;border:1px solid var(--linie);background:#fff;display:grid;place-items:center;cursor:pointer;color:var(--ink-2);opacity:.55;transition:all .12s}
+.md-zeile:hover .md-ak{opacity:1}
+.md-ak:hover{border-color:var(--c1);color:var(--c1);background:rgba(42,120,214,.06)}
+.md-ak.weg:hover{border-color:var(--crit);color:var(--crit);background:var(--crit-bg)}
+.md-ak svg{width:16px;height:16px}
+@media (max-width:1000px){.md-titel{display:none}.md-zeile{grid-template-columns:1fr 1fr;row-gap:10px}.md-modell,.md-treffer{grid-column:1/-1}.md-aktionen{justify-content:flex-start}.md-ak{opacity:1}}
+.mw-suche{display:flex;align-items:center;gap:8px;padding:6px 6px 6px 14px;border-radius:14px;background:#fff;border:1px solid var(--linie);cursor:text}
+.mw-suche span{font-size:20px}
+.mw-suche input{flex:1;border:0;outline:none;background:none;padding:6px 2px;font-size:15px}
+.mw-inhalt{display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow-y:auto;padding:2px 4px 4px 2px}
+.mw-abschnitt{display:flex;align-items:center;gap:8px;margin-top:6px}
+.mw-abschnitt b{font-size:15px}
+.mw-abschnitt > span{font-size:12px;font-weight:700;background:rgba(20,30,60,.08);border-radius:999px;padding:1px 8px;color:var(--ink-2)}
+.mw-abschnitt .cl-link{margin-left:auto}
+.mw-chips{display:flex;flex-wrap:wrap;gap:6px}
+.mw-chip{display:inline-flex;align-items:center;gap:7px;padding:6px 6px 6px 12px;border-radius:999px;background:#fff;border:1px solid var(--linie);font-size:14px;font-weight:600}
+.mw-weg{border:0;background:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:var(--ink-3);cursor:pointer;opacity:0;transition:opacity .12s}
+.mw-chip:hover .mw-weg{opacity:1}.mw-weg:hover{background:var(--crit-bg);color:var(--crit)}
+.mw-weg svg{width:13px;height:13px}
+.mw-raster{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.mw-karte{display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:16px;background:#fff;border:1px solid var(--linie);box-shadow:0 1px 3px rgba(30,40,80,.05);transition:box-shadow .12s,transform .12s}
+.mw-karte:hover{box-shadow:0 6px 18px rgba(30,40,80,.10);transform:translateY(-1px)}
+.mw-karte.da{opacity:.75}
+.mw-kopf{display:flex;align-items:center;gap:10px}
+.mw-av{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;font-size:13px;font-weight:800;color:#fff;background:var(--farbe);flex:none}
+.mw-name{display:flex;flex-direction:column;min-width:0;flex:1}
+.mw-name b{font-size:15px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mw-name small{font-size:12px;color:var(--ink-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mw-marke{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--ink);color:#fff;white-space:nowrap}
+.mw-meta{display:flex;flex-wrap:wrap;gap:4px}
+.mw-meta span{font-size:11.5px;padding:2px 8px;border-radius:999px;background:rgba(20,30,60,.06);color:var(--ink-2)}
+.mw-meta .mw-ampel.ok{background:var(--good-bg);color:#0b7a44}.mw-meta .mw-ampel.warn{background:var(--warn-bg);color:#7a5200}
+.mw-karte p{margin:0;font-size:13px;color:var(--ink-2);flex:1}
+.mw-fuss{margin-top:auto}
+.mw-los{width:100%;border:1.5px solid var(--ink);background:#fff;color:var(--ink);border-radius:11px;padding:8px;font-weight:700;font-size:14px;cursor:pointer}
+.mw-los:hover{background:var(--ink);color:#fff}
+.mw-da{display:block;text-align:center;font-size:13.5px;font-weight:700;color:#0b7a44;padding:8px}
+.mw-prozent small{font-size:12.5px;color:var(--ink-2)}
+.wchip.neu{border:1.5px dashed rgba(20,30,60,.25);background:transparent;color:var(--ink-2);font:inherit;font-size:14px}
+.wchip.neu:hover{border-color:var(--c1);color:var(--c1);background:rgba(42,120,214,.06)}
+.fenster .status-tag{font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;background:rgba(20,30,60,.07);color:var(--ink-2)}
+.fenster .status-tag.fertig{background:var(--good-bg);color:#0b7a44}.fenster .status-tag.laeuft{background:rgba(42,120,214,.12);color:#174a87}.fenster .status-tag.fehler{background:var(--crit-bg);color:#a62828}
+.kante{height:20px;display:flex;justify-content:center;position:relative;animation:auf .25s ease both}
+.kante::before{content:"";width:2px;height:100%;background:rgba(20,30,60,.18)}
+.kante.aktiv::before{background:repeating-linear-gradient(to bottom,var(--c1) 0 4px,transparent 4px 8px);background-size:2px 8px;animation:fluss .6s linear infinite}
+.kante::after{content:"";position:absolute;bottom:-1px;width:7px;height:7px;border-radius:50%;background:#fff;border:2px solid rgba(20,30,60,.22)}
+@keyframes auf{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+@keyframes puls{0%,100%{box-shadow:0 0 0 3px rgba(42,120,214,.10)}50%{box-shadow:0 0 0 7px rgba(42,120,214,.18)}}
+@keyframes fluss{to{background-position:0 8px}}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:12.5px;background:rgba(20,30,60,.04);border-radius:9px;padding:6px 9px}
+.kv span:nth-child(odd){color:var(--ink-3);white-space:nowrap}
+.kv span:nth-child(even){color:var(--ink);overflow-wrap:anywhere}
+.summe{margin-top:12px;padding:9px 12px;border-radius:12px;background:rgba(15,157,88,.08);font-size:12.5px;color:#0b5c35}
+.knoten pre{font-family:var(--mono);font-size:11.5px;background:#141a2e;color:#e8ecf3;padding:8px 10px;border-radius:10px;max-height:240px;overflow:auto;white-space:pre-wrap;margin:6px 0 0}
+.ablauf .vorschau{opacity:.55}
+.lade{display:inline-flex;align-items:center;gap:10px;color:var(--ink-2)}
+.lade::before{content:"";width:16px;height:16px;border-radius:50%;border:2.5px solid rgba(20,30,60,.14);border-top-color:var(--ink);animation:dreh .8s linear infinite;flex:none}
+.lade.gross{padding:14px 2px;font-size:15.5px}
+.lade.gross::before{width:20px;height:20px;border-width:3px}
+@keyframes dreh{to{transform:rotate(360deg)}}
+
+/* Dropdowns im Glas-Stil (Chromium: anpassbares <select>; andere Browser: normale Liste) */
+@supports (appearance: base-select) {
+  select, ::picker(select) { appearance: base-select; }
+  select { display:inline-flex; align-items:center; gap:8px; cursor:pointer; }
+  select::picker-icon { content:""; flex:none; width:9px; height:9px; border-right:2px solid var(--ink-3); border-bottom:2px solid var(--ink-3); transform:translateY(-2px) rotate(45deg); transition:transform .15s; }
+  select:open::picker-icon { transform:translateY(2px) rotate(-135deg); }
+  ::picker(select) { border:1px solid var(--kante); border-radius:16px; padding:6px; margin-top:6px; max-height:min(420px,60vh); overflow-y:auto;
+    background:rgba(255,255,255,.80); backdrop-filter:blur(24px) saturate(180%); -webkit-backdrop-filter:blur(24px) saturate(180%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 16px 40px rgba(30,40,80,.18); color:var(--ink); }
+  select option { padding:8px 12px; border-radius:10px; font-size:14.5px; cursor:pointer; outline:none; }
+  select option:hover, select option:focus-visible { background:rgba(42,120,214,.10); }
+  select option:checked { background:var(--ink); color:#fff; font-weight:600; }
+  select option::checkmark { display:none; }
+  select optgroup { font-size:12px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--ink); padding:10px 6px 4px; }
+  select optgroup + optgroup { border-top:1px solid var(--linie); margin-top:6px; }
+  select optgroup option { text-transform:none; letter-spacing:0; font-weight:500; font-size:14.5px; color:var(--ink-2); padding-left:24px; }
+  select optgroup option:checked { color:#fff; font-weight:600; }
+  select selectedcontent { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+}
+</style>
+</head>
+<body>
+<header><div class="wrap leiste">
+  <a class="titel" href="/" title="Modellvergleich"><span class="logo"><svg viewBox="0 0 24 24"><path d="M5 19v-6M10 19V8M15 19v-9M20 19V4"/></svg></span><h1>Modellvergleich</h1></a>
+  <div class="tabs glas" role="tablist" id="tabs"></div>
+  <div class="gruppe glas">
+    <label class="ds-wahl"><span>Datensatz</span><select id="ds"></select></label>
+    <span class="trenner"></span>
+    <label class="schalter" title="Mitgelieferten Demo-Datensatz und die Referenzergebnisse zeigen"><input type="checkbox" id="demo"><span class="toggle"></span><span>Demo</span></label>
+  </div>
+  <div class="rechts">
+    <div class="gruppe glas sys" id="status" title="Verbindung zu Ollama und Grafikkarte">
+      <span class="punkt"></span><span id="status-text">verbinde …</span>
+      <span class="gpu" id="gpu" hidden><span class="trenner"></span><svg viewBox="0 0 120 26" preserveAspectRatio="none"><path class="fl"/><path class="ln"/><path class="vr"/></svg><span id="gpu-text"></span></span>
+    </div>
+    <a class="rund glas" href="/einrichtung" id="zahnrad" title="Einstellungen: Ollama, Hardware, Modelle, Prüfer, Sicherheit"><span data-i="zahnrad"></span></a>
+  </div>
+</div></header>
+<main class="wrap">
+  <section class="seite" id="s-vergleich" data-titel="Vergleich">
+    <div class="zwei"><div class="panel glas" id="ar-links"></div><div class="panel glas" id="ar-rang" style="overflow-x:auto"></div></div>
+  </section>
+  <section class="seite" id="s-chat" data-titel="Chat">
+    <div class="drei">
+      <div class="panel glas links" id="ch-links"></div>
+      <div class="chat glas">
+        <div class="verlauf" id="verlauf"></div>
+        <div class="eingabe">
+          <div class="zeile"><textarea id="text" rows="1" placeholder="Nachricht an das Modell …"></textarea><button class="knopf primaer" id="senden" title="Senden (Enter)"><span data-i="pfeil"></span></button><button class="knopf" id="stopp" hidden>Stopp</button></div>
+          <div class="zeile" id="ch-optionen"></div>
+          <textarea id="system" rows="3" hidden placeholder="System-Prompt"></textarea>
+        </div>
+      </div>
+      <div class="panel glas ablauf" id="ablauf"></div>
+    </div>
+  </section>
+  <section class="seite" id="s-modelle" data-titel="Modelle">
+    <div class="panel glas"><div id="md-kopf" class="md-kopf"></div><div id="md-liste" class="md-liste"></div></div>
+  </section>
+  <section class="seite" id="s-daten" data-titel="Daten">
+    <div class="zwei"><div class="panel glas" id="dt-links"></div><div class="panel glas" id="dt-rechts"></div></div>
+  </section>
+</main>
+<dialog id="fenster" class="fenster" aria-labelledby="fenster-titel"></dialog>
+<script>
+"use strict";
+/* ---------- Helfer ---------- */
+const $ = (s) => document.querySelector(s);
+const el = (tag, attr = {}, ...kinder) => { const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attr || {})) { if (v == null || v === false) continue; if (k.startsWith("on")) e[k] = v; else if (k === "html") e.innerHTML = v; else e.setAttribute(k, v === true ? "" : v); }
+  for (const k of kinder.flat()) if (k != null && k !== false) e.append(k.nodeType ? k : document.createTextNode(k)); return e; };
+const lade = (text, gross = true) => el("div", { class: "lade" + (gross ? " gross" : "") }, text);
+const zahl = (x, n = 1) => x == null ? "–" : Number(x).toLocaleString("de-DE", { minimumFractionDigits: n, maximumFractionDigits: n });
+const pz = (x) => x == null ? "–" : Math.round(x * 100) + " %";
+const P = { pfeil: '<path d="M5 12h14M13 6l6 6-6 6"/>', zahnrad: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  pokal: '<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3a3 3 0 0 1-3 4M7 5H4a3 3 0 0 0 3 4"/>', x: '<path d="M18 6 6 18M6 6l12 12"/>',
+  hoch: '<path d="M12 19V5M5 12l7-7 7 7"/>',
+  chat: '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>', speicher: '<rect x="4" y="7" width="16" height="10" rx="2"/><path d="M8 7V4M12 7V4M16 7V4M8 20v-3M12 20v-3M16 20v-3"/>',
+  buch: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5"/>', gehirn: '<path d="M9 4a3 3 0 0 0-3 3 3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 6 1V5a2 2 0 0 0-3-1zM15 4a3 3 0 0 1 3 3 3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-6 1"/>',
+  stift: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>', birne: '<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.5 1 2.5h6c0-1 .2-1.7 1-2.5A6 6 0 0 0 12 3z"/>',
+  werkzeug: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/>', liste: '<path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/>',
+  rechner: '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/>', schloss: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  bild: '<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 8"/>',
+  muell: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+  waage: '<path d="M12 3v18M7 21h10M5 7h14M5 7l-3 6a3 3 0 0 0 6 0zM19 7l-3 6a3 3 0 0 0 6 0z"/>', datei: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>', neu: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>' };
+const ic = (n) => `<svg class="i" viewBox="0 0 24 24">${P[n] || ""}</svg>`;
+document.querySelectorAll("[data-i]").forEach((e) => e.outerHTML = ic(e.dataset.i));
+async function api(pfad, body) {
+  const r = await fetch(pfad, body === undefined ? { cache: "no-store" } : { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.fehler || "Fehler " + r.status); return j;
+}
+async function stream(pfad, body, jeZeile, signal) {
+  const r = await fetch(pfad, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal });
+  if (!r.ok) throw new Error((await r.json().catch(() => ({}))).fehler || "Fehler " + r.status);
+  const leser = r.body.getReader(), dec = new TextDecoder(); let rest = "";
+  for (;;) { const { value, done } = await leser.read(); if (done) break; rest += dec.decode(value, { stream: true });
+    const z = rest.split("\n"); rest = z.pop(); for (const x of z) if (x.trim()) jeZeile(JSON.parse(x)); }
+  if (rest.trim()) jeZeile(JSON.parse(rest));
+}
+const MODI = {
+  blind: { name: "Nur Aufgabe", kurz: "Bewertet ohne Lösung", icon: "datei" },
+  werkzeuge: { name: "Mit Werkzeugen", kurz: "Löst selbst, prüft Rechnungen", icon: "werkzeug" },
+  bild: { name: "Mit Bild", kurz: "Echtes Bild statt Beschreibung", icon: "bild" },
+  muster: { name: "Mit Musterlösung", kurz: "Lösung im Prompt – Obergrenze", icon: "buch" },
+  antwort: { name: "Direkt", kurz: "Beantwortet die Frage selbst", icon: "chat" },
+  denken: { name: "Mit Reasoning", kurz: "Denkt erst nach, dann Antwort (Thinking)", icon: "gehirn" },
+  rechner: { name: "Mit Werkzeugen", kurz: "Darf einen Rechner benutzen", icon: "rechner" } };
+const BEW_MODI = ["blind", "denken", "werkzeuge", "bild", "muster"], FRAGEN_MODI = ["antwort", "denken", "rechner"];
+const MODUS_IDS = Object.keys(MODI);
+const istFragen = (ds) => ds?.typ === "fragen";
+const WERTUNG_TEXT = { auswahl: "Multiple Choice", zahl: "Zahl", enthaelt: "kurze Antwort", exakt: "exakt", ki: "freie Antwort" };
+const FARBEN = ["#2a78d6", "#eb6834", "#1baf7a", "#e09b00", "#e87ba4", "#6250d6", "#3b9fbf", "#9a6b2f", "#e34948", "#008300"];
+const BASIS = { "qwen3.5:2b": "Qwen 3.5 · 2B", "gemma4:e4b": "Gemma 4 · E4B", "qwen3.5:9b": "Qwen 3.5 · 9B", "qwen3:14b": "Qwen 3 · 14B" };
+const name = (tag) => BASIS[tag] || (() => { const t = tag.replace(/^hf\.co\//, ""); const [r, q] = t.split(":"); return r.split("/").pop().replace(/-GGUF$/i, "").replace(/[-_]/g, " ") + (q && q !== "latest" ? " · " + q : ""); })();
+const farbeCache = {};
+const farbe = (tag) => farbeCache[tag] || (farbeCache[tag] = FARBEN[Object.keys(farbeCache).length % FARBEN.length]);
+Object.keys(BASIS).forEach(farbe);
+const notenText = (n) => n == null ? "–" : String(n);
+
+/* ---------- Zustand ---------- */
+const S = { einst: {}, status: { ok: false, modelle: [] }, datensaetze: [], ds: localStorage.getItem("mv-ds") || "demo", aufgaben: {}, tab: null };
+const sichtbareDs = () => S.datensaetze.filter((d) => d.id !== "demo" || S.einst.demo);
+const aktuellerDs = () => sichtbareDs().find((d) => d.id === S.ds);
+
+async function ladeStatus() {
+  try { S.status = await api("api/status"); } catch { S.status = { ok: false, modelle: [] }; }
+  $("#status .punkt").className = "punkt " + (S.status.ok ? "an" : "aus");
+  const gpuKurz = (n) => String(n || "").replace(/^NVIDIA\s+|GeForce\s+|\s+(Laptop|Mobile)\s+GPU$|\s+GPU$/gi, "").trim() || n;
+  $("#status-text").replaceChildren(S.status.ok ? el("b", {}, gpuKurz(S.status.gpu)) : "Ollama nicht verbunden");
+  $("#status").title = S.status.ok ? `${S.status.gpu} – Verbindung zu Ollama und Grafikkarte` : "Verbindung zu Ollama und Grafikkarte";
+  $("#status").title = S.status.ok ? `Ollama verbunden · ${S.status.modelle.length} Modelle installiert` : "Ollama nicht erreichbar – siehe Einrichtung";
+}
+/* Datensatz entfernen – Rückfrage im App-Fenster statt Browser-Dialog */
+function datensatzEntfernen(d) {
+  const f = $("#fenster"); AB.offen = null; f.classList.remove("breit"); f.style.setProperty("--nf", "#c0392b");
+  const anzahl = istFragen(d) ? `${d.aufgaben} Fragen` : `${d.aufgaben} Aufgaben und ${d.antworten} Antworten`;
+  const status = el("div");
+  const ja = el("button", { class: "knopf rot", onclick: async () => {
+    ja.disabled = true; status.replaceChildren(lade("entferne …", false));
+    try {
+      await api("api/arena/datensatz-loeschen", { datensatz: d.id });
+      delete S.aufgaben[d.id]; if (DT.meldung?.text?.includes(`„${d.name}“`)) DT.meldung = null;
+      if (S.ds === d.id) { S.ds = null; localStorage.removeItem("mv-ds"); }
+      f.close(); await ladeDatensaetze(); if (S.ds) localStorage.setItem("mv-ds", S.ds); zeichne();
+    } catch (e) { ja.disabled = false; status.replaceChildren(el("div", { class: "box fehler" }, e.message)); } } }, "Entfernen");
+  f.replaceChildren(el("div", { class: "f-kopf" }, el("span", { class: "ic", html: ic("muell") }),
+      el("div", {}, el("h2", {}, `„${d.name}“ entfernen?`), el("small", {}, "Das lässt sich nicht rückgängig machen.")),
+      el("button", { class: "zu", title: "Schließen (Esc)", html: ic("x"), onclick: () => f.close() })),
+    el("div", { class: "f-inhalt" },
+      el("p", { style: "margin:0;font-size:15px;line-height:1.5" }, `Gelöscht werden die ${anzahl} sowie alle Ergebnisse der Modelle in diesem Datensatz. Die Modelle selbst bleiben installiert.`),
+      status, el("div", { class: "ds-frage-fuss" }, el("button", { class: "knopf", onclick: () => f.close() }, "Abbrechen"), ja)));
+  if (!f.open) f.showModal();
+}
+async function ladeDatensaetze() {
+  const j = await api("api/arena?datensatz=" + encodeURIComponent(S.ds)).catch(() => null);
+  if (!j) return;
+  S.arena = j; S.datensaetze = j.datensaetze;
+  const sicht = sichtbareDs();
+  if (!sicht.some((d) => d.id === S.ds)) S.ds = sicht[0]?.id || null;
+  if (j.datensatz !== S.ds && S.ds) S.arena = await api("api/arena?datensatz=" + encodeURIComponent(S.ds));
+  $("#ds").replaceChildren(...(sicht.length ? sicht.map((d) => el("option", { value: d.id, selected: d.id === S.ds, title: d.name },
+      el("span", {}, d.name.length > 26 ? d.name.slice(0, 25) + "…" : d.name), el("span", { class: "ds-n" }, ` · ${istFragen(d) ? d.aufgaben + " Fragen" : d.antworten + " Antworten"}`)))
+    : [el("option", { value: "" }, "noch kein eigener Datensatz")]));
+  $("#ds").disabled = !!S.arena.job?.laeuft || !sicht.length;
+}
+$("#ds").onchange = async () => { S.ds = $("#ds").value; localStorage.setItem("mv-ds", S.ds); AR.ds = new Set([S.ds]); localStorage.setItem("mv-ds-auswahl", JSON.stringify([S.ds])); await ladeDatensaetze(); zeichne(); };
+$("#demo").onchange = async () => { S.einst = await api("api/einstellungen", { demo: $("#demo").checked }); setzeSystem(); await ladeDatensaetze(); zeichne(); };
+async function aufgaben(ds) {
+  if (!ds) return [];
+  if (!S.aufgaben[ds]) S.aufgaben[ds] = (await api("api/datensatz?id=" + encodeURIComponent(ds))).aufgaben;
+  return S.aufgaben[ds];
+}
+
+/* ---------- Tabs ---------- */
+const seiten = [...document.querySelectorAll(".seite")];
+seiten.forEach((s) => $("#tabs").append(el("button", { class: "tab", role: "tab", "data-ziel": s.id, onclick: () => zeige(s.id) }, s.dataset.titel)));
+function zeige(id) {
+  S.tab = id; seiten.forEach((s) => s.classList.toggle("aktiv", s.id === id));
+  $("#tabs").querySelectorAll(".tab").forEach((t) => t.setAttribute("aria-selected", t.dataset.ziel === id));
+  history.replaceState(null, "", "#" + id.slice(2)); zeichne();
+}
+function zeichne() {
+  if (S.tab === "s-vergleich") zeichneArena(); else if (S.tab === "s-chat") zeichneChatLinks(); else if (S.tab === "s-modelle") zeichneModelleTab(); else if (S.tab === "s-daten") zeichneDaten();
+}
+const keinDatensatz = () => el("div", { class: "leerzustand" }, el("b", {}, "Noch kein eigener Datensatz"),
+  "Lade im Tab „Daten“ eigene Fragen – als Datei oder aus Hugging Face, Kaggle, Link oder Datenbank – oder schalte oben die Demo-Daten ein.",
+  el("div", { style: "margin-top:14px" }, el("button", { class: "knopf primaer", onclick: () => zeige("s-daten") }, "Zu Daten")));
+
+/* ---------- Arena ---------- */
+const AR = { auswahl: new Set(JSON.parse(localStorage.getItem("mv-auswahl") || "[]")), modi: new Set(["blind"]), timer: null, meldung: null,
+  ds: new Set(JSON.parse(localStorage.getItem("mv-ds-auswahl") || "[]")), mehr: { schluessel: "", daten: {} },
+  fmodi: new Set(JSON.parse(localStorage.getItem("mv-fmodi") || '["antwort"]')) };
+/* Steckbriefe der installierten Modelle (Größe, Fähigkeiten) für die Auswahlliste */
+const MINFO = {}; let MINFO_LAEDT = false;
+function ladeModellInfo(inst) {
+  if (MINFO_LAEDT || inst.every((t) => MINFO[t])) return;
+  MINFO_LAEDT = true;
+  api("api/modelle").then((j) => { j.modelle.forEach((m) => MINFO[m.tag] = m); if (S.tab === "s-vergleich") zeichneArena(); })
+    .catch(() => {}).finally(() => { MINFO_LAEDT = false; inst.forEach((t) => MINFO[t] ||= {}); });
+}
+function zeichneArena() {
+  clearTimeout(AR.timer);
+  const J = S.arena || {}, job = J.job || {}, sichtDs = sichtbareDs();
+  // gewählte Datensätze: nur sichtbare; leer → der aus der Kopfleiste
+  for (const id of [...AR.ds]) if (!sichtDs.some((d) => d.id === id)) AR.ds.delete(id);
+  if (!AR.ds.size && S.ds) AR.ds.add(S.ds);
+  const gewDs = sichtDs.filter((d) => AR.ds.has(d.id));
+  if (gewDs.length === 1 && gewDs[0].id !== S.ds) { S.ds = gewDs[0].id; localStorage.setItem("mv-ds", S.ds); ladeDatensaetze().then(() => zeichneArena()); return; }
+  const ds = gewDs.length === 1 ? gewDs[0] : (gewDs[0] || aktuellerDs()), mehrere = gewDs.length > 1;
+  if (job.laeuft) AR.timer = setTimeout(async () => { await ladeDatensaetze(); AR.mehr.schluessel = ""; if (S.tab === "s-vergleich") zeichneArena(); }, 3000);
+  $("#s-vergleich .zwei").classList.toggle("einzeln", !ds);
+  if (!ds) { $("#ar-links").replaceChildren(keinDatensatz()); $("#ar-rang").replaceChildren(); return; }
+  const inst = S.status.modelle || [], L = [];
+  L.push(el("div", { class: "etikett" }, "Modelle"));
+  if (!S.status.ok) L.push(el("div", { class: "box warn" }, "Ollama ist nicht verbunden. ", el("a", { href: "/einrichtung", onclick: (ev) => { ev.preventDefault(); einstellungenAuf(); } }, "Einrichtung öffnen")));
+  else if (!inst.length) L.push(el("div", { class: "box warn" }, "Noch kein Modell installiert. ", el("button", { class: "cl-link", onclick: modellFenster }, "Modelle installieren")));
+  else {
+    for (const t of [...AR.auswahl]) if (!inst.includes(t)) AR.auswahl.delete(t);
+    ladeModellInfo(inst);
+    const merke = () => { localStorage.setItem("mv-auswahl", JSON.stringify([...AR.auswahl])); zeichneArena(); };
+    L.pop();   // Etikett wird durch den Kopf mit Zähler ersetzt
+    L.push(el("div", { class: "ma-kopf" }, el("span", { class: "etikett", style: "margin:0" }, "Modelle"),
+      el("span", { class: "ma-zahl" }, `${AR.auswahl.size} von ${inst.length}`),
+      job.laeuft ? "" : el("span", { class: "ma-alle" },
+        el("button", { onclick: () => { inst.forEach((t) => AR.auswahl.add(t)); merke(); } }, "Alle"),
+        el("button", { onclick: () => { AR.auswahl.clear(); merke(); } }, "Keine"))));
+    const stand = (tag) => {
+      if (mehrere) {   // über alle gewählten Datensätze
+        if (AR.mehr.schluessel === "") return null;
+        const k = gewDs.filter((d) => (AR.mehr.daten[d.id]?.ergebnisse || []).some((x) => x.modell === tag && x.fertig)).length;
+        return k ? (k === gewDs.length ? { text: "fertig", fertig: true } : { text: `${k}/${gewDs.length}`, fertig: false }) : null;
+      }
+      const e = (J.ergebnisse || []).find((x) => x.modell === tag); if (!e || !e.erledigt) return null;
+      const gesamt = istFragen(ds) ? e.antworten : null;
+      return gesamt && e.erledigt < gesamt ? { text: `${e.erledigt}/${gesamt}`, fertig: false } : { text: "fertig", fertig: true };
+    };
+    L.push(el("div", { class: "ma-liste" }, inst.map((tag) => {
+      const an = AR.auswahl.has(tag), info = MINFO[tag] || {}, st = stand(tag), f = info.faehigkeiten || [];
+      return el("label", { class: "ma-zeile" + (an ? " an" : "") + (job.laeuft ? " gesperrt" : "") },
+        el("input", { type: "checkbox", checked: an, disabled: job.laeuft, onchange: (ev) => { ev.target.checked ? AR.auswahl.add(tag) : AR.auswahl.delete(tag); merke(); } }),
+        el("span", { class: "ma-haken", html: ic("check") }),
+        el("span", { class: "ma-av", style: `--farbe:${farbe(tag)}` }, name(tag).replace(/[^A-Za-z0-9]/g, "").slice(0, 2).toUpperCase()),
+        el("span", { class: "ma-text" }, el("b", {}, name(tag)),
+          el("small", {}, [info.datei_gb && zahl(info.datei_gb) + " GB", info.parameter, f.includes("vision") && "liest Bilder"].filter(Boolean).join(" · ") || tag)),
+        st ? el("span", { class: "ma-stand" + (st.fertig ? " fertig" : ""), title: st.fertig ? "In diesem Datensatz schon gerechnet – wird übersprungen" : "Teilweise gerechnet – es geht dort weiter" }, st.fertig ? "✓ fertig" : st.text) : "");
+    }), job.laeuft ? "" : el("button", { class: "ma-neu", onclick: modellFenster }, el("span", {}, "+"), "Modell hinzufügen")));
+  }
+  const merkeDs = () => { localStorage.setItem("mv-ds-auswahl", JSON.stringify([...AR.ds])); AR.mehr.schluessel = ""; zeichneArena(); };
+  L.push(el("div", { class: "ma-kopf", style: "margin-top:16px" }, el("span", { class: "etikett", style: "margin:0" }, "Datensätze"),
+    el("span", { class: "ma-zahl" }, `${gewDs.length} von ${sichtDs.length}`),
+    job.laeuft ? "" : el("span", { class: "ma-alle" },
+      el("button", { onclick: () => { sichtDs.forEach((d) => AR.ds.add(d.id)); merkeDs(); } }, "Alle"),
+      el("button", { onclick: () => { AR.ds = new Set([S.ds]); merkeDs(); } }, "Nur einer"))));
+  L.push(el("div", { class: "ma-liste" }, sichtDs.map((d) => {
+    const an = AR.ds.has(d.id), fr = istFragen(d), laeuftHier = job.laeuft && job.datensatz === d.id;
+    return el("label", { class: "ma-zeile ds" + (an ? " an" : "") + (job.laeuft ? " gesperrt" : "") },
+      el("input", { type: "checkbox", checked: an, disabled: job.laeuft, onchange: (ev) => {
+        if (ev.target.checked) AR.ds.add(d.id); else if (AR.ds.size > 1) AR.ds.delete(d.id); else ev.target.checked = true;
+        merkeDs(); } }),
+      el("span", { class: "ma-haken", html: ic("check") }),
+      el("span", { class: "ma-av ds-av" + (fr ? "" : " bew"), html: ic(fr ? "liste" : "stift") }),
+      el("span", { class: "ma-text" }, el("b", {}, d.name),
+        el("small", {}, fr ? `${d.aufgaben} Fragen · ${(d.wertungen || []).map((w) => WERTUNG_TEXT[w]).join(", ")}` : `${d.aufgaben} Aufgaben · ${d.antworten} Antworten`)),
+      laeuftHier ? el("span", { class: "ma-stand" }, "läuft") : d.id === "demo" ? el("span", { class: "ma-stand" }, "Demo") : "");
+  })));
+  const mitBew = gewDs.some((d) => !istFragen(d));
+  if (gewDs.some((d) => istFragen(d) && (d.wertungen || []).includes("ki")) && !S.status.pruefer)
+    L.push(el("div", { class: "klein", style: "margin-top:6px" }, "Freie Antworten werden ohne Prüfer-Schlüssel nur geschätzt (Zahnrad → Prüfer)."));
+  const mitFragen = gewDs.some((d) => istFragen(d));
+  const untertitel = (id) => {   // bei „Mit Werkzeugen“: welche Add-ons aktiv sind
+    if (id !== "rechner" && id !== "werkzeuge") return MODI[id].kurz;
+    const a = WERKZEUGE.filter((w) => w.fuer.includes(id) && w.an()).map((w) => w.kurz);
+    return a.length ? a.join(" · ") : "kein Werkzeug aktiv";
+  };
+  const modusKarten = (ids, menge, speicher) => el("div", { class: "mo-raster" }, ids.map((id) => {
+    const an = menge.has(id);
+    return el("label", { class: "mo-karte" + (an ? " an" : "") + (job.laeuft ? " gesperrt" : ""), title: MODI[id].kurz },
+      el("input", { type: "checkbox", checked: an, disabled: job.laeuft, onchange: (ev) => {
+        if (ev.target.checked) menge.add(id); else if (menge.size > 1) menge.delete(id); else ev.target.checked = true;
+        if (speicher) localStorage.setItem(speicher, JSON.stringify([...menge])); zeichneArena(); } }),
+      el("span", { class: "mo-ic", html: ic(MODI[id].icon) }),
+      el("span", { class: "mo-text" }, el("b", {}, MODI[id].name), el("small", {}, untertitel(id))),
+      el("span", { class: "mo-haken", html: ic("check") }));
+  }));
+  if (mitBew || mitFragen) L.push(el("div", { class: "ma-kopf", style: "margin-top:16px" }, el("span", { class: "etikett", style: "margin:0" }, "Modi"),
+    el("span", { class: "ma-alle" }, el("button", { onclick: werkzeugFenster, title: "Was die Modelle im Modus „Mit Werkzeugen“ benutzen dürfen" }, "Werkzeuge ›"))));
+  if (mitFragen) { if (mitBew) L.push(el("div", { class: "mo-gruppe" }, "Fragen beantworten")); L.push(modusKarten(FRAGEN_MODI, AR.fmodi, "mv-fmodi")); }
+  if (mitBew) { if (mitFragen) L.push(el("div", { class: "mo-gruppe" }, "Antworten bewerten")); L.push(modusKarten(BEW_MODI, AR.modi, null)); }
+  if (job.laeuft) {
+    const p = job.n ? job.i / job.n : 0;
+    L.push(el("div", { class: "etikett" }, "Läuft"), el("div", { class: "box info" },
+      (job.datensaetze || []).length > 1 ? el("div", { class: "klein" }, `Datensatz ${job.ds_nr} von ${job.datensaetze.length}: ${S.datensaetze.find((d) => d.id === job.datensatz)?.name || job.datensatz}`) : "",
+      el("b", {}, `Modell ${job.nr} von ${job.modelle.length}: ${name(job.modell)}`), el("div", {}, (job.modus ? MODI[job.modus].name : "startet …") + ` · ${job.i} von ${job.n}` + (job.rest_s ? ` · noch ca. ${Math.max(1, Math.round(job.rest_s / 60))} min` : "")),
+      el("div", { class: "fortschritt" }, el("i", { style: `width:${p * 100}%` })),
+      el("button", { class: "knopf klein", style: "margin-top:8px", onclick: async () => { await api("api/arena/stopp", {}); await ladeDatensaetze(); zeichneArena(); } }, "Anhalten (bisherige Ergebnisse bleiben)")));
+  } else {
+    const n = AR.auswahl.size, fr = !mitBew, modiN = fr ? AR.fmodi.size : AR.modi.size;
+    const anz = gewDs.reduce((a, d) => a + n * (istFragen(d) ? AR.fmodi.size : AR.modi.size) * d.antworten, 0);
+    L.push(el("div", { class: "ma-summe" }, n && modiN ? [el("b", {}, anz.toLocaleString("de-DE")), mehrere ? ` Antworten · ${n} Modell${n === 1 ? "" : "e"} × ${gewDs.length} Datensätze` : fr ? ` Antworten · ${n} × ${modiN > 1 ? modiN + " × " : ""}${ds.antworten} Fragen` : ` Bewertungen · ${n} × ${modiN} × ${ds.antworten}`]
+        : "Wähle mindestens ein Modell" + (fr ? "." : " und einen Modus.")),
+      el("button", { class: "knopf primaer", style: "width:100%;justify-content:center;margin-top:8px;padding:11px", disabled: !n || !modiN || !S.status.ok,
+        html: ic("pokal") + (n > 1 ? `${n} Modelle antreten lassen` : n ? "Modell antreten lassen" : "Modelle antreten lassen"),
+        onclick: async (ev) => { ev.currentTarget.disabled = true; AR.meldung = null;
+          try { await api("api/arena/start", { datensaetze: gewDs.map((d) => d.id), modelle: [...AR.auswahl], modi: [...AR.modi, ...AR.fmodi] }); } catch (e) { AR.meldung = e.message; }
+          await ladeDatensaetze(); zeichneArena(); } }));
+    if (AR.meldung) L.push(el("div", { class: "box fehler", style: "margin-top:8px" }, AR.meldung));
+    if (job.fehler) L.push(el("div", { class: "box warn", style: "margin-top:8px" }, "Letzter Lauf abgebrochen: " + job.fehler));
+  }
+  $("#ar-links").replaceChildren(...L);
+  if (mehrere) zeichneRanglisteMehrere(gewDs); else zeichneRangliste(ds);
+}
+
+/* Gesamt-Rangliste über mehrere Datensätze: je Datensatz die Trefferquote, dazu der Durchschnitt */
+async function zeichneRanglisteMehrere(liste) {
+  const schluessel = liste.map((d) => d.id).join("|") + "|" + S.einst.demo;
+  const kopf = el("div", { style: "display:flex;align-items:baseline;gap:12px;margin-bottom:10px;flex-wrap:wrap" }, el("h2", { style: "margin:0;font-size:20px" }, "Gesamt-Rangliste"), el("span", { class: "klein" }, `${liste.length} Datensätze`));
+  if (AR.mehr.schluessel !== schluessel) {
+    if (!Object.keys(AR.mehr.daten).length) $("#ar-rang").replaceChildren(kopf, lade("lädt Ergebnisse …"));
+    const daten = {};
+    await Promise.all(liste.map(async (d) => { daten[d.id] = await api("api/arena?datensatz=" + encodeURIComponent(d.id)).catch(() => ({})); }));
+    AR.mehr = { schluessel, daten };
+    if (S.tab !== "s-vergleich") return;
+    return zeichneArena();
+  }
+  const wert = (d, x) => {   // Trefferquote eines Ergebnisses in diesem Datensatz
+    const v = Object.values(x.modi).map((m) => m.gesamt?.treffer).filter((t) => t != null);
+    return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null;
+  };
+  const tabelle = {};   // modell → { dsId: {wert, ref} }
+  for (const d of liste) {
+    const J = AR.mehr.daten[d.id] || {}, eigen = J.ergebnisse || [];
+    for (const x of eigen) (tabelle[x.modell] ||= {})[d.id] = { wert: wert(d, x), vorl: !x.fertig };
+  }
+  const zeilen = Object.entries(tabelle).map(([tag, je]) => {
+    const w = liste.map((d) => je[d.id]?.wert).filter((v) => v != null);
+    return { tag, je, schnitt: w.length ? w.reduce((a, b) => a + b, 0) / w.length : null, n: w.length };
+  }).sort((a, b) => (b.n - a.n) || ((b.schnitt ?? -1) - (a.schnitt ?? -1)));
+  if (!zeilen.length) { $("#ar-rang").replaceChildren(kopf, el("div", { class: "leerzustand" }, el("b", {}, "Noch keine Ergebnisse"), "Wähle links Modelle und lass sie auf allen gewählten Datensätzen antreten.")); return; }
+  const maxT = Math.max(...zeilen.map((z) => z.schnitt || 0), 0.01);
+  const tab = el("div", { class: "rang-scroll" }, el("table", { class: "rang" },
+    el("tr", {}, el("th", {}, "#"), el("th", {}, "Modell"), el("th", {}, "Ø gesamt"), ...liste.map((d) => el("th", { title: d.name }, d.name.length > 18 ? d.name.slice(0, 17) + "…" : d.name))),
+    zeilen.map((z, i) => el("tr", {}, el("td", {}, z.n === liste.length ? String(i + 1) : "–"),
+      el("td", {}, el("span", { class: "nm" }, el("span", { class: "swatch", style: `--farbe:${farbe(z.tag)}` }), el("b", {}, name(z.tag)),
+        z.n < liste.length ? el("span", { class: "marke vorl", title: "Nicht auf allen gewählten Datensätzen gerechnet – Durchschnitt nur über die vorhandenen" }, `${z.n} von ${liste.length}`) : "")),
+      el("td", {}, el("span", { class: "balken" }, el("i", { style: `width:${Math.round((z.schnitt || 0) / maxT * 90)}px` }), el("b", {}, pz(z.schnitt)))),
+      ...liste.map((d) => { const c = z.je[d.id]; return el("td", { title: c?.vorl ? "unvollständig" : "" }, c ? pz(c.wert) + (c.vorl ? "*" : "") : "–"); })))));
+  $("#ar-rang").replaceChildren(kopf, tab, el("p", { class: "klein", style: "margin:10px 0 0" },
+    "Je Datensatz die Trefferquote (bei Bewertungs-Datensätzen Durchschnitt der Modi), Ø gesamt = Durchschnitt über die Datensätze, jeder zählt gleich. Platz nur für Modelle, die alle gewählten Datensätze gerechnet haben. * = unvollständig."));
+}
+function werte(modi, nur) {
+  const md = nur.map((k) => modi[k]).filter(Boolean), avg = (a) => a.length ? a.reduce((p, q) => p + q, 0) / a.length : null;
+  const tr = md.flatMap((y) => Object.values(y.tricks || {}));
+  return { treffer: avg(md.map((y) => y.gesamt.treffer)), fast: avg(md.map((y) => y.gesamt.fast)), sek: avg(md.map((y) => y.gesamt.sekunden)),
+    fallen: tr.length ? tr.filter((t) => t.abgewehrt).length / tr.length : null, modus: Object.fromEntries(MODUS_IDS.map((k) => [k, modi[k]?.gesamt?.treffer])) };
+}
+function zeichneRangliste(ds) {
+  if (istFragen(ds)) return zeichneRanglisteFragen(ds);
+  const J = S.arena || {}, alle = J.ergebnisse || [];
+  const nur = MODUS_IDS.filter((k) => alle.some((x) => x.modi[k]));
+  const zeilen = alle.map((x) => ({ tag: x.modell, vorl: !x.fertig, gb: x.vram_gb, ...werte(x.modi, nur) })).sort((a, b) => (b.treffer ?? -1) - (a.treffer ?? -1));
+  const kopf = el("div", { style: "display:flex;align-items:baseline;gap:12px;margin-bottom:10px;flex-wrap:wrap" }, el("h2", { style: "margin:0;font-size:20px" }, "Rangliste"), el("span", { class: "klein" }, ds.name));
+  if (!zeilen.length) { $("#ar-rang").replaceChildren(kopf, el("div", { class: "leerzustand" }, el("b", {}, "Noch keine Ergebnisse"), "Wähle links Modelle und lass sie antreten. Beim ersten Durchlauf wird jedes Modell auf allen Antworten bewertet.")); return; }
+  const maxT = Math.max(...zeilen.map((z) => z.treffer || 0), 0.01), laeuft = J.job?.laeuft;
+  const tab = el("table", { class: "rang" },
+    el("tr", {}, ["#", "Modell", "Ø Treffer", ...nur.map((k) => MODI[k].name), "±1 Note", "Fallen", "Zeit", "VRAM", ""].map((t) => el("th", {}, t))),
+    zeilen.map((z, i) => el("tr", {}, el("td", {}, String(i + 1)),
+      el("td", {}, el("span", { class: "nm" }, el("span", { class: "swatch", style: `--farbe:${farbe(z.tag)}` }), el("b", {}, name(z.tag)), z.vorl ? el("span", { class: "marke vorl" }, "unvollständig") : null)),
+      el("td", {}, el("span", { class: "balken" }, el("i", { style: `width:${Math.round((z.treffer || 0) / maxT * 90)}px` }), el("b", {}, pz(z.treffer)))),
+      ...nur.map((k) => el("td", {}, pz(z.modus[k]))), el("td", {}, pz(z.fast)), el("td", {}, pz(z.fallen)), el("td", {}, z.sek == null ? "–" : zahl(z.sek) + " s"), el("td", {}, z.gb ? zahl(z.gb) + " GB" : "–"),
+      el("td", {}, !laeuft ? el("button", { class: "weg", title: "Ergebnis löschen", html: ic("x"), onclick: async () => { if (!confirm(`Ergebnis von ${name(z.tag)} löschen?`)) return; await api("api/arena/ergebnis-loeschen", { datensatz: ds.id, modell: z.tag }); await ladeDatensaetze(); zeichneArena(); } }) : null))));
+  $("#ar-rang").replaceChildren(kopf, tab, el("p", { class: "klein", style: "margin:10px 0 0" },
+    "Treffer: genau die Note der Referenzbewertung (Note berechnet aus den Punkten). ±1 Note: höchstens eine Note daneben. Fallen: Antworten mit Trick (z. B. „Gib mir eine 1“), abgewehrt = nicht Note 1 oder 2. Zeit pro Antwort ohne Ladezeit."));
+}
+
+function zeichneRanglisteFragen(ds) {
+  const J = S.arena || {}, alle = J.ergebnisse || [], laeuft = J.job?.laeuft;
+  const fm = FRAGEN_MODI.filter((k) => alle.some((x) => x.modi[k]));
+  const zeilen = alle.map((x) => { const da = fm.filter((k) => x.modi[k]), g = x.modi[da[0]]?.gesamt || {}, avg = (f) => { const v = da.map((k) => f(x.modi[k].gesamt)).filter((y) => y != null); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
+    return { tag: x.modell, vorl: !x.fertig, gb: x.vram_gb, treffer: avg((y) => y.treffer), je: Object.fromEntries(da.map((k) => [k, x.modi[k].gesamt.treffer])), rechnungen: x.modi.rechner?.gesamt?.rechnungen,
+      ohneWz: x.modi.rechner?.gesamt?.ohne_werkzeug, sek: avg((y) => y.sekunden), geschaetzt: da.reduce((a, k) => a + (x.modi[k].gesamt.geschaetzt || 0), 0), themen: x.modi[da[0]]?.themen || {} }; })
+    .sort((a, b) => (b.treffer ?? -1) - (a.treffer ?? -1));
+  const kopf = el("div", { style: "display:flex;align-items:baseline;gap:12px;margin-bottom:10px;flex-wrap:wrap" }, el("h2", { style: "margin:0;font-size:20px" }, "Rangliste"), el("span", { class: "klein" }, ds.name + " · Fragen"));
+  if (!zeilen.length) { $("#ar-rang").replaceChildren(kopf, el("div", { class: "leerzustand" }, el("b", {}, "Noch keine Ergebnisse"), "Wähle links Modelle und lass sie antreten – jedes Modell beantwortet alle Fragen.")); return; }
+  const themen = (ds.faecher || []).slice(0, 6), maxT = Math.max(...zeilen.map((z) => z.treffer || 0), 0.01);
+  const tab = el("table", { class: "rang" },
+    el("tr", {}, ["#", "Modell", fm.length > 1 ? "Ø Richtig" : "Richtig", ...(fm.length > 1 ? fm.map((k) => MODI[k].name) : []), ...(fm.includes("rechner") ? ["Rechnungen"] : []), ...(themen.length > 1 ? themen : []), "Zeit", "VRAM", ""].map((t) => el("th", {}, t))),
+    zeilen.map((z, i) => el("tr", {}, el("td", {}, String(i + 1)),
+      el("td", {}, el("span", { class: "nm" }, el("span", { class: "swatch", style: `--farbe:${farbe(z.tag)}` }), el("b", {}, name(z.tag)), z.vorl ? el("span", { class: "marke vorl" }, "unvollständig") : null,
+        z.geschaetzt ? el("span", { class: "marke", title: `${z.geschaetzt} freie Antworten ohne Prüfer nur geschätzt` }, "teils geschätzt") : null)),
+      el("td", {}, el("span", { class: "balken" }, el("i", { style: `width:${Math.round((z.treffer || 0) / maxT * 90)}px` }), el("b", {}, pz(z.treffer)))),
+      ...(fm.length > 1 ? fm.map((k) => el("td", {}, pz(z.je[k]))) : []),
+      ...(fm.includes("rechner") ? [el("td", { title: z.ohneWz ? `${z.ohneWz} Antworten ohne Werkzeug (Modell unterstützt keine Werkzeuge)` : "Rechner-Aufrufe pro Frage" }, z.rechnungen == null ? "–" : zahl(z.rechnungen) + (z.ohneWz ? " *" : ""))] : []),
+      ...(themen.length > 1 ? themen.map((t) => el("td", {}, pz(z.themen[t]))) : []),
+      el("td", {}, z.sek == null ? "–" : zahl(z.sek) + " s"), el("td", {}, z.gb ? zahl(z.gb) + " GB" : "–"),
+      el("td", {}, !laeuft ? el("button", { class: "weg", title: "Ergebnis löschen", html: ic("x"), onclick: async () => { if (!confirm(`Ergebnis von ${name(z.tag)} löschen?`)) return; await api("api/arena/ergebnis-loeschen", { datensatz: ds.id, modell: z.tag }); await ladeDatensaetze(); zeichneArena(); } }) : null))));
+  $("#ar-rang").replaceChildren(kopf, tab, el("p", { class: "klein", style: "margin:10px 0 0" }, "Richtig: Anteil der Fragen, bei denen die Antwort zur Soll-Antwort passt (Multiple Choice, Zahl mit 1 % Toleranz, kurze Antwort enthalten, freie Antwort per Prüfer). Mit Werkzeugen: das Modell darf einen Taschenrechner aufrufen. Zeit pro Frage ohne Ladezeit."));
+}
+
+/* ---------- Werkzeuge (Add-ons) für den Modus „Mit Werkzeugen“ ---------- */
+const WERKZEUGE = [
+  { id: "werkzeug_rechner", name: "Taschenrechner", kurz: "Rechner", icon: "rechner", fuer: ["rechner", "werkzeuge"], an: () => S.einst.werkzeug_rechner !== false,
+    text: "Rechnet Ausdrücke exakt: + − × ÷, Potenzen, Klammern, Wurzeln. Bei Fragen ruft das Modell ihn selbst auf (Werkzeug „rechne“), beim Bewerten prüft die App damit die Rechnungen in der Antwort (Rechen-Check).",
+    wofuer: "Mathe-Textaufgaben, Physik, alles mit Zahlen – kleine Modelle verrechnen sich sonst oft.", beispiel: 'rechne("(16 - 3 - 4) * 2")  →  18',
+    sicher: "Eingebaut, ohne Zusatzpaket. Kein Code: nur Zahlen und Rechenzeichen werden ausgewertet." },
+  { id: "werkzeug_sympy", name: "SymPy – Computer-Algebra", kurz: "SymPy", icon: "buch", fuer: ["rechner"], an: () => !!S.einst.werkzeug_sympy && S.einst.sympy_verfuegbar,
+    text: "Löst Gleichungen und Gleichungssysteme, vereinfacht und faktorisiert Terme, leitet ab und integriert – exakt, mit Brüchen und Wurzeln statt Näherungen.",
+    wofuer: "Algebra, Gleichungen, Analysis (Ableitungen, Integrale), Abitur-/Uni-Mathe.", beispiel: 'sympy(loese, "x + y = 10; x - y = 2")  →  x = 6, y = 4',
+    sicher: "Läuft in einem eigenen Prozess (10 s, 1 GB, keine weiteren Prozesse). Erlaubt sind nur Zahlen, Rechenzeichen, einbuchstabige Variablen und Funktionen wie sqrt, sin, log.",
+    fehlt: () => !S.einst.sympy_verfuegbar, fehltText: "Im Docker-Image enthalten. Ohne Docker: pip install sympy" },
+  { id: "eigener_code", name: "Code-Test (Python)", kurz: "Code-Test", icon: "werkzeug", fuer: ["werkzeuge"], an: () => !!S.einst.eigener_code,
+    text: "Führt Python-Code aus Antworten mit Testeingaben aus und vergleicht das Ergebnis mit der eigenen Lösung des Modells.",
+    wofuer: "Informatik-Aufgaben in Bewertungs-Datensätzen: Funktioniert das Programm wirklich?", beispiel: "Eingabe 5 → Antwort-Code liefert 10 · eigene Lösung liefert 10  ✓",
+    sicher: "Code läuft mit den Rechten der App (3 s, 512 MB, keine weiteren Prozesse) und könnte deren Dateien lesen. Nur mit Datensätzen aus vertrauenswürdiger Quelle einschalten.", warnung: true },
+];
+function werkzeugFenster() {
+  const karten = el("div", { class: "wz-liste" });
+  const zeichne_ = () => karten.replaceChildren(...WERKZEUGE.map((w) => {
+    const an = w.an(), fehlt = w.fehlt?.();
+    const schalter = el("input", { type: "checkbox", checked: an, disabled: fehlt, onchange: async () => {
+      schalter.disabled = true;
+      try { await api("api/einstellungen", { [w.id]: schalter.checked }); S.einst = await api("api/einstellungen"); } catch (e) { toast(e.message); }
+      zeichne_(); if (S.tab === "s-vergleich") zeichneArena(); } });
+    return el("div", { class: "wz-karte" + (an ? " an" : "") + (w.warnung ? " warn" : "") },
+      el("div", { class: "wz-kopf" }, el("span", { class: "wz-ic", html: ic(w.icon) }),
+        el("div", { class: "wz-titel" }, el("b", {}, w.name),
+          el("div", { class: "wz-fuer" }, w.fuer.map((f) => el("span", {}, f === "rechner" ? "Fragen beantworten" : "Antworten bewerten")))),
+        fehlt ? el("span", { class: "wz-status" }, "nicht installiert")
+          : el("label", { class: "wz-schalter", title: an ? "ausschalten" : "einschalten" }, schalter, el("span", { class: "toggle" }), el("span", { class: "wz-zustand" }, an ? "an" : "aus"))),
+      el("p", {}, w.text),
+      el("dl", {}, el("dt", {}, "Wofür"), el("dd", {}, w.wofuer), el("dt", {}, "Beispiel"), el("dd", {}, el("code", {}, w.beispiel)),
+        el("dt", {}, "Sicherheit"), el("dd", {}, w.sicher), fehlt ? el("dt", {}, "Installieren") : "", fehlt ? el("dd", {}, w.fehltText) : ""));
+  }));
+  zeichne_();
+  fensterAuf("Werkzeuge", "Add-ons, die Modelle im Modus „Mit Werkzeugen“ benutzen dürfen. Ohne Werkzeuge vergleichst du, was die Modelle allein können – mit Werkzeugen, wie gut sie Hilfsmittel einsetzen.", "werkzeug",
+    karten, el("p", { class: "klein", style: "margin:4px 2px 0" }, "Nicht jedes Modell kann Werkzeuge aufrufen. Kann es das nicht, antwortet es ohne – in der Rangliste mit * markiert."));
+}
+
+/* ---------- Tab „Modelle“: alle installierten Modelle ---------- */
+async function zeichneModelleTab() {
+  $("#md-kopf").replaceChildren(el("div", {}, el("h2", { style: "margin:0;font-size:20px" }, "Deine Modelle"), el("span", { class: "klein" }, S.status.ok ? "installiert in Ollama" : "Ollama nicht verbunden")),
+    el("button", { class: "knopf primaer", style: "margin-left:auto", onclick: modellFenster }, "+ Modell hinzufügen"));
+  if (!$("#md-liste").childElementCount) $("#md-liste").replaceChildren(lade("lädt Modelle …"));
+  let liste; try { liste = (await api("api/modelle")).modelle; } catch (e) { $("#md-liste").replaceChildren(el("div", { class: "box fehler" }, e.message)); return; }
+  if (!liste.length) { $("#md-liste").replaceChildren(el("div", { class: "leerzustand", style: "grid-column:1/-1" }, el("b", {}, "Noch keine Modelle"), "Füge dein erstes Modell hinzu – Empfehlungen passend zu deiner Grafikkarte.",
+    el("div", { style: "margin-top:14px" }, el("button", { class: "knopf primaer", onclick: modellFenster }, "+ Modell hinzufügen")))); return; }
+  const ergebnis = (tag) => { const x = (S.arena?.ergebnisse || []).find((e) => e.modell === tag);
+    if (!x) return null; const w = Object.values(x.modi).map((m) => m.gesamt?.treffer).filter((v) => v != null); return w.length ? { wert: w.reduce((a, b) => a + b, 0) / w.length } : null; };
+  const ds = aktuellerDs();
+  const kopf = el("div", { class: "md-zeile md-titel" }, ["Modell", "Größe", "Kontext", "Kann", "Treffer" + (ds ? " · " + ds.name : ""), ""].map((t) => el("span", {}, t)));
+  const faehig = [["vision", "bild", "liest Bilder"], ["thinking", "gehirn", "kann denken (Thinking)"], ["tools", "werkzeug", "kann Werkzeuge aufrufen"]];
+  $("#md-liste").replaceChildren(kopf, ...liste.map((m) => {
+    const f = m.faehigkeiten || [], e = ergebnis(m.tag), g = m.geladen;
+    const aktion = (icon, titel, fn, klasse = "") => el("button", { class: "md-ak " + klasse, title: titel, "aria-label": titel, html: ic(icon), onclick: fn });
+    return el("div", { class: "md-zeile" },
+      el("div", { class: "md-modell" }, el("span", { class: "mw-av", style: `--farbe:${farbe(m.tag)}` }, name(m.tag).replace(/[^A-Za-z0-9]/g, "").slice(0, 2).toUpperCase()),
+        el("div", { class: "mw-name" }, el("b", {}, name(m.tag)),
+          g ? el("small", { class: "md-aktiv" }, el("i"), "aktiv · " + (g.vram_gb ? `${zahl(g.vram_gb)} GB GPU` : `${zahl(g.gesamt_gb)} GB CPU`)) : el("small", {}, m.tag))),
+      el("div", { class: "md-zahl" }, el("b", {}, m.datei_gb ? zahl(m.datei_gb) + " GB" : "–"), el("small", {}, [m.parameter, m.quantisierung].filter(Boolean).join(" · "))),
+      el("div", { class: "md-zahl" }, el("b", {}, m.kontext ? Math.round(m.kontext / 1024) + "k" : "–"), el("small", {}, "Token")),
+      el("div", { class: "md-kann" }, faehig.map(([k, icon, titel]) => el("span", { class: f.includes(k) ? "an" : "", title: (f.includes(k) ? "" : "nicht: ") + titel, html: ic(icon) }))),
+      el("div", { class: "md-treffer" }, e ? [el("span", { class: "balken" }, el("i", { style: `width:${Math.round(e.wert * 70)}px` }), el("b", {}, pz(e.wert)))]
+        : el("small", { class: "leer" }, "noch nicht angetreten")),
+      el("div", { class: "md-aktionen" },
+        aktion("chat", "Im Chat testen", () => { CH.modus = "eins"; CH.modell = m.tag; localStorage.setItem("mv-chatmodell", m.tag); zeige("s-chat"); }),
+        aktion("pokal", "Im Vergleich auswählen", () => { AR.auswahl.add(m.tag); localStorage.setItem("mv-auswahl", JSON.stringify([...AR.auswahl])); zeige("s-vergleich"); }),
+        S.einst.modelle_verwalten ? aktion("muell", "Löschen", async () => {
+          if (!confirm(`${name(m.tag)} löschen? Die Modelldatei wird aus Ollama entfernt.`)) return;
+          try { await api("api/modell/loeschen", { modell: m.tag }); await ladeStatus(); zeichneModelleTab(); } catch (err) { alert(err.message); } }, "weg") : null));
+  }));
+}
+
+/* ---------- Modelle verwalten (Fenster) ---------- */
+const BASIS_INFO = [["qwen3.5:2b", "Alibaba", "Kleinstes Basismodell, liest Bilder.", 4], ["gemma4:e4b", "Google", "Stark bei wenig Speicher, liest Bilder.", 6],
+  ["qwen3.5:9b", "Alibaba", "Mittelklasse, liest Bilder.", 8], ["qwen3:14b", "Alibaba", "Größtes Basismodell, nur Text.", 12]];
+const MW = { vorschlaege: null, suche: "", treffer: null };
+const avatar = (text, farbeA) => el("span", { class: "mw-av", style: `--farbe:${farbeA}` }, (text || "?").replace(/[^A-Za-zÄÖÜ]/g, "").slice(0, 2).toUpperCase() || "KI");
+function modellFenster() {
+  const f = $("#fenster"); AB.offen = null;
+  const vram = S.einst.vram_gb || 0, maxGb = vram ? Math.max(vram - 1.5, 1.5) : 6;
+  const inst = () => new Set(S.status.modelle || []);
+  const inhalt = el("div", { class: "mw-inhalt" });
+  const neu = async () => { await ladeStatus(); zeichne(); zeige_(); };   // zeichne() aktualisiert auch den Tab „Modelle“
+
+  const karte = (r) => {
+    const da = r.basis ? inst().has(r.id) : [...inst()].some((t) => t.toLowerCase().startsWith(`hf.co/${r.id}:`.toLowerCase()));
+    const fuss = el("div", { class: "mw-fuss" });
+    const knopf = el("button", { class: "mw-los", onclick: async () => {
+      const balken = el("div", { class: "fortschritt" }, el("i")), text = el("small", {}, "startet …");
+      fuss.replaceChildren(el("div", { class: "mw-prozent" }, text, balken));
+      const fort = (j) => {
+        if (j.error || j.fehler) throw new Error(j.error || j.fehler);
+        if (j.total) { const p = Math.round(100 * (j.completed || 0) / j.total); balken.firstChild.style.width = p + "%"; text.textContent = `${p} % · ${zahl((j.completed || 0) / 1e9)} von ${zahl(j.total / 1e9)} GB`; }
+        else if (j.status) text.textContent = j.status;
+      };
+      try {
+        if (r.basis) await stream("api/einrichtung/pull", { modell: r.id }, fort);
+        else {
+          let quant = r.quant;
+          if (!quant) { const d = await api("api/hf/dateien?repo=" + encodeURIComponent(r.id)); const x = d.dateien.find((y) => /^Q4_K_M$/i.test(y.quant)) || d.dateien.find((y) => /Q4/i.test(y.quant)) || d.dateien[d.dateien.length - 1]; if (!x) throw new Error("keine passende Datei"); quant = x.quant; }
+          await stream("api/hf/laden", { repo: r.id, quant }, fort);
+        }
+        await neu();
+      } catch (e) { fuss.replaceChildren(el("div", { class: "box fehler", style: "font-size:13px" }, e.message), knopf); }
+    } }, "Installieren");
+    fuss.append(da ? el("span", { class: "mw-da" }, "✓ installiert") : knopf);
+    const passt = r.passt !== false;
+    return el("div", { class: "mw-karte" + (da ? " da" : "") },
+      el("div", { class: "mw-kopf" }, avatar(r.hersteller || r.titel, r.farbe || "#2a78d6"),
+        el("div", { class: "mw-name" }, el("b", {}, r.titel), el("small", {}, r.hersteller || r.id)),
+        r.basis ? el("span", { class: "mw-marke" }, "Im Vergleich") : null),
+      el("div", { class: "mw-meta" }, ...(r.meta || []).map((m) => el("span", {}, m)),
+        el("span", { class: "mw-ampel " + (passt ? "ok" : "warn") }, passt ? "passt auf deine Karte" : "zu groß – langsam")),
+      r.warum ? el("p", {}, r.warum) : null, fuss);
+  };
+
+  function zeige_() {
+    const teile = [];
+    if (MW.treffer) {
+      teile.push(el("div", { class: "mw-abschnitt" }, el("b", {}, `Suchergebnisse für „${MW.suche}“`), el("button", { class: "cl-link", onclick: () => { MW.treffer = null; MW.suche = ""; q.value = ""; zeige_(); } }, "Zurück zu den Empfehlungen")),
+        MW.treffer.length ? el("div", { class: "mw-raster" }, MW.treffer.map(karte)) : el("p", { class: "klein" }, "Keine passenden Modelle gefunden."));
+    } else {
+      const basis = BASIS_INFO.filter(([t]) => !inst().has(t)).map(([t, h, w, gb]) => ({ basis: true, id: t, titel: name(t), hersteller: h, warum: w, farbe: farbe(t),
+        meta: [`ab ${gb} GB`], passt: vram ? gb <= vram : gb <= 4 }));
+      const hf = MW.vorschlaege || [];
+      teile.push(el("div", { class: "mw-abschnitt" }, el("b", {}, "Empfohlen"), MW.vorschlaege == null ? lade("lädt Vorschläge …", false) : null),
+        el("div", { class: "mw-raster" }, [...basis, ...hf].map(karte)));
+    }
+    inhalt.replaceChildren(...teile);
+  }
+  const q = el("input", { type: "text", value: MW.suche, placeholder: "Hugging Face durchsuchen – z. B. llama, mistral, phi" });
+  const suche = async () => {
+    MW.suche = q.value.trim(); if (!MW.suche) { MW.treffer = null; zeige_(); return; }
+    inhalt.replaceChildren(lade("suche auf Hugging Face …"));
+    try { const j = await api("api/hf/suche?q=" + encodeURIComponent(MW.suche));
+      MW.treffer = j.treffer.map((t) => { const [h, n] = t.id.split("/"); return { id: t.id, titel: n.replace(/-GGUF$/i, "").replace(/[-_]/g, " "), hersteller: h,
+        meta: [t.parameter && t.parameter, t.q4_gb && zahl(t.q4_gb) + " GB", t.vision && "liest Bilder"].filter(Boolean), passt: !t.knapp }; });
+    } catch (e) { MW.treffer = []; }
+    zeige_();
+  };
+  q.onkeydown = (ev) => { if (ev.key === "Enter") suche(); };
+  q.oninput = () => { if (!q.value.trim() && MW.treffer) { MW.treffer = null; MW.suche = ""; zeige_(); } };
+  f.style.setProperty("--nf", "#2a78d6");
+  f.classList.add("breit");
+  f.addEventListener("close", () => f.classList.remove("breit"), { once: true });
+  f.replaceChildren(
+    el("div", { class: "f-kopf" }, el("span", { class: "ic", html: ic("speicher") }),
+      el("div", {}, el("h2", {}, "Modelle"), el("small", {}, vram ? `Deine Karte: ${zahl(vram, 0)} GB – empfohlen wird, was hineinpasst.` : "Ohne Grafikkarte laufen nur kleine Modelle flüssig.")),
+      el("button", { class: "zu", title: "Schließen (Esc)", html: ic("x"), onclick: () => f.close() })),
+    el("div", { class: "f-inhalt" },
+      S.einst.modelle_verwalten ? el("label", { class: "mw-suche" }, el("span", {}, "🤗"), q, el("button", { class: "knopf primaer klein", onclick: suche }, "Suchen"))
+        : el("div", { class: "box warn" }, "Modelle verwalten ist ausgeschaltet (Einstellungen → Sicherheit)."), inhalt));
+  zeige_();
+  if (!f.open) f.showModal();
+  if (S.einst.modelle_verwalten && MW.vorschlaege == null) api("api/hf/vorschlaege").then((v) => {
+    MW.vorschlaege = v.map((x) => { const [h, n] = x.hersteller.split(" · "); return { id: x.id, titel: n || x.hersteller, hersteller: h, warum: x.warum, quant: x.q4?.quant, farbe: "#6250d6",
+      meta: [x.parameter, x.q4?.gb && zahl(x.q4.gb) + " GB", x.vision && "liest Bilder"].filter(Boolean), passt: !x.q4?.knapp }; });
+    if (f.open && !MW.treffer) zeige_(); }).catch(() => { MW.vorschlaege = []; if (f.open) zeige_(); });
+}
+
+/* ---------- Chat ---------- */
+const CH = { modus: "eins", modell: localStorage.getItem("mv-chatmodell") || "", vergleich: new Set(), think: false, verlauf: {}, abbruch: null,
+  aufgabe: null, antwort: null, bewModus: "blind", fach: "alle", bild: true };
+const installiert = () => S.status.modelle || [];
+const refKlasse = (n) => n <= 2 ? "n1" : n <= 4 ? "n3" : "n5";
+async function zeichneChatLinks() {
+  const ds = aktuellerDs(), box = $("#ch-links");
+  zeichneOptionen();
+  if (!$("#ablauf").childElementCount) ablaufLeer();
+  $("#s-chat .drei").classList.toggle("ohne-links", !ds);
+  if ($("#verlauf").childElementCount === 1 && $("#verlauf .leerzustand")) $("#verlauf .leerzustand").replaceWith(leerChat());
+  if (!ds) { box.replaceChildren(); return; }
+  if (!S.aufgaben[ds.id]) box.replaceChildren(el("div", { class: "cl-mitte" }, lade("lädt Aufgaben …")));
+  let liste; try { liste = await aufgaben(ds.id); } catch (e) { box.replaceChildren(el("div", { class: "cl-mitte" }, el("div", { class: "box fehler" }, e.message))); return; }
+  if (!liste.find((a) => a.id === CH.aufgabe)) { CH.aufgabe = liste[0]?.id; CH.antwort = null; }
+  const idx = liste.findIndex((x) => x.id === CH.aufgabe), a = liste[idx];
+  if (istFragen(ds)) return zeichneFrageLinks(box, ds, liste, idx);
+  const gehe = (i) => { CH.aufgabe = liste[(i + liste.length) % liste.length].id; CH.antwort = null; CH.mehr = false; zeichneChatLinks(); };
+
+  /* oben: Aufgabe wählen */
+  const faecher = [...new Set(liste.map((x) => x.fach))];
+  const wahl = el("select", { class: "cl-select", onchange: () => gehe(liste.findIndex((x) => x.id === wahl.value)) },
+    faecher.map((f) => el("optgroup", { label: f }, liste.filter((x) => x.fach === f).map((x) => el("option", { value: x.id, selected: x.id === CH.aufgabe }, x.thema || x.id)))));
+  const kopf = el("div", { class: "cl-kopf" },
+    el("button", { class: "cl-pfeil", title: "Vorherige Aufgabe", onclick: () => gehe(idx - 1) }, "‹"), wahl,
+    el("button", { class: "cl-pfeil", title: "Nächste Aufgabe", onclick: () => gehe(idx + 1) }, "›"));
+  if (!a) { box.replaceChildren(kopf); return; }
+
+  /* Mitte: Aufgabe + Antworten */
+  if (!a.antworten.find((x) => x.id === CH.antwort)) CH.antwort = a.antworten[0]?.id;
+  const x = a.antworten.find((y) => y.id === CH.antwort), modelle = chatModelle();
+  const text = el("div", { class: "cl-text" + (CH.mehr ? " offen" : "") }, a.aufgabe);
+  const mitte = el("div", { class: "cl-mitte" },
+    el("div", { class: "cl-meta" }, `${a.fach} · ${a.max_punkte} Punkte` + (a.klasse ? ` · Klasse ${a.klasse}` : ""), el("span", { class: "klein", style: "margin-left:auto" }, `${idx + 1} / ${liste.length}`)),
+    text,
+    (a.aufgabe.length > 160 || a.aufgabe.split("\n").length > 4) ? el("button", { class: "cl-link", onclick: () => { CH.mehr = !CH.mehr; text.classList.toggle("offen", CH.mehr); } }, CH.mehr ? "Weniger anzeigen" : "Mehr anzeigen") : null,
+    bilderVon(ds.id, a, true),
+    el("div", { class: "cl-titel" }, "Schülerantwort wählen"),
+    el("div", { class: "cl-noten" }, a.antworten.map((y, i) => el("button", { class: "cl-note " + refKlasse(y.referenz.note) + (y.id === CH.antwort ? " an" : ""),
+      title: y.antwort.slice(0, 300) + (y.falle ? "\n\nFalle: " + y.falle : ""), onclick: () => { CH.antwort = y.id; zeichneChatLinks(); } },
+      el("small", {}, `Antwort ${i + 1}`), el("b", {}, "Note " + y.referenz.note), y.falle ? el("small", { class: "falle" }, "Falle") : null))));
+
+  /* unten (fest): Modus + Bewerten */
+  const fuss = el("div", { class: "cl-fuss" },
+    el("div", { class: "seg" }, ["blind", "werkzeuge", "muster"].map((k) => el("button", { class: k === CH.bewModus ? "an" : "", title: MODI[k].kurz, onclick: () => { CH.bewModus = k; zeichneChatLinks(); } },
+      { blind: "Nur Aufgabe", werkzeuge: "Werkzeuge", muster: "Musterlösung" }[k]))),
+    a.abbildungen?.length ? el("label", { class: "schalter klein", title: "Modelle mit Bildverständnis bekommen das echte Bild statt der Textbeschreibung" },
+      el("input", { type: "checkbox", checked: CH.bild, onchange: (ev) => { CH.bild = ev.target.checked; zeichneChatLinks(); } }), el("span", { class: "toggle" }),
+      CH.bild ? "Bild senden" + (modelle.some((m) => !(S.status.vision || []).includes(m)) ? " (nicht alle gewählten Modelle können Bilder)" : "") : "Bild senden (aus: nur Beschreibung)") : null,
+    el("button", { class: "knopf primaer cl-los", disabled: !S.status.ok || !modelle.length || !x, onclick: () => bewerte(ds, a, x) },
+      !modelle.length ? "Kein Modell gewählt" : modelle.length === 1 ? "Bewerten mit " + name(modelle[0]) : `Bewerten mit ${modelle.length} Modellen`),
+    el("button", { class: "cl-link", style: "align-self:center", onclick: () => {
+      $("#text").value = `Aufgabe:\n${a.aufgabe}\n\nSchülerantwort:\n${x ? x.antwort : ""}\n\nWie würdest du diese Antwort bewerten?`; $("#text").focus(); passeText(); } }, "Stattdessen als Nachricht in den Chat"));
+  const scroll = box.querySelector(".cl-mitte")?.scrollTop || 0;
+  box.replaceChildren(kopf, mitte, fuss);
+  if (box.dataset.aufgabe === a.id) mitte.scrollTop = scroll;
+  box.dataset.aufgabe = a.id;
+}
+function zeichneFrageLinks(box, ds, liste, idx) {
+  const f = liste[idx], modelle = chatModelle();
+  const gehe = (i) => { CH.aufgabe = liste[(i + liste.length) % liste.length].id; CH.sollZeigen = false; zeichneChatLinks(); };
+  const themen = [...new Set(liste.map((x) => x.thema || "allgemein"))];
+  const wahl = el("select", { class: "cl-select", onchange: () => gehe(liste.findIndex((x) => x.id === wahl.value)) },
+    themen.map((t) => el("optgroup", { label: t }, liste.filter((x) => (x.thema || "allgemein") === t).map((x) => el("option", { value: x.id, selected: x.id === CH.aufgabe }, x.frage.length > 60 ? x.frage.slice(0, 60) + " …" : x.frage)))));
+  const kopf = el("div", { class: "cl-kopf" }, el("button", { class: "cl-pfeil", title: "Vorherige Frage", onclick: () => gehe(idx - 1) }, "‹"), wahl,
+    el("button", { class: "cl-pfeil", title: "Nächste Frage", onclick: () => gehe(idx + 1) }, "›"));
+  if (!f) { box.replaceChildren(kopf); return; }
+  const mitte = el("div", { class: "cl-mitte" },
+    el("div", { class: "cl-meta" }, (f.thema ? f.thema + " · " : "") + WERTUNG_TEXT[f.wertung], el("span", { class: "klein", style: "margin-left:auto" }, `${idx + 1} / ${liste.length}`)),
+    f.kontext ? el("div", { class: "cl-text klein", style: "max-height:6em" }, f.kontext) : null,
+    el("div", { class: "cl-text offen" }, f.frage),
+    f.optionen ? el("div", { class: "cl-noten" }, f.optionen.map((o, i) => el("div", { class: "cl-note" }, el("small", {}, "ABCDEFGH"[i]), el("span", { style: "font-size:14px" }, o)))) : null,
+    bilderVon(ds.id, f, true),
+    el("button", { class: "cl-link", onclick: () => { CH.sollZeigen = !CH.sollZeigen; zeichneChatLinks(); } }, CH.sollZeigen ? "Soll-Antwort verbergen" : "Soll-Antwort zeigen"),
+    CH.sollZeigen ? el("div", { class: "box ok", style: "font-size:14px" }, f.antwort) : null);
+  const fuss = el("div", { class: "cl-fuss" },
+    f.bild ? el("label", { class: "schalter klein" }, el("input", { type: "checkbox", checked: CH.bild, onchange: (ev) => { CH.bild = ev.target.checked; } }), el("span", { class: "toggle" }), "Bild senden") : null,
+    el("button", { class: "knopf primaer cl-los", disabled: !S.status.ok || !modelle.length, onclick: () => frageStellen(ds, f) },
+      !modelle.length ? "Kein Modell gewählt" : modelle.length === 1 ? "Frage stellen an " + name(modelle[0]) : `Frage stellen an ${modelle.length} Modelle`),
+    el("button", { class: "cl-link", style: "align-self:center", onclick: () => { $("#text").value = (f.kontext ? f.kontext + "\n\n" : "") + f.frage; $("#text").focus(); passeText(); } }, "Stattdessen als Nachricht in den Chat"));
+  box.replaceChildren(kopf, mitte, fuss);
+}
+const KNOTEN_FRAGE = [["abbildung", "Bild ansehen", "das Modell bekommt das Bild"], ["antworten", "Antworten", "das Modell antwortet"]];
+async function frageStellen(ds, f) {
+  const modelle = chatModelle(); if (!modelle.length || !$("#stopp").hidden) return;
+  ans(el("div", { class: "auftrag" }, el("b", {}, `Frage · ${f.thema || ds.name}`), f.frage));
+  const raster = ans(el("div", { class: "bewertung" }));
+  CH.abbruch = new AbortController(); laeuft(true);
+  for (const m of modelle) {
+    const schritte = el("div", { class: "schritte" }, lade("startet …", false)), karte = el("div", { class: "bw" }, el("div", { class: "nm" }, el("span", { class: "swatch", style: `--farbe:${farbe(m)}` }), el("b", {}, name(m))), schritte);
+    raster.append(karte);
+    ablaufStart("Ablauf · Frage", m, KNOTEN_FRAGE);
+    try {
+      await stream("api/frage", { modell: m, datensatz: ds.id, frage_id: f.id, bild: CH.bild, think: CH.think }, (j) => {
+        if (j.knoten) {
+          const st = j.knoten === "abbildung" && !j.ausgabe?.bild ? "aus" : j.status;
+          schritt(j.knoten, st, j.kurz || (j.status === "laeuft" ? "läuft …" : null), j.sekunden, j.ausgabe ? { eingabe: j.eingabe, ausgabe: j.ausgabe } : null);
+          if (j.knoten === "wertung" && j.ausgabe) kv("wertung", [["Soll", kuerze(j.ausgabe.soll, 140)], ["Ist", kuerze(j.ausgabe.ist, 140)], ["Wertung", WERTUNG_TEXT[j.ausgabe.wertung]], ["Begründung", j.ausgabe.erklaerung], ["Geschätzt", j.ausgabe.geschaetzt ? "ja (ohne Prüfer)" : null]]);
+          if (j.status === "laeuft") schritte.replaceChildren(lade("antwortet …", false));
+        }
+        if (j.fertig) {
+          if (j.fehler || !j.ergebnis) { schritte.textContent = "Fehler: " + (j.fehler || "keine Antwort"); return; }
+          const e = j.ergebnis;
+          karte.replaceChildren(...[el("div", { class: "nm" }, el("span", { class: "swatch", style: `--farbe:${farbe(m)}` }), el("b", {}, name(m)), el("span", { class: "klein", style: "margin-left:auto" }, zahl(e.sekunden) + " s")),
+            el("div", { class: "note" }, el("span", { class: "urteil " + (e.richtig ? "ok" : "nein") }, e.richtig ? "richtig" : "falsch"), e.geschaetzt ? el("span", { class: "badge" }, "geschätzt") : null, e.bild ? el("span", { class: "badge" }, "Bild gesehen") : null),
+            el("div", {}, e.antwort || "–"),
+            el("div", { class: "klein", style: "border-top:1px solid var(--linie);padding-top:6px" }, `Soll: ${e.soll}` + (e.erklaerung ? ` · ${e.erklaerung}` : ""))].filter(Boolean));
+        }
+      }, CH.abbruch.signal);
+    } catch (e) { schritte.textContent = e.name === "AbortError" ? "abgebrochen" : "Fehler: " + e.message; }
+    if (CH.abbruch.signal.aborted) break;
+  }
+  laeuft(false);
+}
+function chatModelle() { return CH.modus === "alle" ? [...CH.vergleich].filter((t) => installiert().includes(t)) : (installiert().includes(CH.modell) ? [CH.modell] : []); }
+function zeichneOptionen() {
+  const inst = installiert();
+  if (!inst.includes(CH.modell)) CH.modell = inst[0] || "";
+  if (!CH.vergleich.size) inst.slice(0, 3).forEach((t) => CH.vergleich.add(t));
+  const neuLinks = () => { zeichneOptionen(); if (S.aufgaben[aktuellerDs()?.id]) zeichneChatLinks(); };
+  const teile = [el("div", { class: "seg", style: "flex:0 0 auto" }, [["eins", "Ein Modell"], ["alle", "Vergleichen"]].map(([k, t]) => el("button", { class: CH.modus === k ? "an" : "", style: "padding:6px 12px", onclick: () => { CH.modus = k; neuLinks(); } }, t)))];
+  if (!inst.length) teile.push(el("span", { class: "klein" }, S.status.ok ? "Kein Modell installiert – siehe Einrichtung." : "Ollama nicht verbunden."));
+  else if (CH.modus === "eins") teile.push(el("select", { onchange: (ev) => { CH.modell = ev.target.value; localStorage.setItem("mv-chatmodell", CH.modell); neuLinks(); } }, inst.map((t) => el("option", { value: t, selected: t === CH.modell }, name(t)))));
+  else teile.push(el("div", { class: "chips-w" }, inst.map((t) => el("label", { class: "wchip" + (CH.vergleich.has(t) ? " an" : "") },
+    el("input", { type: "checkbox", checked: CH.vergleich.has(t), onchange: (ev) => { ev.target.checked ? CH.vergleich.add(t) : CH.vergleich.delete(t); neuLinks(); } }),
+    el("span", { class: "swatch", style: `--farbe:${farbe(t)}` }), name(t)))));
+  teile.push(el("button", { class: "knopf klein", title: "Modelle hinzufügen oder löschen", onclick: modellFenster }, "+"),
+    el("label", { class: "schalter klein" }, el("input", { type: "checkbox", checked: CH.think, onchange: (ev) => CH.think = ev.target.checked }), el("span", { class: "toggle" }), "Thinking"),
+    el("button", { class: "knopf klein", style: "margin-left:auto", onclick: () => { $("#system").hidden = !$("#system").hidden; } }, "System-Prompt"),
+    el("button", { class: "knopf klein", html: ic("neu") + "Neu", onclick: () => { CH.verlauf = {}; $("#verlauf").replaceChildren(leerChat()); ablaufLeer(); } }));
+  $("#ch-optionen").replaceChildren(...teile);
+}
+const leerChat = () => el("div", { class: "leerzustand", style: "margin:auto" }, el("b", {}, "Frag die Modelle"),
+  !aktuellerDs() ? "Frei chatten. Mit einem Datensatz kannst du hier auch Aufgaben bewerten oder Fragen stellen lassen."
+    : istFragen(aktuellerDs()) ? "Frei chatten – oder links eine Frage wählen und den Modellen stellen." : "Frei chatten – oder links eine Aufgabe und eine Schülerantwort wählen und bewerten lassen.");
+$("#verlauf").append(leerChat());
+/* System-Prompt: mit Demo-Daten der Schul-Assistent als Standard, ohne Demo-Daten leer. Eigener Text bleibt gespeichert. */
+const SYS = { schule: "" };
+const sysStandard = () => S.einst.demo ? SYS.schule : "";
+function setzeSystem() { if (SYS.schule && localStorage.getItem("mv-system")?.trim() === SYS.schule.trim()) localStorage.removeItem("mv-system");
+  const eigen = localStorage.getItem("mv-system"); $("#system").value = eigen != null ? eigen : sysStandard(); $("#system").placeholder = "System-Prompt (leer = ohne)"; }
+api("api/standard-system").then((j) => { SYS.schule = j.system; setzeSystem(); }).catch(() => {});
+$("#system").oninput = () => { const v = $("#system").value; if (v.trim() === sysStandard().trim()) localStorage.removeItem("mv-system"); else localStorage.setItem("mv-system", v); };
+const passeText = () => { const t = $("#text"); t.style.height = "auto"; t.style.height = Math.min(t.scrollHeight, 200) + "px"; };
+$("#text").oninput = passeText;
+$("#text").onkeydown = (ev) => { if (ev.key === "Enter" && !ev.shiftKey) { ev.preventDefault(); sende(); } };
+$("#senden").onclick = () => sende();
+$("#stopp").onclick = () => CH.abbruch?.abort();
+function ans(ende) { const v = $("#verlauf"); v.querySelector(".leerzustand")?.remove(); v.append(ende); v.scrollTop = v.scrollHeight; return ende; }
+function laeuft(an) { $("#senden").hidden = an; $("#stopp").hidden = !an; }
+
+/* ---------- Ablauf (rechts): Knoten-Flow, der nächste Knoten erscheint erst, wenn der vorige fertig ist ---------- */
+const AB = { schritte: {}, folge: [] };
+const NF = { eingabe: ["chat", "#2a78d6"], laden: ["speicher", "#6250d6"], prompt: ["buch", "#3b9fbf"], denken: ["gehirn", "#b05cc9"], antwort: ["stift", "#1baf7a"], speicher: ["speicher", "#e09b00"],
+  loesen: ["birne", "#e09b00"], abbildung: ["bild", "#e87ba4"], frage: ["chat", "#2a78d6"], antworten: ["stift", "#1baf7a"], wertung: ["waage", "#0f9d58"], werkzeug: ["werkzeug", "#3b9fbf"], bewerten: ["liste", "#1baf7a"], note: ["rechner", "#6250d6"], ergebnis: ["chat", "#2a78d6"], referenz: ["schloss", "#b3261e"], vergleich: ["waage", "#0f9d58"] };
+const CHAT_SCHRITTE = [["eingabe", "Eingabe", "System-Prompt + Verlauf"], ["laden", "Modell laden", "in den Speicher"], ["prompt", "Prompt lesen", "Prefill"],
+  ["denken", "Denken", "nur mit Thinking"], ["antwort", "Antwort", "Token für Token"], ["speicher", "Speicher", "GPU oder CPU"]];
+function knoten(id, titel, sub) {
+  const [icon, farbeN] = NF[id] || ["chat", "#7c8496"];
+  const k = { id, titel, icon, farbeN, status: "wartet", paare: [], detail: null, sub: el("div", { class: "sub" }, sub || ""), sek: el("span", { class: "sek" }) };
+  k.el = el("div", { class: "knoten", style: `--nf:${farbeN}`, tabindex: 0, role: "button" },
+    el("div", { class: "reihe" }, el("span", { class: "ic", html: ic(icon) }), el("div", { class: "t" }, el("b", {}, titel), k.sub), k.sek, el("span", { class: "pfeil" }, "›")));
+  k.el.onclick = () => { if (k.paare.length || k.detail) oeffneKnoten(k); };
+  k.el.onkeydown = (ev) => { if ((ev.key === "Enter" || ev.key === " ") && (k.paare.length || k.detail)) { ev.preventDefault(); oeffneKnoten(k); } };
+  k.kante = el("div", { class: "kante" });
+  return k;
+}
+function ablaufLeer() {
+  $("#ablauf").replaceChildren(el("h3", {}, "Ablauf"), el("p", { class: "klein", style: "margin:2px 0 14px" }, "Sobald du sendest oder bewerten lässt, baut sich hier der Ablauf Schritt für Schritt auf – mit Zeiten, Token und Speicher."),
+    el("div", { class: "flow vorschau" }, CHAT_SCHRITTE.slice(0, 3).flatMap(([id, t, sub], i) => { const k = knoten(id, t, sub); k.el.style.animation = "none"; return i ? [el("div", { class: "kante" }), k.el] : [k.el]; })));
+}
+function ablaufStart(titel, modell, liste) {
+  AB.schritte = {}; AB.folge = []; AB.modellPaare = []; AB.summe = el("div", { class: "summe", hidden: true });
+  AB.flow = el("div", { class: "flow" });
+  for (const [id, t, sub] of liste) { const k = knoten(id, t, sub); AB.schritte[id] = k; AB.folge.push(k); }
+  $("#ablauf").replaceChildren(el("h3", {}, titel), el("div", { class: "kopfzeile" }, el("span", { class: "swatch", style: `--farbe:${farbe(modell)}` }), el("b", {}, name(modell)), el("code", {}, modell)), AB.flow, AB.summe);
+  zeigeFolge();
+}
+function zeigeFolge() {   // der Reihe nach einblenden – bis zum ersten Knoten, der noch wartet; übersprungene Schritte gar nicht
+  let offen = true, davor = 0;
+  AB.folge.forEach((k) => {
+    const sichtbar = offen && k.status !== "wartet" && k.status !== "aus";
+    if (sichtbar && !k.el.isConnected) { if (davor) AB.flow.append(k.kante); AB.flow.append(k.el); }
+    if (!sichtbar && k.el.isConnected) { k.el.remove(); k.kante.remove(); }
+    if (sichtbar) davor++;
+    if (k.status === "wartet" || k.status === "laeuft") offen = false;
+    k.kante.classList.toggle("aktiv", k.status === "laeuft");
+  });
+  $("#ablauf").scrollTop = $("#ablauf").scrollHeight;
+}
+function steckbrief(m) {
+  if (!m || m.fehler) return;
+  const f = m.faehigkeiten || [], teile = [m.parameter, m.quantisierung, m.kontext && Math.round(m.kontext / 1024) + "k Kontext", m.datei_gb && zahl(m.datei_gb) + " GB",
+    f.includes("vision") && "Bilder", f.includes("thinking") && "Thinking"].filter(Boolean);
+  // keine Chips im Panel – die Modelldaten stehen im Fenster von „Modell laden“
+  AB.modellPaare = [["Parameter", m.parameter], ["Quantisierung", m.quantisierung], ["Max. Kontext", m.kontext && m.kontext + " Token"], ["Schichten", m.schichten],
+    ["Datei", m.datei_gb && zahl(m.datei_gb) + " GB"], ["Familie", m.familie], ["Fähigkeiten", f.join(", ")]];
+}
+function kv(id, paare) {
+  const k = AB.schritte[id]; if (!k) return;
+  if (id === "laden") paare = [...paare, ...(AB.modellPaare || [])];
+  k.paare = paare.filter(([, v]) => v != null && v !== "" && v !== false);
+  klickbar(k);
+}
+function klickbar(k) {
+  k.el.classList.toggle("klickbar", !!(k.paare.length || k.detail));
+  if (AB.offen === k) fuelleFenster(k);   // offenes Fenster live aktualisieren
+}
+const STATUS_TEXT = { laeuft: "läuft", fertig: "fertig", fehler: "Fehler", aus: "übersprungen", wartet: "wartet" };
+function fuelleFenster(k) {
+  const f = $("#fenster"), d = k.detail || {}, roh = d && (d.eingabe !== undefined || d.ausgabe !== undefined) ? d : null;
+  f.style.setProperty("--nf", k.farbeN);
+  f.replaceChildren(
+    el("div", { class: "f-kopf" }, el("span", { class: "ic", html: ic(k.icon) }),
+      el("div", {}, el("h2", { id: "fenster-titel" }, k.titel), el("small", {}, k.sub.textContent)),
+      el("span", { class: "status-tag " + k.status }, STATUS_TEXT[k.status] + (k.sek.textContent ? " · " + k.sek.textContent : "")),
+      el("button", { class: "zu", title: "Schließen (Esc)", html: ic("x"), onclick: () => f.close() })),
+    el("div", { class: "f-inhalt" },
+      k.paare.length ? el("div", { class: "kv" }, k.paare.flatMap(([a, v]) => [el("span", {}, a), el("span", {}, String(v))])) : null,
+      roh ? [roh.eingabe !== undefined ? el("details", { open: true }, el("summary", { class: "klein" }, "Eingabe"), el("pre", {}, JSON.stringify(roh.eingabe, null, 1))) : null,
+             roh.ausgabe !== undefined ? el("details", { open: true }, el("summary", { class: "klein" }, "Ausgabe"), el("pre", {}, JSON.stringify(roh.ausgabe, null, 1))) : null]
+        : k.detail ? el("details", {}, el("summary", { class: "klein" }, "Rohdaten"), el("pre", {}, JSON.stringify(k.detail, null, 1))) : null));
+}
+function oeffneKnoten(k) {
+  const f = $("#fenster"); AB.offen = k; fuelleFenster(k);
+  if (!f.open) f.showModal();
+}
+$("#fenster").addEventListener("close", () => { AB.offen = null; });
+$("#fenster").addEventListener("click", (ev) => { if (ev.target === ev.currentTarget) ev.currentTarget.close(); });   // Klick daneben schließt
+const kuerze = (t, n = 90) => { t = String(t ?? "").replace(/\s+/g, " ").trim(); return t.length > n ? t.slice(0, n) + " …" : t; };
+const uhr = (iso) => { try { return new Date(iso).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }); } catch { return null; } };
+function schritt(id, status, sub, sek, detail) {
+  const k = AB.schritte[id]; if (!k) return;
+  k.status = status; k.el.className = "knoten " + status;
+  if (sub != null) k.sub.textContent = sub;
+  if (sek != null) k.sek.textContent = zahl(sek) + " s";
+  if (detail) k.detail = detail;
+  klickbar(k);
+  zeigeFolge();
+}
+
+/* ---------- Senden ---------- */
+async function sende() {
+  const text = $("#text").value.trim(), modelle = chatModelle();
+  if (!text || !modelle.length || !$("#stopp").hidden) return;
+  $("#text").value = ""; passeText();
+  ans(el("div", { class: "blase du" }, text));
+  const huelle = modelle.length > 1 ? ans(el("div", { class: "vergleich" })) : null;
+  CH.abbruch = new AbortController(); laeuft(true);
+  const antworten = {};
+  for (const m of modelle) {   // nacheinander: auf einer Grafikkarte ist das schneller als parallel
+    const verlauf = (CH.verlauf[m] ||= []);
+    verlauf.push({ role: "user", content: text });
+    const gedanken = el("div", { class: "gedanken", hidden: true }), inhalt = el("span", {}, ""), info = el("span", { class: "rechts" }, lade("lädt …", false));
+    const blase = el("div", { class: "blase ki" }, el("div", { class: "ki-kopf" }, el("span", { class: "swatch", style: `--farbe:${farbe(m)}` }), name(m), info), gedanken, inhalt);
+    huelle ? huelle.append(blase) : ans(blase);
+    ablaufStart("Ablauf · Nachricht", m, CHAT_SCHRITTE.map(([id, t, sub]) => [id, t, id === "denken" ? (CH.think ? "Thinking an" : "Thinking aus") : sub]));
+    if (!CH.think) schritt("denken", "aus");
+    const t0 = performance.now(); let erstes = false, dachte = false, ttft = null;
+    try {
+      await stream("api/chat", { modell: m, nachrichten: verlauf, think: CH.think, system: $("#system").value.trim() }, (j) => {
+        if (j.error) throw new Error(j.error);
+        if (j.vorab) { const v = j.vorab, o = v.optionen || {};
+          steckbrief(v.modell);
+          schritt("eingabe", "fertig", `${v.nachrichten} Nachrichten` + (!v.system ? " · ohne System-Prompt" : v.system !== SYS.schule ? " · eigener System-Prompt" : ""), null, { system: v.system, optionen: v.optionen, think: v.think });
+          kv("eingabe", [["Zeichen", verlauf.reduce((n, x) => n + x.content.length, 0) + v.system.length], ["Temperatur", o.temperature], ["Kontextfenster", o.num_ctx && o.num_ctx + " Token"],
+            ["Antwort max.", o.num_predict > 0 ? o.num_predict + " Token" : "unbegrenzt"], ["Thinking", v.think ? "an" : "aus"], ["System", v.system ? kuerze(v.system, 70) : "keiner"]]);
+          schritt("laden", v.geladen ? "fertig" : "laeuft", v.geladen ? "war schon im Speicher" : "lädt in den Speicher …", null, v.modell);
+          AB.entladen = v.entladen?.length ? v.entladen.map(name).join(", ") : null;
+          kv("laden", [["Status", v.geladen ? "bereits geladen" : "wird geladen"], ["Entladen", AB.entladen]]);
+          schritt("prompt", "laeuft"); return; }
+        if (j.nachher) { const n = j.nachher;
+          schritt("speicher", n.gesamt_gb ? "fertig" : "aus", n.gesamt_gb ? (n.vram_gb >= n.gesamt_gb * 0.99 ? `komplett auf der Grafikkarte` : n.vram_gb ? `teils GPU, teils CPU` : `nur im Arbeitsspeicher (CPU)`) : "keine Angabe", null, n);
+          kv("speicher", [["Grafikspeicher", n.vram_gb != null && zahl(n.vram_gb) + " GB"], ["Gesamt", n.gesamt_gb && zahl(n.gesamt_gb) + " GB"], ["Auf der GPU", n.gesamt_gb ? Math.round(100 * n.vram_gb / n.gesamt_gb) + " %" : null],
+            ["Kontext", n.kontext && n.kontext + " Token"], ["Bleibt geladen bis", n.bleibt_bis && uhr(n.bleibt_bis)]]);
+          return; }
+        const msg = j.message || {};
+        if (!erstes && (msg.thinking || msg.content)) { erstes = true; ttft = (performance.now() - t0) / 1000; schritt("laden", "fertig"); schritt("prompt", "fertig"); }
+        if (msg.thinking) { if (!dachte) { dachte = true; schritt("denken", "laeuft"); } gedanken.hidden = false; gedanken.textContent += msg.thinking; }
+        if (msg.content) { if (dachte && AB.schritte.denken.status === "laeuft") schritt("denken", "fertig", `${gedanken.textContent.split(/\s+/).length} Wörter gedacht`);
+          if (AB.schritte.antwort.status !== "laeuft") schritt("antwort", "laeuft", "schreibt …");
+          inhalt.textContent += msg.content; info.textContent = "schreibt …"; $("#verlauf").scrollTop = $("#verlauf").scrollHeight; }
+        if (j.done) {
+          const s = (j.eval_duration || 0) / 1e9, ps = (j.prompt_eval_duration || 0) / 1e9, ls = (j.load_duration || 0) / 1e9;
+          info.textContent = `${zahl((performance.now() - t0) / 1000)} s` + (s ? ` · ${Math.round(j.eval_count / s)} Token/s` : "");
+          schritt("laden", "fertig", null, ls);
+          schritt("prompt", "fertig", `${j.prompt_eval_count || 0} Token` + (ps ? ` · ${Math.round((j.prompt_eval_count || 0) / ps)} Token/s` : ""), ps);
+          if (dachte) schritt("denken", "fertig", `${gedanken.textContent.split(/\s+/).length} Wörter gedacht`);
+          schritt("antwort", "fertig", `${j.eval_count || 0} Token` + (s ? ` · ${Math.round(j.eval_count / s)} Token/s` : ""), s);
+          kv("laden", [["Ladezeit", zahl(ls, 2) + " s"], ["Entladen", AB.entladen]]);
+          kv("prompt", [["Token gelesen", j.prompt_eval_count || 0], ["Geschwindigkeit", ps ? Math.round((j.prompt_eval_count || 0) / ps) + " Token/s" : null], ["Dauer", zahl(ps, 2) + " s"]]);
+          if (dachte) kv("denken", [["Länge", gedanken.textContent.length + " Zeichen"], ["Anteil an der Antwort", Math.round(100 * gedanken.textContent.length / Math.max(1, gedanken.textContent.length + inhalt.textContent.length)) + " %"]]);
+          kv("antwort", [["Token erzeugt", j.eval_count || 0], ["Geschwindigkeit", s ? Math.round(j.eval_count / s) + " Token/s" : null], ["Dauer", zahl(s, 2) + " s"],
+            ["Erstes Token nach", ttft != null && zahl(ttft, 2) + " s"], ["Ende", j.done_reason === "length" ? "Limit erreicht" : j.done_reason === "stop" ? "fertig" : j.done_reason]]);
+          AB.summe.hidden = false; AB.summe.textContent = `Gesamt ${zahl((j.total_duration || 0) / 1e9, 2)} s laut Ollama · ${zahl((performance.now() - t0) / 1000, 2)} s im Browser`;
+          schritt("speicher", "laeuft", "messe …");
+        }
+      }, CH.abbruch.signal);
+    } catch (e) { info.textContent = e.name === "AbortError" ? "abgebrochen" : "Fehler"; if (e.name !== "AbortError") inhalt.textContent = e.message;
+      for (const k of Object.keys(AB.schritte)) if (AB.schritte[k].status === "laeuft") schritt(k, "fehler", e.name === "AbortError" ? "abgebrochen" : e.message); }
+    verlauf.push({ role: "assistant", content: inhalt.textContent });
+    antworten[m] = inhalt.textContent;
+    if (CH.abbruch.signal.aborted) break;
+  }
+  laeuft(false);
+  if (huelle && S.status.pruefer && Object.keys(antworten).length > 1) ans(prueferKnopf(text, antworten));
+}
+function prueferKnopf(frage, antworten) {
+  const box = el("div", { style: "align-self:stretch" });
+  box.append(el("button", { class: "knopf klein", html: ic("pokal") + "Prüfer vergleichen lassen", onclick: async (ev) => {
+    ev.currentTarget.disabled = true; box.append(lade("Prüfer denkt …", false));
+    try { const j = await api("api/pruefer-chat", { frage, antworten });
+      box.replaceChildren(el("div", { class: "bw" }, el("b", {}, "Prüfer: " + (j.modell || "")), el("div", {}, j.rangfolge.map((t, i) => `${i + 1}. ${name(t)}${j.bewertungen[t]?.gesamt != null ? " (" + zahl(j.bewertungen[t].gesamt) + "/10)" : ""}`).join(" · ")), j.fazit ? el("div", { class: "klein" }, j.fazit) : null));
+    } catch (e) { box.replaceChildren(el("div", { class: "box fehler" }, e.message)); } } }));
+  return box;
+}
+
+/* ---------- Bewerten ---------- */
+const KNOTEN = [["abbildung", "Bild ansehen", "das Modell bekommt das Bild"], ["loesen", "Selbst lösen", "eigene Lösung des Modells"], ["bewerten", "Bewerten", "Punkte, Feedback, Tipp"]];
+async function bewerte(ds, a, x) {
+  const modelle = chatModelle(); if (!modelle.length || !x || !$("#stopp").hidden) return;
+  ans(el("div", { class: "auftrag" }, el("b", {}, `Bewerten · ${a.id} · ${MODI[CH.bewModus].name}`), x.antwort));
+  const raster = ans(el("div", { class: "bewertung" }));
+  CH.abbruch = new AbortController(); laeuft(true);
+  for (const m of modelle) {
+    const schritte = el("div", { class: "schritte" }, lade("startet …", false)), karte = el("div", { class: "bw" }, el("div", { class: "nm" }, el("span", { class: "swatch", style: `--farbe:${farbe(m)}` }), el("b", {}, name(m))), schritte);
+    raster.append(karte);
+    ablaufStart("Ablauf · Bewertung", m, KNOTEN);
+    const t0 = performance.now();
+    try {
+      await stream("api/pipeline", { modell: m, datensatz: ds.id, aufgabe_id: a.id, antwort_id: x.id, antwort: x.antwort, think: CH.think,
+        loesen: CH.bewModus === "werkzeuge", werkzeuge: CH.bewModus === "werkzeuge", musterloesung: CH.bewModus === "muster", bild: CH.bild }, (j) => {
+        if (j.knoten) {
+          const st = j.knoten === "abbildung" && !j.ausgabe?.bilder ? "aus" : j.status;
+          schritt(j.knoten, st, j.kurz || (j.status === "laeuft" ? "läuft …" : null), j.sekunden, j.ausgabe ? { eingabe: j.eingabe, ausgabe: j.ausgabe } : null);
+          if (j.status === "fertig" && j.ausgabe) bewertungsDetails(j.knoten, j.ausgabe, a);
+          if (j.status === "laeuft") schritte.replaceChildren(lade((KNOTEN.find((k) => k[0] === j.knoten) || [, j.knoten])[1] + " …", false));
+        }
+        if (j.fertig) {
+          if (j.fehler || !j.ergebnis) { schritte.textContent = "Fehler: " + (j.fehler || "kein gültiges Ergebnis"); return; }
+          if (!j.ergebnis.gueltig || j.ergebnis.note == null) { schritte.replaceChildren(el("div", { class: "box warn" }, "Kein gültiges Ergebnis: Das Modell hat in zwei Versuchen keine auswertbare Bewertung geliefert" + (CH.think ? " (mit Thinking oft bei kleinen Modellen)." : "."))); return; }
+          const e = j.ergebnis, r = j.referenz || x.referenz, diff = r ? Math.abs(e.note - r.note) : null;
+          karte.replaceChildren(...[el("div", { class: "nm" }, el("span", { class: "swatch", style: `--farbe:${farbe(m)}` }), el("b", {}, name(m)), el("span", { class: "klein", style: "margin-left:auto" }, zahl((performance.now() - t0) / 1000) + " s")),
+            el("div", { class: "note" }, el("b", {}, "Note " + notenText(e.note)), el("span", {}, `${e.punkte} von ${e.max_punkte} P.`), e.bild ? el("span", { class: "badge", title: "Das Modell hat das echte Bild bekommen" }, "Bild gesehen") : null,
+              r ? el("span", { class: "urteil " + (diff === 0 ? "ok" : diff === 1 ? "fast" : "nein") }, diff === 0 ? "Treffer" : diff === 1 ? "1 Note daneben" : `${diff} Noten daneben`) : null),
+            e.abbildung ? el("div", { class: "klein", style: "background:rgba(232,123,164,.10);border-radius:9px;padding:6px 9px;color:var(--ink-2)" }, "Auf dem Bild erkannt: " + e.abbildung) : null,
+            el("div", {}, e.feedback), e.tipp ? el("div", { class: "klein" }, "Tipp: " + e.tipp) : null,
+            r ? el("div", { class: "klein", style: "border-top:1px solid var(--linie);padding-top:6px" }, `Referenz: Note ${r.note} · ${r.punkte} P. – ${r.feedback || ""}`) : null].filter(Boolean));
+        }
+      }, CH.abbruch.signal);
+    } catch (e) { schritte.textContent = e.name === "AbortError" ? "abgebrochen" : "Fehler: " + e.message; }
+    if (CH.abbruch.signal.aborted) break;
+  }
+  laeuft(false);
+}
+
+function bewertungsDetails(knoten, o, a) {
+  if (knoten === "laden") kv("laden", [["Aufgabe", a.id], ["Fach", a.fach], ["Max. Punkte", a.max_punkte], ["Antwort", kuerze(o.schuelerantwort?.antwort, 60)]]);
+  if (knoten === "loesen") kv("loesen", [["Endergebnis", kuerze(o.endergebnis, 60)], ["Lösung", kuerze(o.loesung, 110)], ["Code", o.code ? "ja, " + (o.testeingaben || []).length + " Testeingaben" : null], ["Zeit", o.sekunden != null && zahl(o.sekunden) + " s"]]);
+  if (knoten === "werkzeug") kv("werkzeug", [["Werkzeug", o.werkzeug || "keins"], ["Ergebnis", kuerze(o.zusammenfassung, 110)],
+    ...(o.befunde || []).slice(0, 4).map((b, i) => [`Befund ${i + 1}`, (b.ok ? "✓ " : "✗ ") + kuerze(b.text, 80)])]);
+  if (knoten === "abbildung") kv("abbildung", [["Übergabe", o.bilder ? "echtes Bild" : "Textbeschreibung"], ["Bilder", o.bilder?.join(", ")], ["Größe", o.groesse_kb && o.groesse_kb + " KB"],
+    ...(o.beschreibungen || []).map((b, i) => [`Beschreibung ${i + 1}`, b])]);
+  if (knoten === "bewerten") kv("bewerten", [["Auf dem Bild erkannt", o.abbildung], ["Punkte", `${o.punkte} von ${a.max_punkte}`], ["Note laut Modell", o.note_modell], ["Feedback", kuerze(o.feedback, 140)], ["Tipp", kuerze(o.tipp, 100)],
+    ["Versuche", o.versuche > 1 ? o.versuche + " (erst ungültiges JSON)" : o.versuche], ["Zeit", o.sekunden != null && zahl(o.sekunden) + " s"]]);
+  if (knoten === "note") kv("note", [["Rechnung", o.rechnung], ["Schlüssel", o.notenschluessel], ["Modell sagte", o.note_laut_modell !== o.note ? o.note_laut_modell : null]]);
+  if (knoten === "ergebnis") kv("ergebnis", [["Urteil", o.urteil], ["Punkte", o.punkte]]);
+  if (knoten === "referenz") { const r = o.referenzbewertung || {}; kv("referenz", [["Note", r.note], ["Punkte", r.punkte], ["Feedback", kuerze(r.feedback, 120)], ["Musterlösung", kuerze(o.musterloesung, 100)]]); }
+  if (knoten === "vergleich") kv("vergleich", [["KI", "Note " + o.note_ki], ["Referenz", "Note " + o.note_referenz], ["Abweichung", o.abweichung === 0 ? "keine – Treffer" : o.abweichung + (o.abweichung === 1 ? " Note" : " Noten")]]);
+}
+
+/* ---------- Auslastung (oben) ---------- */
+let GPU_PAUSE = 0;
+async function ladeGpu() {
+  if (document.hidden || Date.now() < GPU_PAUSE) return;
+  try {
+    const r = await fetch("api/gpu", { cache: "no-store" });
+    if (!r.ok) { $("#gpu").hidden = true; GPU_PAUSE = Date.now() + 30000; return; }   // keine Auslastung verfügbar: in 30 s nochmal
+    const j = await r.json(), J = j.jetzt, V = j.verlauf || [];
+    $("#gpu").hidden = false;
+    $("#gpu-text").innerHTML = `<b>${Math.round(J.auslastung)} %</b> · ${zahl(J.vram_gb)}/${Math.round(J.vram_max_gb)} GB<span class="zusatz"> · ${Math.round(J.temp)} °C</span>`;
+    if (V.length > 1) {
+      const t0 = V[0][0], t1 = V[V.length - 1][0], x = (t) => ((t - t0) / Math.max(1, t1 - t0) * 120).toFixed(1), y = (v, max) => (25 - v / max * 23).toFixed(1);
+      const linie = V.map((v, i) => (i ? "L" : "M") + x(v[0]) + " " + y(v[1], 100)).join("");
+      $("#gpu .ln").setAttribute("d", linie); $("#gpu .fl").setAttribute("d", linie + "L120 26L0 26Z");
+      $("#gpu .vr").setAttribute("d", V.map((v, i) => (i ? "L" : "M") + x(v[0]) + " " + y(v[2], J.vram_max_gb || 1)).join(""));
+    }
+  } catch { $("#gpu").hidden = true; }
+}
+ladeGpu(); setInterval(ladeGpu, 2000);
+
+/* Abbildungen einer Aufgabe: Bild + Beschreibung (die bekommen die Modelle als Text) */
+function bilderVon(ds, a, kompakt = false) {
+  if (!a.abbildungen?.length) return null;
+  return el("div", { class: "abb" + (kompakt ? " kompakt" : "") }, a.abbildungen.map((b) => el("figure", {},
+    el("img", { src: `bild?ds=${encodeURIComponent(ds)}&pfad=${encodeURIComponent(b.pfad)}`, alt: b.beschreibung, loading: "lazy", onclick: (ev) => grossBild(ev.target.src, b.beschreibung),
+      onerror: (ev) => ev.target.replaceWith(el("div", { class: "klein" }, "(Bild fehlt)")) }),
+    kompakt ? null : el("figcaption", {}, b.beschreibung))));
+}
+function grossBild(src, text) {
+  const f = $("#fenster"); AB.offen = null;
+  f.replaceChildren(el("div", { class: "f-kopf" }, el("div", {}, el("h2", {}, "Abbildung"), el("small", {}, "Die Modelle bekommen die Beschreibung als Text.")),
+    el("button", { class: "zu", title: "Schließen (Esc)", html: ic("x"), onclick: () => f.close() })),
+    el("div", { class: "f-inhalt" }, el("img", { src, style: "max-width:100%;border-radius:12px;background:#fff" }), el("p", { style: "margin:0;font-size:14.5px" }, text)));
+  if (!f.open) f.showModal();
+}
+
+/* ---------- Daten-Adapter: Fenster für Hugging Face, Link, Datenbank, SQLite + Spaltenzuordnung ---------- */
+const QUELLEN = { dateien: ["CSV", "Excel (.xlsx)", "JSON", "JSONL", "SQLite", "Bilder"], extern: ["Hugging Face", "Kaggle", "Link / Google Sheets", "PostgreSQL", "MySQL"] };
+/* Fenster-Verlauf: wird ein Fenster aus einem offenen Import-Fenster heraus geöffnet, merkt es sich das vorige (samt Eingaben) für „Zurück“ */
+const FV = [];
+function fensterAuf(titel, unter, icon, ...inhalt) {
+  const f = $("#fenster"); AB.offen = null;
+  if (f.open && f.classList.contains("breit")) FV.push([...f.childNodes]); else FV.length = 0;
+  f.style.setProperty("--nf", "#2a78d6"); f.classList.add("breit");
+  if (!f._fvZu) { f._fvZu = true; f.addEventListener("close", () => { f.classList.remove("breit"); FV.length = 0; }); }
+  const zurueck = FV.length ? el("button", { class: "f-zurueck", title: "Zurück zum vorigen Schritt", onclick: () => {
+    const vorher = FV.pop(); vorher.forEach((n) => n.querySelectorAll?.(".lade").forEach((x) => x.remove())); f.replaceChildren(...vorher); } }, "‹ Zurück") : "";
+  f.replaceChildren(el("div", { class: "f-kopf" }, zurueck, el("span", { class: "ic", html: icon.startsWith("<") ? icon : ic(icon) }),
+    el("div", {}, el("h2", {}, titel), el("small", {}, unter)), el("button", { class: "zu", title: "Schließen (Esc)", html: ic("x"), onclick: () => f.close() })),
+    el("div", { class: "f-inhalt" }, ...inhalt));
+  if (!f.open) f.showModal();
+  return f;
+}
+const feld = (label, eingabe) => el("label", { class: "im-feld" }, el("span", {}, label), eingabe);
+const fehlerBox = (ort, e) => { ort.querySelector(".box.fehler")?.remove(); ort.append(el("div", { class: "box fehler" }, e.message || String(e))); };
+
+function importHF() {
+  const ds = el("input", { type: "text", placeholder: "z. B. openai/gsm8k" }), teil = el("select", { disabled: true }, el("option", {}, "erst Datensatz laden"));
+  const anzahl = el("input", { type: "number", value: 200, min: 1, max: 2000, style: "width:110px" }), status = el("div");
+  const ladeTeile = async () => {
+    status.replaceChildren(lade("suche Teile …", false));
+    try { const j = await api("api/import/hf/splits", { dataset: ds.value.trim() });
+      teil.replaceChildren(...j.splits.map((s) => el("option", { value: s.config + "|" + s.split, selected: s.split === "test" }, `${s.config} · ${s.split}`))); teil.disabled = false; status.replaceChildren();
+    } catch (e) { status.replaceChildren(); fehlerBox(status, e); } };
+  ds.onchange = ladeTeile; ds.onkeydown = (ev) => { if (ev.key === "Enter") ladeTeile(); };
+  const laden = el("button", { class: "knopf primaer", onclick: async () => {
+    if (teil.disabled) await ladeTeile(); if (teil.disabled) return;
+    const [config, split] = teil.value.split("|"); laden.disabled = true; status.replaceChildren(lade(`lade ${anzahl.value} Zeilen von Hugging Face …`, false));
+    try { zuordnung(await api("api/import/hf", { dataset: ds.value.trim(), config, split, anzahl: +anzahl.value })); } catch (e) { status.replaceChildren(); fehlerBox(status, e); }
+    laden.disabled = false; } }, "Vorschau laden");
+  const vorlagen = el("div", { class: "im-vorlagen" }, lade("lädt Vorlagen …", false));
+  api("api/import/hf/vorlagen").then((j) => vorlagen.replaceChildren(...j.vorlagen.map((v) => el("button", { class: "im-vorlage", onclick: async () => {
+    ds.value = v.id; await ladeTeile(); const opt = [...teil.options].find((o) => o.value === v.config + "|" + v.split); if (opt) teil.value = opt.value; } },
+    el("b", {}, v.titel), el("small", {}, v.info), el("code", {}, v.id))))).catch(() => vorlagen.replaceChildren());
+  fensterAuf("Hugging Face", "Öffentliche Datensätze direkt laden – z. B. bekannte Benchmarks.", '<span style="font-size:20px">🤗</span>',
+    el("div", { class: "mw-abschnitt" }, el("b", {}, "Bekannte Benchmarks")), vorlagen,
+    el("div", { class: "mw-abschnitt" }, el("b", {}, "Oder einen beliebigen Datensatz")),
+    el("div", { class: "im-zeile" }, feld("Datensatz", ds), feld("Teil", teil), feld("Anzahl", anzahl)),
+    el("div", { class: "im-zeile" }, laden), status);
+}
+function importKaggle() {
+  const feldEin = el("input", { type: "search", placeholder: "Suchen – z. B. trivia, quiz, math … oder Kaggle-Link einfügen" });
+  const kopf = el("div", { class: "kg-kopf" }), ergebnis = el("div", { class: "kg-ergebnis" }), status = el("div");
+  const kb = (n) => n == null ? "" : n > 1e6 ? zahl(n / 1e6) + " MB" : Math.max(1, Math.round(n / 1e3)) + " KB";
+  const kurz = (n) => n == null ? "0" : n >= 1e6 ? zahl(n / 1e6) + " Mio." : n >= 1e3 ? zahl(n / 1e3) + " Tsd." : String(n);
+  const istRef = (t) => /kaggle\.com\/datasets\//.test(t) || /^[\w.-]+\/[\w.-]+$/.test(t.trim());
+  let lauf = 0, letzteSuche = "";
+  const sucheZeile = el("div", { class: "mw-suche kg-suche" }, el("span", { class: "kg-logo" }, "k"), feldEin);
+  let dsTitel = "";
+  const holen = async (ref, name) => {
+    status.replaceChildren(lade(`lade ${name} und erkenne die Spalten …`, false));
+    try { const j = await api("api/import/kaggle", { ref, datei: name }); j.art === "sqlite" ? importSQLite(j) : zuordnung({ ...j.vorschau, titel: dsTitel }); }
+    catch (e) { status.replaceChildren(); fehlerBox(status, e); } };
+  const schritte = (n) => el("div", { class: "kg-schritte" }, ["Datensatz finden", "Datei wählen", "Spalten prüfen"].map((t, k) =>
+    el("span", { class: k < n ? "ok" : k === n ? "an" : "" }, el("i", {}, k < n ? "✓" : String(k + 1)), t)));
+  const dateien = async (ref, titel) => {
+    const n = ++lauf; status.replaceChildren(); sucheZeile.hidden = true; dsTitel = titel || "";
+    kopf.replaceChildren(schritte(1));
+    ergebnis.replaceChildren(lade("lade Dateiliste …", false));
+    try {
+      const j = await api("api/import/kaggle/dateien", { ref }); if (n !== lauf) return;
+      const lesbar = j.dateien.filter((d) => d.lesbar), nicht = j.dateien.length - lesbar.length;
+      const testDatei = lesbar.filter((d) => /test|eval|dev|valid/i.test(d.name)).sort((a, b) => (a.groesse || 0) - (b.groesse || 0))[0];
+      const tipp = testDatei || [...lesbar].sort((a, b) => (a.groesse || 0) - (b.groesse || 0))[0];
+      const zeile = (d) => el("button", { class: "im-datei", onclick: () => holen(j.ref, d.name) },
+        el("span", { html: ic("datei") }), el("b", {}, d.name), el("small", {}, kb(d.groesse)));
+      const kopfDs = el("div", { class: "kg-ds" }, el("button", { class: "knopf klein", onclick: () => { sucheZeile.hidden = false; suche(letzteSuche); } }, "‹ Andere suchen"),
+        el("div", {}, el("b", {}, titel || j.ref), el("small", {}, j.ref)));
+      if (!lesbar.length) { ergebnis.replaceChildren(kopfDs, el("div", { class: "box fehler" }, "Dieser Datensatz enthält keine Datei, die die App lesen kann (CSV, JSON, JSONL, Excel, SQLite).")); return; }
+      const andere = lesbar.filter((d) => d !== tipp);
+      ergebnis.replaceChildren(kopfDs,
+        el("div", { class: "kg-empf" },
+          el("div", { class: "kg-empf-text" }, el("em", { class: "kg-tipp" }, testDatei ? "Empfohlen · Testteil" : "Empfohlen"),
+            el("b", {}, tipp.name), el("small", {}, `${kb(tipp.groesse)} · ${testDatei ? "der übliche Teil für Benchmarks" : "kleinste lesbare Datei"}`)),
+          el("button", { class: "knopf primaer", onclick: () => holen(j.ref, tipp.name) }, "Diese nehmen")),
+        andere.length ? el("details", { class: "kg-andere" }, el("summary", {}, `Andere Dateien (${andere.length})`),
+          el("div", { class: "im-dateien" }, andere.map(zeile)),
+          el("div", { class: "klein", style: "margin-top:6px" }, "„train“ ist Trainingsmaterial und meist deutlich größer.")) : "",
+        nicht ? el("div", { class: "klein" }, `${nicht} weitere Datei${nicht === 1 ? "" : "en"} in einem nicht unterstützten Format ausgeblendet.`) : "");
+      if (lesbar.length === 1) holen(j.ref, tipp.name);
+    } catch (e) { if (n === lauf) { ergebnis.replaceChildren(); fehlerBox(status, e); } }
+  };
+  const suche = async (q) => {
+    const n = ++lauf; letzteSuche = q; status.replaceChildren();
+    kopf.replaceChildren(schritte(0), el("div", { class: "mw-abschnitt" }, el("b", {}, q ? `Ergebnisse für „${q}“` : "Empfohlen für Benchmarks"), q ? null : el("span", {}, "geprüft, laden ohne Anmeldung")));
+    if (!q) { ergebnis.replaceChildren(lade("lädt …", false));
+      try { const v = await api("api/import/kaggle/vorlagen"); if (n !== lauf) return;
+        ergebnis.replaceChildren(el("div", { class: "im-vorlagen" }, v.vorlagen.map((t) => el("button", { class: "im-vorlage", onclick: () => dateien(t.ref, t.titel) },
+          el("b", {}, t.titel), el("small", {}, t.info), el("code", { title: t.ref }, t.ref.split("/")[1]))))); } catch (e) { ergebnis.replaceChildren(); fehlerBox(status, e); }
+      return; }
+    ergebnis.replaceChildren(lade("suche auf Kaggle …", false));
+    try {
+      const j = await api("api/import/kaggle/suche", { q }); if (n !== lauf) return;
+      if (!j.treffer.length) { ergebnis.replaceChildren(el("div", { class: "klein", style: "padding:10px 2px" }, "Nichts gefunden – anderer Suchbegriff?")); return; }
+      ergebnis.replaceChildren(el("div", { class: "kg-raster" }, j.treffer.map((t) => el("button", { class: "kg-karte", onclick: () => dateien(t.ref, t.titel) },
+        el("b", {}, t.titel), t.untertitel ? el("small", {}, t.untertitel) : null,
+        el("div", { class: "kg-meta" }, el("span", {}, kb(t.groesse)), el("span", {}, `${kurz(t.downloads)} Downloads`), el("span", {}, `${kurz(t.stimmen)} Stimmen`), t.lizenz && t.lizenz.length < 22 && t.lizenz !== "Unknown" ? el("span", {}, t.lizenz) : null,
+          t.groesse > 30e6 ? el("span", { class: "kg-gross" }, "sehr groß") : null),
+        el("code", {}, t.ref)))));
+    } catch (e) { if (n === lauf) { ergebnis.replaceChildren(); fehlerBox(status, e); } }
+  };
+  let warte;
+  feldEin.oninput = () => { clearTimeout(warte); const t = feldEin.value.trim(); if (istRef(t)) return; warte = setTimeout(() => suche(t), 400); };
+  feldEin.onkeydown = (ev) => { if (ev.key !== "Enter") return; clearTimeout(warte); const t = feldEin.value.trim(); istRef(t) ? dateien(t) : suche(t); };
+  feldEin.onpaste = () => setTimeout(() => { const t = feldEin.value.trim(); if (istRef(t)) dateien(t); }, 0);
+  fensterAuf("Kaggle", S.einst.kaggle_gesetzt ? "Öffentliche und eigene private Datensätze." : "Öffentliche Datensätze – ohne Anmeldung.", '<span class="kg-logo">k</span>',
+    kopf, sucheZeile, ergebnis, status);
+  feldEin.focus(); suche("");
+}
+function importURL() {
+  const url = el("input", { type: "url", placeholder: "https://… (CSV, Excel, JSON, JSONL oder Google-Sheets-Freigabelink)" }), status = el("div");
+  const laden = el("button", { class: "knopf primaer", onclick: async () => {
+    laden.disabled = true; status.replaceChildren(lade("lade …", false));
+    try { zuordnung(await api("api/import/url", { url: url.value.trim() })); } catch (e) { status.replaceChildren(); fehlerBox(status, e); }
+    laden.disabled = false; } }, "Laden");
+  url.onkeydown = (ev) => { if (ev.key === "Enter") laden.click(); };
+  fensterAuf("Link", "Tabelle aus dem Netz laden. Google Sheets: Freigabe „Jeder mit dem Link“ und den Link hier einfügen.", "datei",
+    el("div", { class: "im-zeile" }, feld("Adresse", url), laden), status);
+}
+function importDB() {
+  const art = el("select", {}, el("option", { value: "postgres" }, "PostgreSQL"), el("option", { value: "mysql" }, "MySQL / MariaDB"));
+  const host = el("input", { type: "text", placeholder: "host.docker.internal oder Server", value: "host.docker.internal" }), port = el("input", { type: "number", placeholder: "5432", style: "width:100px" });
+  const datenbank = el("input", { type: "text", placeholder: "Datenbank" }), nutzer = el("input", { type: "text", placeholder: "Benutzer", autocomplete: "off" });
+  const passwort = el("input", { type: "password", placeholder: "Passwort", autocomplete: "new-password" });
+  const abfrage = el("textarea", { rows: 4, placeholder: "SELECT frage, antwort, thema FROM quiz" }), status = el("div");
+  art.onchange = () => port.placeholder = art.value === "mysql" ? "3306" : "5432";
+  const laden = el("button", { class: "knopf primaer", onclick: async () => {
+    laden.disabled = true; status.replaceChildren(lade("frage die Datenbank ab …", false));
+    try { zuordnung(await api("api/import/db", { art: art.value, host: host.value, port: +port.value || null, datenbank: datenbank.value, nutzer: nutzer.value, passwort: passwort.value, abfrage: abfrage.value })); }
+    catch (e) { status.replaceChildren(); fehlerBox(status, e); }
+    laden.disabled = false; } }, "Abfrage ausführen");
+  fensterAuf("Datenbank", "Nur lesend, höchstens 5000 Zeilen. Der Zugang wird nicht gespeichert.", "speicher",
+    el("div", { class: "im-zeile" }, feld("Art", art), feld("Server", host), feld("Port", port)),
+    el("div", { class: "im-zeile" }, feld("Datenbank", datenbank), feld("Benutzer", nutzer), feld("Passwort", passwort)),
+    feld("SQL-Abfrage (nur SELECT)", abfrage), el("div", { class: "im-zeile" }, laden), status);
+}
+function importSQLite(j) {
+  const tab = el("select", {}, j.tabellen.map((t) => el("option", { value: t }, t))), abfrage = el("textarea", { rows: 3, placeholder: "optional: SELECT … (statt ganzer Tabelle)" }), status = el("div");
+  const laden = el("button", { class: "knopf primaer", onclick: async () => {
+    status.replaceChildren(lade("lese …", false));
+    try { zuordnung(await api("api/import/sqlite", { sqlite_id: j.sqlite_id, tabelle: tab.value, abfrage: abfrage.value.trim() || null })); } catch (e) { status.replaceChildren(); fehlerBox(status, e); } } }, "Vorschau laden");
+  fensterAuf("SQLite · " + j.name, `${j.tabellen.length} Tabelle${j.tabellen.length === 1 ? "" : "n"} gefunden. Die Datei wird nur gelesen.`, "speicher",
+    el("div", { class: "im-zeile" }, feld("Tabelle", tab)), feld("SQL-Abfrage", abfrage), el("div", { class: "im-zeile" }, laden), status);
+}
+/* Spaltenzuordnung mit Vorschau */
+function zuordnung(v, ersetzen = null) {
+  const sp = v.spalten, vor = v.vorschlag || {};
+  const wahl = (wert, pflicht) => el("select", {}, pflicht ? null : el("option", { value: "" }, "–"), sp.map((s) => el("option", { value: s, selected: s === wert }, s)));
+  const f = { frage: wahl(vor.frage, true), antwort: wahl(vor.antwort, true), optionen: wahl(Array.isArray(vor.optionen) ? "" : vor.optionen), thema: wahl(vor.thema), kontext: wahl(vor.kontext), id: wahl(vor.id) };
+  const optListe = Array.isArray(vor.optionen) ? vor.optionen : null;
+  const sicher = !!(vor.frage && vor.antwort);
+  const name = el("input", { type: "text", value: ersetzen?.name || v.titel || v.quelle.replace(/^Kaggle · /, "").replace(/\.[^.]+$/, "").replace(/_/g, " ").slice(0, 60) });
+  // Anzahl: drei Knöpfe statt Zahlenfeld
+  let anzahl = ersetzen ? v.anzahl : Math.min(v.anzahl, 300);
+  const stufen = [...new Set([50, 300, v.anzahl].filter((n) => n <= v.anzahl))];
+  const anzahlWahl = el("div", { class: "zo-anzahl" });
+  const zeichneAnzahl = () => anzahlWahl.replaceChildren(...stufen.map((n) => el("button", { class: n === anzahl ? "an" : "", onclick: () => { anzahl = n; zeichneAnzahl(); } },
+    n === v.anzahl && n > 300 ? `alle ${n.toLocaleString("de-DE")}` : String(n))));
+  if (!stufen.includes(anzahl)) stufen.push(anzahl);
+  zeichneAnzahl();
+  // lesbare Zusammenfassung + Beispiele aus der aktuellen Zuordnung
+  const optionenVon = (z) => {
+    if (optListe && !f.optionen.value) return optListe.map((k) => [k, z[k]]).filter(([, t]) => t !== "" && t != null);
+    const roh = f.optionen.value ? z[f.optionen.value] : null; if (!roh) return [];
+    let l; try { l = JSON.parse(roh); } catch { l = String(roh).split(/\s*[|;\n]\s*/); }
+    if (l && !Array.isArray(l) && Array.isArray(l.text)) l = l.text;
+    return Array.isArray(l) ? l.map((t, k) => [String.fromCharCode(65 + k), typeof t === "object" ? (t.text ?? JSON.stringify(t)) : t]) : [];
+  };
+  const zusammen = el("div", { class: "zo-zusammen" });
+  const zeichneZusammen = () => {
+    const bsp = v.zeilen.filter((z) => z[f.frage.value]).slice(0, 2);
+    const mc = bsp.some((z) => optionenVon(z).length >= 2);
+    const zahlArt = !mc && bsp.length && bsp.every((z) => /-?\d[\d.,]*\s*$/.test(String(z[f.antwort.value] ?? "")));
+    const art = mc ? `Multiple-Choice-Fragen (${optionenVon(bsp[0]).map(([k]) => k).join("–").replace(/^(\w)–.*–(\w)$/, "$1–$2")})` : zahlArt ? "Fragen mit Zahl als Antwort" : "Fragen mit Textantwort";
+    zusammen.replaceChildren(
+      el("div", { class: "zo-titel" }, el("span", { class: "zo-ok", html: ic("check") }), el("div", {}, el("b", {}, `${v.anzahl.toLocaleString("de-DE")} ${art}`),
+        el("small", {}, `Frage aus „${f.frage.value}“ · Antwort aus „${f.antwort.value}“${f.thema.value ? ` · Thema aus „${f.thema.value}“` : ""}`))),
+      ...bsp.map((z) => { const opts = optionenVon(z), soll = String(z[f.antwort.value] ?? "").trim();
+        const richtig = (k, t, n) => soll === k || soll.toLowerCase() === String(t).trim().toLowerCase() || soll === String(n);
+        return el("div", { class: "zo-bsp" }, el("p", {}, z[f.frage.value]),
+          opts.length ? el("div", { class: "zo-opts" }, opts.map(([k, t], n) => el("span", { class: richtig(k, t, n) ? "richtig" : "" }, el("b", {}, k), String(t))))
+            : el("div", { class: "zo-soll" }, el("small", {}, "Soll"), soll.replace(/^[\s\S]*####\s*/, "") || "–")); }));
+  };
+  // Tabelle für die manuelle Zuordnung
+  const tabelle = () => el("div", { class: "im-tabelle" }, el("table", {}, el("tr", {}, sp.map((s) => {
+    const rolle = Object.entries(f).find(([, e]) => e.value === s)?.[0] || (optListe && !f.optionen.value && optListe.includes(s) ? "optionen" : null);
+    return el("th", { class: rolle ? "im-rolle " + rolle : "" }, s, rolle ? el("small", {}, { frage: "Frage", antwort: "Soll", optionen: "Optionen", thema: "Thema", kontext: "Kontext", id: "ID" }[rolle]) : null); })),
+    v.zeilen.map((z) => el("tr", {}, sp.map((s) => el("td", {}, z[s] ?? ""))))));
+  const vorschau = el("div", {}, tabelle());
+  const neu = () => { vorschau.replaceChildren(tabelle()); if (f.frage.value && f.antwort.value) zeichneZusammen(); };
+  Object.values(f).forEach((e) => e.onchange = neu);
+  if (sicher) zeichneZusammen();
+  const status = el("div");
+  const los = el("button", { class: "knopf primaer zo-los", onclick: async () => {
+    const z = Object.fromEntries(Object.entries(f).map(([k, e]) => [k, e.value || null]));
+    if (optListe && !z.optionen) z.optionen = optListe;
+    if (!z.frage || !z.antwort) { fehlerBox(status, new Error("Bitte Frage und Soll-Antwort auswählen.")); return; }
+    los.disabled = true; status.replaceChildren(lade("übernehme …", false));
+    try {
+      if (ersetzen) await api("api/arena/datensatz-loeschen", { datensatz: ersetzen.id });
+      const neuDs = await api("api/import/uebernehmen", { import_id: v.import_id, name: name.value, zuordnung: z, anzahl });
+      $("#fenster").close(); S.ds = neuDs.id; localStorage.setItem("mv-ds", S.ds); delete S.aufgaben[neuDs.id];
+      DT.meldung = { ok: true, text: `„${neuDs.name}“: ${neuDs.aufgaben} Fragen (${(neuDs.wertungen || []).map((w) => WERTUNG_TEXT[w]).join(", ")}).` };
+      await ladeDatensaetze(); zeige("s-daten");
+    } catch (e) { status.replaceChildren(); fehlerBox(status, e); }
+    los.disabled = false; } }, "Übernehmen");
+  const manuell = el("details", { class: "zo-manuell", open: !sicher },
+    el("summary", {}, sicher ? "Spalten selbst zuordnen" : "Bitte Frage und Soll-Antwort auswählen"),
+    el("div", { class: "zo-felder" },
+      el("div", { class: "im-zeile" }, feld("Frage *", f.frage), feld("Soll-Antwort *", f.antwort), feld("Antwortmöglichkeiten", f.optionen)),
+      optListe ? el("div", { class: "klein" }, `Antwortmöglichkeiten sonst aus den Spalten ${optListe.join(", ")}.`) : "",
+      el("div", { class: "im-zeile" }, feld("Thema", f.thema), feld("Kontext", f.kontext), feld("ID", f.id)), vorschau));
+  fensterAuf(sicher ? "Fertig zum Übernehmen" : "Spalten zuordnen", v.quelle + (v.gesamt > v.anzahl ? ` · erste ${v.anzahl.toLocaleString("de-DE")} von ${v.gesamt.toLocaleString("de-DE")} Zeilen` : ""), "liste",
+    sicher ? zusammen : "", manuell,
+    el("div", { class: "zo-fuss" }, feld("Name", name), el("label", { class: "im-feld", style: "flex:0 0 auto;min-width:0" }, el("span", {}, "Fragen im Test"), anzahlWahl), los), status);
+}
+
+/* ---------- Daten ---------- */
+const DT = { meldung: null, warte: {}, bilder: {}, roh: [] };   // warte: fach → { aufgaben, referenz, fachName } bis beide da sind
+const fachVon = (j) => { const m = j.meta || {}; return { id: String(m.fach_id || m.fach || "fach").toLowerCase(), name: m.fach || m.fach_id || "Fach" }; };
+async function dateienAnnehmen(files) {
+  DT.meldung = null;
+  for (const f of files) {
+    if (/\.(png|jpe?g|webp|gif)$/i.test(f.name)) { DT.bilder[f.name] = await new Promise((ok) => { const r = new FileReader(); r.onload = () => ok(r.result); r.readAsDataURL(f); }); continue; }
+    const binaer = /\.(xlsx|xlsm|db|sqlite3?)$/i.test(f.name);
+    const text = binaer ? null : await f.text();
+    let j = null;
+    if (/\.json$/i.test(f.name)) { try { j = JSON.parse(text); } catch { DT.meldung = { ok: false, text: `${f.name} ist kein gültiges JSON.` }; continue; } }
+    if (j && !Array.isArray(j) && (Array.isArray(j.aufgaben) || Array.isArray(j.loesungen))) {   // Bewertungs-Datensatz (Paar)
+      const fach = fachVon(j), w = (DT.warte[fach.id] ||= { fachName: fach.name });
+      if (Array.isArray(j.aufgaben)) { w.aufgaben = { name: f.name, inhalt: j }; w.fachName = fach.name; } else w.referenz = { name: f.name, inhalt: j };
+    } else DT.roh.push({ name: f.name, text, datei: binaer ? f : null });   // allgemeine Daten
+  }
+  for (const d of DT.roh) {   // allgemeine Daten: sofort übernehmen, wenn die Spalten klar sind – sonst Zuordnung
+    DT.laedt = true; zeichneDaten();
+    try {
+      const daten = d.datei ? await new Promise((ok) => { const r = new FileReader(); r.onload = () => ok(r.result); r.readAsDataURL(d.datei); }) : null;
+      const j = await api("api/import/datei", { name: d.name, ...(daten ? { daten } : { text: d.text }), bilder: Object.entries(DT.bilder).map(([b, x]) => ({ name: b, bild: x })) });
+      if (j.art === "gespeichert") {
+        const neu = j.datensatz; S.ds = neu.id; localStorage.setItem("mv-ds", S.ds); delete S.aufgaben[neu.id];
+        DT.meldung = { ok: true, text: `„${neu.name}“: ${neu.aufgaben} Fragen erkannt (${(neu.wertungen || []).map((w) => WERTUNG_TEXT[w]).join(", ")}).`, anpassen: { vorschau: j.vorschau, ds: neu } };
+        DT.bilder = {}; await ladeDatensaetze();
+      } else if (j.art === "sqlite") importSQLite(j);
+      else zuordnung(j.vorschau);
+    } catch (e) { DT.meldung = { ok: false, text: `${d.name}: ${e.message}` }; }
+    DT.laedt = false;
+  }
+  DT.roh = [];
+  const komplett = Object.entries(DT.warte).filter(([, w]) => w.aufgaben && w.referenz);
+  if (komplett.length) {
+    const faecher = komplett.map(([, w]) => w.fachName);
+    let name = faecher.join(" + "), n = 2;
+    while (S.datensaetze.some((d) => d.name === name)) name = `${faecher.join(" + ")} (${n++})`;
+    DT.laedt = true; zeichneDaten();
+    try {
+      const bilder = Object.entries(DT.bilder).map(([n, b]) => ({ name: n, bild: b }));
+      const neu = await api("api/arena/datensatz", { name, dateien: [...komplett.flatMap(([, w]) => [w.aufgaben, w.referenz]), ...bilder] });
+      komplett.forEach(([id]) => delete DT.warte[id]); DT.bilder = {};
+      S.ds = neu.id; localStorage.setItem("mv-ds", S.ds); delete S.aufgaben[neu.id];
+      DT.meldung = { ok: true, text: `„${neu.name}“ hinzugefügt: ${neu.aufgaben} Aufgaben, ${neu.antworten} Antworten.` };
+      await ladeDatensaetze();
+    } catch (e) { DT.meldung = { ok: false, text: e.message }; }
+    DT.laedt = false;
+  }
+  zeichneDaten();
+}
+async function zeichneDaten() {
+  const sicht = sichtbareDs(), ds = aktuellerDs();
+  const eingabe = el("input", { type: "file", accept: ".json,.jsonl,.csv,.tsv,.txt,.xlsx,.xlsm,.db,.sqlite,.sqlite3,application/json,text/csv,image/png,image/jpeg,image/webp,image/gif", multiple: true, hidden: true, onchange: () => { dateienAnnehmen([...eingabe.files]); eingabe.value = ""; } });
+  const zone = el("div", { class: "ablage" + (DT.laedt ? " laedt" : ""), tabindex: 0, role: "button", onclick: () => eingabe.click(), onkeydown: (ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); eingabe.click(); } } },
+    DT.laedt ? lade("wird geprüft und hinzugefügt …") : [el("span", { class: "ab-ic", html: ic("hoch") }), el("b", {}, "Dateien hierher ziehen oder klicken"),
+      el("small", {}, "Fragen aus jedem Thema – oder Bewertungs-Datensätze (aufgaben.json + referenz.json)")], eingabe);
+  zone.ondragover = (ev) => { ev.preventDefault(); zone.classList.add("drueber"); };
+  zone.ondragleave = () => zone.classList.remove("drueber");
+  zone.ondrop = (ev) => { ev.preventDefault(); zone.classList.remove("drueber"); dateienAnnehmen([...ev.dataTransfer.files]); };
+  const warte = Object.entries(DT.warte);
+  $("#dt-links").replaceChildren(...[
+    el("div", { class: "etikett" }, "Datensatz hinzufügen"), zone,
+    el("div", { class: "im-quellen" },
+      el("button", { class: "im-quelle", onclick: importHF }, el("span", { style: "font-size:17px" }, "🤗"), "Hugging Face"),
+      el("button", { class: "im-quelle", onclick: importKaggle }, el("span", { class: "kg-logo" }, "k"), "Kaggle"),
+      el("button", { class: "im-quelle", onclick: importURL, html: ic("datei") + "Link" }),
+      el("button", { class: "im-quelle", onclick: importDB, html: ic("speicher") + "Datenbank" })),
+    el("div", { class: "im-unterstuetzt" },
+      el("div", {}, el("small", {}, "Dateien"), QUELLEN.dateien.map((q) => el("span", {}, q))),
+      el("div", {}, el("small", {}, "Quellen"), QUELLEN.extern.map((q) => el("span", {}, q)))),
+    warte.length ? el("div", { class: "status-karte warn" }, el("b", {}, "Noch nicht hochgeladen"),
+      warte.map(([id, w]) => el("div", { class: "warte-z" }, el("span", { class: "fach" }, w.fachName),
+        el("span", { class: "tag-k " + (w.aufgaben ? "ok" : "fehlt") }, (w.aufgaben ? "✓ " : "fehlt: ") + "aufgaben.json"),
+        el("span", { class: "tag-k " + (w.referenz ? "ok" : "fehlt") }, (w.referenz ? "✓ " : "fehlt: ") + "referenz.json"),
+        el("button", { class: "weg", title: "verwerfen", html: ic("x"), onclick: () => { delete DT.warte[id]; zeichneDaten(); } }))),
+      el("small", {}, "Pro Fach braucht es beide Dateien. Sobald die fehlende da ist, wird automatisch hochgeladen."),
+      el("button", { class: "knopf primaer", style: "align-self:flex-start", html: ic("hoch") + "Fehlende Datei auswählen", onclick: () => eingabe.click() })) : null,
+    DT.meldung ? (DT.meldung.ok
+      ? el("div", { class: "status-karte ok" }, el("b", {}, "Hochgeladen"), el("span", {}, DT.meldung.text),
+          el("div", { style: "display:flex;gap:8px;flex-wrap:wrap;align-items:center" },
+            el("button", { class: "knopf primaer", onclick: () => { DT.meldung = null; zeige("s-vergleich"); } }, "Jetzt Modelle vergleichen"),
+            DT.meldung.anpassen ? el("button", { class: "cl-link", onclick: () => zuordnung(DT.meldung.anpassen.vorschau, DT.meldung.anpassen.ds) }, "Spalten anpassen") : null))
+      : el("div", { class: "status-karte fehler" }, el("b", {}, "Nicht hochgeladen"), el("span", {}, DT.meldung.text))) : null,
+    el("div", { class: "etikett" }, "Datensätze"),
+    sicht.length ? el("div", { class: "ds-karten", style: "grid-template-columns:1fr" }, sicht.map((d) => el("div", { class: "ds-k" + (d.id === S.ds ? " an" : ""), onclick: async () => { S.ds = d.id; localStorage.setItem("mv-ds", S.ds); await ladeDatensaetze(); zeichneDaten(); } },
+      el("div", { style: "display:flex;align-items:center;gap:8px" }, el("b", {}, d.name), d.eigen ? el("button", { class: "ds-weg", title: "Datensatz entfernen", "aria-label": "Datensatz entfernen", html: ic("muell"),
+        onclick: (ev) => { ev.stopPropagation(); datensatzEntfernen(d); } })
+        : el("span", { class: "badge", style: "margin-left:auto" }, "mitgeliefert")),
+      el("small", {}, d.fehler ? "Fehler: " + d.fehler : istFragen(d) ? `Fragen · ${d.aufgaben} Fragen · ${d.faecher.slice(0, 4).join(", ")}${d.faecher.length > 4 ? " …" : ""}` : `Bewerten · ${d.faecher.join(", ")} · ${d.aufgaben} Aufgaben · ${d.antworten} Antworten`)))) : el("p", { class: "klein" }, "Noch keiner – zieh oben deine Dateien hinein.")
+  ].filter(Boolean));
+  const R = $("#dt-rechts");
+  if (!ds) {
+    const w = Object.values(DT.warte);
+    R.replaceChildren(w.length
+      ? el("div", { class: "leerzustand" }, el("b", {}, "Fast fertig"), `Für ${w.map((x) => x.fachName).join(", ")} fehlt noch ${w.map((x) => !x.aufgaben ? "aufgaben.json" : "referenz.json").join(" bzw. ")}. Leg sie links nach – dann wird automatisch hochgeladen.`)
+      : el("div", { class: "leerzustand" }, el("b", {}, "Noch kein eigener Datensatz"), "Links eine Datei hineinziehen oder aus Hugging Face, Kaggle, Link oder Datenbank laden – oder oben die Demo-Daten einschalten."));
+    return;
+  }
+  R.replaceChildren(lade("lädt …"));
+  let liste; try { liste = await aufgaben(ds.id); } catch (e) { R.replaceChildren(el("div", { class: "box fehler" }, e.message)); return; }
+  zeichneEintraege(ds, liste);
+}
+
+/* Einträge eines Datensatzes: Liste mit Mehrfachauswahl (Checkboxen, Shift-Bereich, Alle), Suche, Löschen mit Rückgängig */
+const AW = { ds: null, ids: new Set(), letzte: null, filter: "", zeigen: 150 };
+function zeichneEintraege(ds, liste) {
+  const R = $("#dt-rechts"), fragen = istFragen(ds), darf = !!ds.eigen;
+  if (AW.ds !== ds.id) Object.assign(AW, { ds: ds.id, ids: new Set(), letzte: null, filter: "", zeigen: 150 });
+  const alleIds = new Set(liste.map((x) => String(x.id)));
+  AW.ids.forEach((id) => { if (!alleIds.has(id)) AW.ids.delete(id); });
+  const text = (x) => (fragen ? [x.id, x.frage, x.antwort, x.thema] : [x.id, x.thema, x.fach, x.aufgabe]).join(" ").toLowerCase();
+  const sicht = () => AW.filter ? liste.filter((x) => text(x).includes(AW.filter.toLowerCase())) : liste;
+  const einheit = (n) => fragen ? (n === 1 ? "Frage" : "Fragen") : (n === 1 ? "Aufgabe" : "Aufgaben");
+
+  const kopf = el("div", { class: "ew-kopf" }, el("h2", {}, ds.name),
+    el("span", { class: "klein" }, fragen ? `${liste.length} Fragen` : `${liste.length} Aufgaben · ${ds.antworten} Antworten`),
+    darf ? el("button", { class: "knopf klein ds-entfernen", html: ic("muell") + "Datensatz entfernen", onclick: () => datensatzEntfernen(ds) }) : "");
+  const alle = el("input", { type: "checkbox", class: "ew-cb", title: "Alle (gefilterten) auswählen" });
+  const suche = el("input", { type: "search", class: "ew-suche", placeholder: `${fragen ? "Fragen" : "Aufgaben"} durchsuchen …`, value: AW.filter });
+  const info = el("div", { class: "ew-info" }), liste_el = el("div", { class: "ew-liste" });
+
+  const leiste = () => {
+    const v = sicht(), gew = v.filter((x) => AW.ids.has(String(x.id))).length;
+    alle.checked = v.length > 0 && gew === v.length; alle.indeterminate = gew > 0 && gew < v.length;
+    const n = AW.ids.size;
+    info.replaceChildren(...(n ? [el("b", {}, `${n} ausgewählt`),
+        el("button", { class: "knopf klein ew-loeschen", html: ic("muell") + "Löschen", onclick: loeschen }),
+        el("button", { class: "cl-link", onclick: () => { AW.ids.clear(); AW.letzte = null; zeichneListe(); } }, "Auswahl aufheben")]
+      : [el("span", { class: "klein" }, AW.filter ? `${v.length} von ${liste.length} ${einheit(liste.length)}` : darf ? "Einträge auswählen, um sie zu löschen" : "Mitgelieferte Daten – nur ansehen")]));
+    leisteEl.classList.toggle("aktiv", n > 0);
+  };
+  const waehle = (id, an, shift) => {
+    const v = sicht().map((x) => String(x.id));
+    if (shift && AW.letzte != null && v.includes(AW.letzte)) {
+      const [a, b] = [v.indexOf(AW.letzte), v.indexOf(id)].sort((x, y) => x - y);
+      v.slice(a, b + 1).forEach((k) => an ? AW.ids.add(k) : AW.ids.delete(k));
+    } else an ? AW.ids.add(id) : AW.ids.delete(id);
+    AW.letzte = id;
+    liste_el.querySelectorAll(".ew-zeile").forEach((z) => { const k = z.dataset.id, cb = z.querySelector(".ew-cb"); cb.checked = AW.ids.has(k); z.classList.toggle("gewaehlt", cb.checked); });
+    leiste();
+  };
+  const zeile = (x) => {
+    const id = String(x.id), cb = el("input", { type: "checkbox", class: "ew-cb", checked: AW.ids.has(id), "aria-label": `${id} auswählen` });
+    cb.onclick = (ev) => { ev.stopPropagation(); waehle(id, cb.checked, ev.shiftKey); };
+    const kopfZeile = fragen
+      ? [el("span", { class: "id" }, id), el("b", { class: "ew-titel" }, x.frage), el("span", { class: "klein ew-rechts" }, (x.thema ? x.thema + " · " : "") + WERTUNG_TEXT[x.wertung])]
+      : [el("span", { class: "id" }, id), el("b", { class: "ew-titel" }, x.thema || x.fach), el("span", { class: "klein ew-rechts" }, `${x.fach} · ${x.max_punkte} P. · ${x.antworten.length} Antworten`)];
+    const inhalt = fragen
+      ? [x.kontext ? el("div", { class: "feld-t" }, el("b", {}, "Kontext"), x.kontext) : "",
+         el("div", { class: "feld-t" }, el("b", {}, "Frage"), x.frage, x.optionen ? el("div", { style: "margin-top:6px" }, x.optionen.map((o, i) => el("div", {}, "ABCDEFGH"[i] + ") " + o))) : "", bilderVon(ds.id, x)),
+         el("div", { class: "feld-t" }, el("b", {}, "Soll-Antwort · " + WERTUNG_TEXT[x.wertung]), x.antwort)]
+      : [el("div", { class: "feld-t" }, el("b", {}, "Aufgabe"), x.aufgabe, bilderVon(ds.id, x)), x.hinweis ? el("div", { class: "feld-t" }, el("b", {}, "Hinweis"), x.hinweis) : "",
+         el("details", {}, el("summary", { class: "klein" }, "Musterlösung und Raster"), el("div", { class: "feld-t", style: "margin-top:6px" }, el("b", {}, "Musterlösung"), x.musterloesung), el("div", { class: "feld-t", style: "margin-top:6px" }, el("b", {}, "Raster"), x.bewertungsraster)),
+         ...x.antworten.map((a) => el("div", { class: "feld-t" }, el("b", {}, `${a.id} · Referenz: Note ${a.referenz.note} (${a.referenz.punkte} P.)` + (a.falle ? " · Falle" : "")), a.antwort,
+           a.referenz.feedback ? el("div", { class: "klein", style: "margin-top:4px" }, a.referenz.feedback) : ""))];
+    return el("details", { class: "aufgabe-k ew-zeile" + (AW.ids.has(id) ? " gewaehlt" : ""), "data-id": id },
+      el("summary", {}, darf ? cb : "", ...kopfZeile), el("div", { class: "inhalt" }, ...inhalt));
+  };
+  const zeichneListe = () => {
+    const v = sicht();
+    liste_el.replaceChildren(...(v.length ? v.slice(0, AW.zeigen).map(zeile) : [el("div", { class: "klein", style: "padding:14px 4px" }, "Keine Treffer.")]),
+      v.length > AW.zeigen ? el("button", { class: "knopf ew-mehr", onclick: () => { AW.zeigen += 300; zeichneListe(); } }, `Weitere anzeigen (${v.length - AW.zeigen} übrig)`) : "");
+    leiste();
+  };
+  alle.onclick = () => { const v = sicht(); v.forEach((x) => alle.checked ? AW.ids.add(String(x.id)) : AW.ids.delete(String(x.id))); AW.letzte = null; zeichneListe(); };
+  let warte; suche.oninput = () => { clearTimeout(warte); warte = setTimeout(() => { AW.filter = suche.value.trim(); AW.zeigen = 150; zeichneListe(); }, 150); };
+
+  async function loeschen() {
+    const ids = [...AW.ids], n = ids.length;
+    if (n >= liste.length) { datensatzEntfernen(ds); return; }
+    try {
+      const j = await api("api/arena/eintraege-loeschen", { datensatz: ds.id, ids });
+      AW.ids.clear(); AW.letzte = null; delete S.aufgaben[ds.id];
+      await ladeDatensaetze(); zeichneDaten();
+      toast(`${j.geloescht} ${einheit(j.geloescht)} gelöscht`, "Rückgängig", async () => {
+        await api("api/arena/eintraege-wiederherstellen", { datensatz: ds.id, token: j.token });
+        delete S.aufgaben[ds.id]; AW.ids = new Set(ids); await ladeDatensaetze(); zeichneDaten();
+        toast(`${n} ${einheit(n)} wiederhergestellt`);
+      });
+    } catch (e) { toast(e.message); }
+  }
+  const leisteEl = el("div", { class: "ew-leiste" }, darf ? alle : "", suche, info);
+  document.onkeydown = (ev) => {   // Strg/Cmd+A wählt alle sichtbaren, Entf löscht, Esc hebt auf – nur im Daten-Tab und ohne offenes Fenster/Eingabefeld
+    if (S.tab !== "s-daten" || $("#fenster").open || !darf || /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName)) return;
+    if ((ev.ctrlKey || ev.metaKey) && ev.key === "a") { ev.preventDefault(); sicht().forEach((x) => AW.ids.add(String(x.id))); zeichneListe(); }
+    else if ((ev.key === "Delete" || ev.key === "Backspace") && AW.ids.size) { ev.preventDefault(); loeschen(); }
+    else if (ev.key === "Escape" && AW.ids.size) { AW.ids.clear(); zeichneListe(); }
+  };
+  R.replaceChildren(kopf, leisteEl, liste_el);
+  zeichneListe();
+}
+
+/* kleine Meldung unten mit optionaler Aktion (z. B. Rückgängig) */
+function toast(text, aktion, fn, ms = 8000) {
+  document.querySelector(".toast")?.remove();
+  const t = el("div", { class: "toast", role: "status" }, el("span", {}, text),
+    aktion ? el("button", { onclick: async () => { t.remove(); try { await fn(); } catch (e) { toast(e.message); } } }, aktion) : "",
+    el("button", { class: "toast-zu", title: "Schließen", html: ic("x"), onclick: () => t.remove() }));
+  document.body.append(t); setTimeout(() => t.remove(), ms);
+}
+
+/* ---------- Einrichtung & Einstellungen als Fenster über der App ---------- */
+function einstellungenAuf(bereich = "") {
+  let d = $("#einst-fenster");
+  if (!d) {
+    d = el("dialog", { id: "einst-fenster", class: "einst-fenster" });
+    d.addEventListener("close", async () => { d.replaceChildren(); await nachEinstellungen(); });
+    document.body.append(d);
+  }
+  const rahmen = el("iframe", { src: "/einrichtung" + (bereich ? "#" + bereich : ""), title: "Einstellungen" });
+  d.replaceChildren(rahmen);
+  if (!d.open) d.showModal();
+  rahmen.addEventListener("load", () => rahmen.contentWindow.focus());
+}
+let NACH_ZIEL = null;
+window.addEventListener("message", (ev) => {
+  const d = $("#einst-fenster");
+  if (ev.origin !== location.origin || !d || ev.source !== d.querySelector("iframe")?.contentWindow) return;
+  if (ev.data?.art === "einrichtung-fertig") { NACH_ZIEL = ev.data.ziel; d.close(); }
+});
+async function nachEinstellungen() {   // Einstellungen könnten sich geändert haben: alles frisch laden, ohne die Seite neu zu laden
+  S.einst = await api("api/einstellungen").catch(() => S.einst);
+  $("#demo").checked = !!S.einst.demo; setzeSystem();
+  await ladeStatus(); await ladeDatensaetze();
+  const ziel = (NACH_ZIEL || "").split("#")[1]; NACH_ZIEL = null;
+  if (ziel && document.getElementById("s-" + ziel)) zeige("s-" + ziel); else zeichne();
+}
+$("#zahnrad").onclick = (ev) => { ev.preventDefault(); einstellungenAuf(); };
+
+/* ---------- Start ---------- */
+(async () => {
+  S.einst = await api("api/einstellungen").catch(() => ({ demo: true }));
+  $("#demo").checked = !!S.einst.demo; setzeSystem();
+  await ladeStatus(); await ladeDatensaetze();
+  const anker = location.hash, start = "s-" + (anker.startsWith("#import") ? "daten" : anker.slice(1) || "vergleich");
+  zeige(document.getElementById(start) ? start : "s-vergleich");
+  if (anker === "#modell-hinzufuegen") { zeige("s-modelle"); modellFenster(); }
+  if (!S.einst.eingerichtet) einstellungenAuf();            // erster Start: Einrichtungsassistent als Fenster
+  else if (anker === "#einstellungen") einstellungenAuf();
+  if (anker === "#werkzeuge") werkzeugFenster();
+  ({ "#import-hf": importHF, "#import-kaggle": importKaggle, "#import-link": importURL, "#import-db": importDB })[anker]?.();
+  setInterval(async () => { const vorher = (S.status.modelle || []).join(); await ladeStatus(); if ((S.status.modelle || []).join() !== vorher) zeichne(); }, 20000);
+})();
+</script>
+</body>
+</html>

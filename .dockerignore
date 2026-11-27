@@ -1,0 +1,16 @@
+.git
+.gitignore
+.env
+.env.*
+lokal/
+herausforderer/
+**/__pycache__
+**/*.pyc
+*.md
+!README.md
+compose*.yml
+Dockerfile
+.leak-denylist
+/werkzeuge/
+*.swp
+*~
