@@ -35,6 +35,7 @@ Er ist klein: Ergebnisse darauf sind Anhaltspunkte, keine allgemeingültige Rang
 | Anhalten | `docker compose down` |
 | Aktualisieren (nach `git pull`) | `docker compose up -d --build` |
 | Logs ansehen | `docker compose logs -f app` |
+| Neu anfangen (Einstellungen, eigene Daten, Ergebnisse; Modelle bleiben) | Zahnrad → Zurücksetzen |
 | Alles inkl. Modelle und Ergebnisse löschen | `docker compose down -v` |
 
 Modelle und Ergebnisse liegen in Docker-Volumes und bleiben beim Anhalten und Aktualisieren erhalten.

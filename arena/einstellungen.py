@@ -98,3 +98,11 @@ def max_modell_gb() -> float:
     """Größte Modelldatei, die noch mit Kontext in den Grafikspeicher passt."""
     v = get("vram_gb")
     return round(max(float(v) - 1.5, 1.5), 1) if v else 6.0
+
+
+def zuruecksetzen():
+    """Einstellungsdatei (inkl. Schlüssel) löschen – danach gelten wieder die Standardwerte, der Assistent startet neu."""
+    global _cache
+    with _sperre:
+        DATEI.unlink(missing_ok=True)
+        _cache = None

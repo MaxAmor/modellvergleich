@@ -1940,6 +1940,7 @@ window.addEventListener("message", (ev) => {
   const d = $("#einst-fenster");
   if (ev.origin !== location.origin || !d || ev.source !== d.querySelector("iframe")?.contentWindow) return;
   if (ev.data?.art === "einrichtung-fertig") { NACH_ZIEL = ev.data.ziel; d.close(); }
+  if (ev.data?.art === "neustart") { Object.keys(localStorage).filter((x) => x.startsWith("mv-")).forEach((x) => localStorage.removeItem(x)); location.href = "/"; }
 });
 async function nachEinstellungen() {   // Einstellungen könnten sich geändert haben: alles frisch laden, ohne die Seite neu zu laden
   S.einst = await api("api/einstellungen").catch(() => S.einst);

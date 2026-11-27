@@ -34,6 +34,14 @@ h1{font-size:26px;margin:0;letter-spacing:-.02em}
 .hilfe-schritt{display:flex;gap:12px;margin-top:12px}
 .hilfe-schritt b{font-size:14.5px}
 .hilfe-nr{width:24px;height:24px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:#fff;font-size:12.5px;font-weight:700;margin-top:1px}
+.reset-liste{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.reset-liste > div{padding:12px 14px;border-radius:14px;font-size:14.5px}
+.reset-liste .weg{background:rgba(217,56,56,.07);border:1px solid rgba(217,56,56,.25)}
+.reset-liste .bleibt{background:rgba(15,157,88,.07);border:1px solid rgba(15,157,88,.25)}
+.reset-liste ul{margin:6px 0 0;padding-left:18px;line-height:1.6}
+.knopf.reset-knopf{color:#b3261e;border-color:rgba(217,56,56,.4)}.knopf.reset-knopf:hover{background:rgba(217,56,56,.08)}
+.knopf.reset-endgueltig{background:#d93838;border-color:#d93838;color:#fff}.knopf.reset-endgueltig:hover{background:#c02f2f}.knopf.reset-endgueltig:disabled{opacity:.45;cursor:not-allowed}
+@media (max-width:640px){.reset-liste{grid-template-columns:1fr}}
 .zu-x{margin-left:auto;width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.75);display:grid;place-items:center;cursor:pointer;color:var(--ink-2);flex:none}
 .zu-x:hover{background:#fff;color:var(--ink)}.zu-x svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 html:has(body.eingebettet),body.eingebettet{background:transparent !important;min-height:0}
@@ -225,6 +233,7 @@ const SCHRITTE = [
   { titel: "Prüfer", einst: "Prüfer", id: "pruefer", zeichne: pruefer },
   { titel: "Kaggle", einst: "Kaggle", id: "kaggle", zeichne: kaggle, nurEinst: true },   // nur in den Einstellungen, nicht im Assistenten
   { titel: "Sicherheit", einst: "Sicherheit", id: "sicherheit", zeichne: sicherheit },
+  { titel: "Zurücksetzen", einst: "Zurücksetzen", id: "zuruecksetzen", zeichne: zuruecksetzen, nurEinst: true },
   { titel: "Fertig", zeichne: fertig },
 ];
 
@@ -581,6 +590,42 @@ function pruefer(k) {
     erg);
   const sichern = () => speichere({ pruefer_url: url.value.trim(), pruefer_modell: modell.value.trim(), ...(key.value.trim() ? { pruefer_key: key.value.trim() } : {}) });
   unten(k, { beiWeiter: sichern });
+}
+
+/* ---------- Zurücksetzen (nur Einstellungen), doppelt bestätigt ---------- */
+function zuruecksetzen(k) {
+  k.append(el("h2", {}, "Alles zurücksetzen"),
+    el("p", { class: "unter" }, "Setzt die App auf den Zustand nach der Installation zurück. Danach startet der Einrichtungsassistent von vorn."),
+    el("div", { class: "reset-liste" },
+      el("div", { class: "weg" }, el("b", {}, "Wird gelöscht"),
+        el("ul", {}, el("li", {}, "alle Einstellungen (Verbindung, Hardware, Sicherheit, Werkzeuge)"), el("li", {}, "gespeicherte Schlüssel (Prüfer, Kaggle)"),
+          el("li", {}, "alle eigenen Datensätze"), el("li", {}, "alle Ergebnisse und Läufe"))),
+      el("div", { class: "bleibt" }, el("b", {}, "Bleibt erhalten"),
+        el("ul", {}, el("li", {}, "die in Ollama installierten Modelle"), el("li", {}, "der mitgelieferte Demo-Datensatz")))));
+  const bereich = el("div");
+  const erster = el("button", { class: "knopf reset-knopf", onclick: () => {
+    erster.hidden = true;
+    const eingabe = el("input", { placeholder: "zurücksetzen", autocomplete: "off", spellcheck: false });
+    const fehler = el("div");
+    const los = el("button", { class: "knopf reset-endgueltig", disabled: true, onclick: async () => {
+      los.disabled = true; fehler.replaceChildren(lade("setze zurück …"));
+      try {
+        await api("/api/einrichtung/zuruecksetzen", { bestaetigung: eingabe.value });
+        Object.keys(localStorage).filter((x) => x.startsWith("mv-")).forEach((x) => localStorage.removeItem(x));
+        if (EINGEBETTET) window.parent.postMessage({ art: "neustart" }, location.origin);
+        else location.href = "/";
+      } catch (e) { los.disabled = false; fehler.replaceChildren(el("div", { class: "box fehler", style: "margin-top:8px" }, e.message)); }
+    } }, "Endgültig zurücksetzen");
+    eingabe.oninput = () => { los.disabled = eingabe.value.trim().toLowerCase() !== "zurücksetzen"; };
+    eingabe.onkeydown = (ev) => { if (ev.key === "Enter" && !los.disabled) los.click(); };
+    bereich.replaceChildren(el("div", { class: "box fehler", style: "margin-top:14px" },
+      el("b", {}, "Sicher? Das lässt sich nicht rückgängig machen."),
+      el("div", { style: "margin:8px 0 6px" }, "Zur Bestätigung ", el("code", {}, "zurücksetzen"), " eintippen:"),
+      el("div", { class: "zeile" }, el("label", { class: "feld", style: "flex:1" }, eingabe), los,
+        el("button", { class: "knopf", onclick: () => zeige(SCHRITT) }, "Abbrechen")), fehler));
+    eingabe.focus();
+  } }, "Alles zurücksetzen …");
+  k.append(el("div", { style: "margin-top:16px" }, erster), bereich);
 }
 
 /* ---------- Kaggle (nur Einstellungen) ---------- */

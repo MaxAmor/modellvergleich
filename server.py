@@ -884,6 +884,20 @@ class Handler(BaseHTTPRequestHandler):
             gesamt, vram = info.get("size", 0), info.get("size_vram", 0)
             return self._json(200, {"modell": m, "sekunden": round(time.time() - t, 1), "gesamt_gb": round(gesamt / 1024**3, 2),
                                     "vram_gb": round(vram / 1024**3, 2), "anteil_gpu": round(vram / gesamt, 2) if gesamt else 0})
+        if pfad == "/api/einrichtung/zuruecksetzen":
+            if str(d.get("bestaetigung", "")).strip().lower() != "zurücksetzen":
+                return self._json(400, {"fehler": "Bitte zur Bestätigung „zurücksetzen“ eintippen."})
+            from arena import herausforderer as hf, importe as im
+            try:
+                hf.alles_loeschen()
+            except RuntimeError as fehler:
+                return self._json(409, {"fehler": str(fehler)})
+            einstellungen.zuruecksetzen()
+            im._cache.clear()
+            Handler._sqlite.clear()
+            _hw_cache["zeit"] = 0.0
+            status_neu()
+            return self._json(200, {"ok": True})
         if pfad == "/api/einrichtung/pruefer-test":
             from arena import pruefer
             k = pruefer.schluessel()

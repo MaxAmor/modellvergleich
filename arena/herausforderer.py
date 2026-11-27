@@ -627,3 +627,13 @@ def aufgaben_liste(ds: str) -> list[dict]:
     return list(aus.values())
 
 
+
+
+def alles_loeschen():
+    """Gesamt-Reset: eigene Datensätze, Ergebnisse und Papierkorb löschen. Modelle in Ollama bleiben."""
+    if JOB.get("laeuft"):
+        raise RuntimeError("Gerade läuft ein Vergleich – erst anhalten, dann zurücksetzen.")
+    for ordner in (DATENSAETZE, ORDNER, PAPIERKORB):
+        shutil.rmtree(ordner, ignore_errors=True)
+    _cache.clear()
+    _beschreibung_cache.clear()
