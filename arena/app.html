@@ -389,6 +389,29 @@ main{padding-bottom:20px}
 .mo-haken svg{width:12px;height:12px;stroke-width:3.2}
 .mo-karte.an .mo-haken{background:var(--c1);border-color:var(--c1);color:#fff}
 .ma-summe{margin-top:16px;font-size:13.5px;color:var(--ink-3);text-align:center}.ma-summe b{color:var(--ink);font-size:15px}
+.dl-wrap{position:relative}
+.dl-knopf{position:relative;color:var(--ink-2)}
+.dl-ring{position:absolute;inset:3px;border-radius:50%;background:conic-gradient(var(--c1) var(--p,0deg),transparent 0);-webkit-mask:radial-gradient(circle,transparent 62%,#000 64%);mask:radial-gradient(circle,transparent 62%,#000 64%);opacity:0;transition:opacity .2s}
+.dl-knopf.aktiv .dl-ring{opacity:1}.dl-knopf.aktiv{color:var(--c1)}
+.dl-pfeil{display:grid}.dl-pfeil svg{width:19px;height:19px}
+.dl-knopf.aktiv .dl-pfeil svg{animation:dl-hupf 1.4s ease-in-out infinite}
+@keyframes dl-hupf{50%{transform:translateY(2px)}}
+.dl-zahl{position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--c1);color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center;box-shadow:0 0 0 2px #fff}
+.dl-panel{position:absolute;right:0;top:calc(100% + 10px);width:380px;max-height:70vh;overflow-y:auto;padding:12px;border-radius:18px;z-index:40;display:flex;flex-direction:column;gap:6px;background:rgba(255,255,255,.92);box-shadow:0 18px 44px rgba(20,30,70,.22)}
+.dl-kopf{display:flex;flex-direction:column;gap:1px;padding:2px 4px 6px}.dl-kopf b{font-size:15px}
+.dl-zeile{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:12px;background:#fff;border:1px solid var(--linie)}
+.dl-zeile .mw-av{width:32px;height:32px;font-size:12px;border-radius:10px}
+.dl-info{flex:1;min-width:0;display:flex;flex-direction:column}
+.dl-info b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dl-info small{font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.dl-zeile.fertig small{color:#0b7a44;font-weight:600}.dl-zeile.fehler small{color:#a62828}
+.dl-info .fortschritt{margin-top:5px;height:5px}
+.fortschritt.wartet i{width:30% !important;background:rgba(42,120,214,.35);animation:dl-warte 1.6s ease-in-out infinite}
+@keyframes dl-warte{0%{margin-left:-30%}100%{margin-left:100%}}
+.dl-x{width:28px;height:28px;flex:none;border:0;border-radius:8px;background:none;display:grid;place-items:center;color:var(--ink-3);cursor:pointer}
+.dl-x:hover{background:var(--crit-bg);color:var(--crit)}.dl-x svg{width:14px;height:14px}
+.md-downloads{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;padding:12px;border-radius:16px;background:rgba(42,120,214,.06);border:1px solid rgba(42,120,214,.18)}
+.md-dl-kopf{display:flex;align-items:baseline;gap:10px;padding:0 4px 4px}
 .f-zurueck{flex:none;border:1px solid var(--linie);background:#fff;font:inherit;font-size:13.5px;font-weight:600;color:var(--ink-2);padding:7px 12px;border-radius:999px;cursor:pointer;margin-right:2px}
 .f-zurueck:hover{color:var(--c1);border-color:var(--c1)}
 .f-kopf .kg-logo{width:28px;height:28px;font-size:17px;border-radius:8px}
@@ -571,6 +594,10 @@ main{padding-bottom:20px}
       <span class="punkt"></span><span id="status-text">verbinde …</span>
       <span class="gpu" id="gpu" hidden><span class="trenner"></span><svg viewBox="0 0 120 26" preserveAspectRatio="none"><path class="fl"/><path class="ln"/><path class="vr"/></svg><span id="gpu-text"></span></span>
     </div>
+    <div class="dl-wrap" id="dl-wrap" hidden>
+      <button class="rund glas dl-knopf" id="dl-knopf" title="Downloads" aria-label="Downloads"><span class="dl-ring" id="dl-ring"></span><span class="dl-pfeil" data-i="runter"></span><span class="dl-zahl" id="dl-zahl" hidden></span></button>
+      <div class="dl-panel glas" id="dl-panel" hidden></div>
+    </div>
     <a class="rund glas" href="/einrichtung" id="zahnrad" title="Einstellungen: Ollama, Hardware, Modelle, Prüfer, Sicherheit"><span data-i="zahnrad"></span></a>
   </div>
 </div></header>
@@ -593,7 +620,7 @@ main{padding-bottom:20px}
     </div>
   </section>
   <section class="seite" id="s-modelle" data-titel="Modelle">
-    <div class="panel glas"><div id="md-kopf" class="md-kopf"></div><div id="md-liste" class="md-liste"></div></div>
+    <div class="panel glas"><div id="md-kopf" class="md-kopf"></div><div id="md-downloads" class="md-downloads" hidden></div><div id="md-liste" class="md-liste"></div></div>
   </section>
   <section class="seite" id="s-daten" data-titel="Daten">
     <div class="zwei"><div class="panel glas" id="dt-links"></div><div class="panel glas" id="dt-rechts"></div></div>
@@ -611,7 +638,7 @@ const lade = (text, gross = true) => el("div", { class: "lade" + (gross ? " gros
 const zahl = (x, n = 1) => x == null ? "–" : Number(x).toLocaleString("de-DE", { minimumFractionDigits: n, maximumFractionDigits: n });
 const pz = (x) => x == null ? "–" : Math.round(x * 100) + " %";
 const P = { pfeil: '<path d="M5 12h14M13 6l6 6-6 6"/>', zahnrad: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
-  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>', runter: '<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',
   pokal: '<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3a3 3 0 0 1-3 4M7 5H4a3 3 0 0 0 3 4"/>', x: '<path d="M18 6 6 18M6 6l12 12"/>',
   hoch: '<path d="M12 19V5M5 12l7-7 7 7"/>',
   chat: '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>', speicher: '<rect x="4" y="7" width="16" height="10" rx="2"/><path d="M8 7V4M12 7V4M16 7V4M8 20v-3M12 20v-3M16 20v-3"/>',
@@ -974,8 +1001,81 @@ function werkzeugFenster() {
     karten, el("p", { class: "klein", style: "margin:4px 2px 0" }, "Nicht jedes Modell kann Werkzeuge aufrufen. Kann es das nicht, antwortet es ohne – in der Rangliste mit * markiert."));
 }
 
+/* ---------- Downloads (laufen auf dem Server weiter, auch wenn Fenster geschlossen werden) ---------- */
+const DLS = { liste: [], hoerer: new Set(), vorher: {} };
+const gbT = (b) => zahl(b / 1e9);
+const aktivDl = (d) => d && (d.status === "laeuft" || d.status === "wartet");
+function dlText(d) {
+  if (d.status === "wartet") return "wartet auf einen freien Platz …";
+  if (d.status === "fertig") return "✓ installiert";
+  if (d.status === "fehler") return "Fehler: " + (d.fehler || "unbekannt");
+  if (d.status === "abgebrochen") return "abgebrochen";
+  if (!d.total) return d.schritt ? "bereitet vor …" : "startet …";
+  const rest = d.rest_s ? ` · noch ${d.rest_s >= 90 ? Math.round(d.rest_s / 60) + " min" : d.rest_s + " s"}` : "";
+  return `${Math.round(d.anteil * 100)} % · ${gbT(d.completed)} von ${gbT(d.total)} GB` + (d.tempo ? ` · ${zahl(d.tempo / 1e6)} MB/s` : "") + rest;
+}
+const dlFuer = (name, repo) => DLS.liste.find((x) => x.modell === name || (repo && x.modell.toLowerCase().startsWith(`hf.co/${repo}:`.toLowerCase())));
+async function dlStarten(r, quant) {   // r: {basis, id, titel}
+  const titel = r.titel || r.id;
+  const j = r.basis ? await api("api/einrichtung/pull", { modell: r.id, titel }) : await api("api/hf/laden", { repo: r.id, quant, titel });
+  DLS.liste = [j, ...DLS.liste.filter((x) => x.modell !== j.modell)]; dlZeichnen(); dlPlanen(400);
+  return j;
+}
+let dlTimer = null;
+function dlPlanen(ms) { clearTimeout(dlTimer); dlTimer = setTimeout(dlAktualisieren, ms); }
+async function dlAktualisieren() {
+  try { DLS.liste = (await api("api/downloads")).downloads; } catch {}
+  let neuFertig = false;
+  for (const d of DLS.liste) {
+    if (d.status === "fertig" && DLS.vorher[d.modell] && DLS.vorher[d.modell] !== "fertig") { neuFertig = true; toast(`${d.titel} ist installiert`); }
+    DLS.vorher[d.modell] = d.status;
+  }
+  if (neuFertig) { await ladeStatus(); zeichne(); }
+  dlZeichnen();
+  dlPlanen(DLS.liste.some(aktivDl) ? 1000 : 5000);
+}
+function dlZeichnen() {
+  const aktiv = DLS.liste.filter(aktivDl), alle = DLS.liste;
+  $("#dl-wrap").hidden = !alle.length;
+  const gesamt = aktiv.reduce((a, d) => a + (d.total || 0), 0), fertig = aktiv.reduce((a, d) => a + (d.completed || 0), 0);
+  $("#dl-ring").style.setProperty("--p", aktiv.length ? (gesamt ? fertig / gesamt : 0) * 360 + "deg" : "360deg");
+  $("#dl-knopf").classList.toggle("aktiv", aktiv.length > 0);
+  $("#dl-zahl").hidden = !aktiv.length; $("#dl-zahl").textContent = aktiv.length;
+  $("#dl-knopf").title = aktiv.length ? `${aktiv.length} Download${aktiv.length === 1 ? "" : "s"} – ${dlText(aktiv[0])}` : "Downloads";
+  if (!$("#dl-panel").hidden) dlPanel();
+  DLS.hoerer.forEach((f) => f());
+  if (S.tab === "s-modelle") zeichneDownloadsTab();
+}
+function dlZeile(d, kompakt) {
+  const aktiv = aktivDl(d);
+  return el("div", { class: "dl-zeile " + d.status },
+    el("span", { class: "mw-av", style: `--farbe:${farbe(d.modell)}` }, (d.titel || "?").replace(/[^A-Za-zÄÖÜ]/g, "").slice(0, 2).toUpperCase() || "KI"),
+    el("div", { class: "dl-info" }, el("b", { title: d.modell }, d.titel), el("small", {}, dlText(d)),
+      aktiv ? el("div", { class: "fortschritt" + (d.status === "wartet" ? " wartet" : "") }, el("i", { style: `width:${Math.round(d.anteil * 100)}%` })) : ""),
+    aktiv ? el("button", { class: "dl-x", title: "Abbrechen", html: ic("x"), onclick: async () => { await api("api/download/abbrechen", { modell: d.modell }); dlPlanen(200); } })
+      : d.status === "fehler" || d.status === "abgebrochen"
+        ? el("button", { class: "cl-link", onclick: async () => { await api(d.modell.startsWith("hf.co/") ? "api/hf/laden" : "api/einrichtung/pull",
+            d.modell.startsWith("hf.co/") ? { repo: d.modell.slice(6).split(":")[0], quant: d.modell.split(":")[1] || "", titel: d.titel } : { modell: d.modell, titel: d.titel }); dlPlanen(200); } }, "Erneut")
+        : kompakt ? el("button", { class: "dl-x", title: "Aus der Liste nehmen", html: ic("x"), onclick: async () => { await api("api/download/entfernen", { modell: d.modell }); dlPlanen(100); } }) : "");
+}
+function dlPanel() {
+  const aktiv = DLS.liste.filter(aktivDl);
+  $("#dl-panel").replaceChildren(el("div", { class: "dl-kopf" }, el("b", {}, "Downloads"),
+      el("span", { class: "klein" }, aktiv.length ? `${aktiv.length} aktiv · laufen weiter, auch wenn du Fenster schließt` : "alle fertig")),
+    ...DLS.liste.map((d) => dlZeile(d, true)));
+}
+$("#dl-knopf").onclick = (ev) => { ev.stopPropagation(); const p = $("#dl-panel"); p.hidden = !p.hidden; if (!p.hidden) dlPanel(); };
+document.addEventListener("click", (ev) => { if (!$("#dl-wrap").contains(ev.target)) $("#dl-panel").hidden = true; });
+function zeichneDownloadsTab() {
+  const box = $("#md-downloads"); if (!box) return;
+  const liste = DLS.liste.filter((d) => d.status !== "fertig");
+  box.hidden = !liste.length;
+  if (liste.length) box.replaceChildren(el("div", { class: "md-dl-kopf" }, el("b", {}, "Wird heruntergeladen"), el("span", { class: "klein" }, "läuft im Hintergrund weiter")), ...liste.map((d) => dlZeile(d, false)));
+}
+
 /* ---------- Tab „Modelle“: alle installierten Modelle ---------- */
 async function zeichneModelleTab() {
+  zeichneDownloadsTab();
   $("#md-kopf").replaceChildren(el("div", {}, el("h2", { style: "margin:0;font-size:20px" }, "Deine Modelle"), el("span", { class: "klein" }, S.status.ok ? "installiert in Ollama" : "Ollama nicht verbunden")),
     el("button", { class: "knopf primaer", style: "margin-left:auto", onclick: modellFenster }, "+ Modell hinzufügen"));
   if (!$("#md-liste").childElementCount) $("#md-liste").replaceChildren(lade("lädt Modelle …"));
@@ -1023,25 +1123,24 @@ function modellFenster() {
   const karte = (r) => {
     const da = r.basis ? inst().has(r.id) : [...inst()].some((t) => t.toLowerCase().startsWith(`hf.co/${r.id}:`.toLowerCase()));
     const fuss = el("div", { class: "mw-fuss" });
+    let fehler = null;
     const knopf = el("button", { class: "mw-los", onclick: async () => {
-      const balken = el("div", { class: "fortschritt" }, el("i")), text = el("small", {}, "startet …");
-      fuss.replaceChildren(el("div", { class: "mw-prozent" }, text, balken));
-      const fort = (j) => {
-        if (j.error || j.fehler) throw new Error(j.error || j.fehler);
-        if (j.total) { const p = Math.round(100 * (j.completed || 0) / j.total); balken.firstChild.style.width = p + "%"; text.textContent = `${p} % · ${zahl((j.completed || 0) / 1e9)} von ${zahl(j.total / 1e9)} GB`; }
-        else if (j.status) text.textContent = j.status;
-      };
+      knopf.disabled = true; fehler = null;
       try {
-        if (r.basis) await stream("api/einrichtung/pull", { modell: r.id }, fort);
-        else {
-          let quant = r.quant;
-          if (!quant) { const d = await api("api/hf/dateien?repo=" + encodeURIComponent(r.id)); const x = d.dateien.find((y) => /^Q4_K_M$/i.test(y.quant)) || d.dateien.find((y) => /Q4/i.test(y.quant)) || d.dateien[d.dateien.length - 1]; if (!x) throw new Error("keine passende Datei"); quant = x.quant; }
-          await stream("api/hf/laden", { repo: r.id, quant }, fort);
-        }
-        await neu();
-      } catch (e) { fuss.replaceChildren(el("div", { class: "box fehler", style: "font-size:13px" }, e.message), knopf); }
+        let quant = r.quant;
+        if (!r.basis && !quant) { const d = await api("api/hf/dateien?repo=" + encodeURIComponent(r.id)); const x = d.dateien.find((y) => /^Q4_K_M$/i.test(y.quant)) || d.dateien.find((y) => /Q4/i.test(y.quant)) || d.dateien[d.dateien.length - 1]; if (!x) throw new Error("keine passende Datei"); quant = x.quant; }
+        await dlStarten(r, quant);
+      } catch (e) { fehler = e.message; }
+      knopf.disabled = false; aktualisiere();
     } }, "Installieren");
-    fuss.append(da ? el("span", { class: "mw-da" }, "✓ installiert") : knopf);
+    const aktualisiere = () => {   // Stand vom Server: Download läuft weiter, auch nach Schließen des Fensters
+      const d = dlFuer(r.basis ? r.id : null, r.basis ? null : r.id), jetztDa = da || inst().has(r.id) || d?.status === "fertig";
+      if (jetztDa) fuss.replaceChildren(el("span", { class: "mw-da" }, "✓ installiert"));
+      else if (aktivDl(d)) fuss.replaceChildren(el("div", { class: "mw-prozent" }, el("small", {}, dlText(d)), el("div", { class: "fortschritt" + (d.status === "wartet" ? " wartet" : "") }, el("i", { style: `width:${Math.round(d.anteil * 100)}%` }))));
+      else fuss.replaceChildren(...(fehler || d?.status === "fehler" ? [el("div", { class: "box fehler", style: "font-size:13px;margin-bottom:6px" }, fehler || d.fehler)] : []), knopf);
+    };
+    const hoer = () => { if (!fuss.isConnected && fuss.dataset.gesehen) DLS.hoerer.delete(hoer); else { if (fuss.isConnected) fuss.dataset.gesehen = 1; aktualisiere(); } };
+    DLS.hoerer.add(hoer); aktualisiere();
     const passt = r.passt !== false;
     return el("div", { class: "mw-karte" + (da ? " da" : "") },
       el("div", { class: "mw-kopf" }, avatar(r.hersteller || r.titel, r.farbe || "#2a78d6"),
@@ -2026,6 +2125,7 @@ $("#zahnrad").onclick = (ev) => { ev.preventDefault(); einstellungenAuf(); };
   const anker = location.hash, start = "s-" + (anker.startsWith("#import") ? "daten" : anker.slice(1) || "vergleich");
   zeige(document.getElementById(start) ? start : "s-vergleich");
   if (anker === "#modell-hinzufuegen") { zeige("s-modelle"); modellFenster(); }
+  dlAktualisieren();
   if (!S.einst.eingerichtet) einstellungenAuf();            // erster Start: Einrichtungsassistent als Fenster
   else if (anker === "#einstellungen") einstellungenAuf();
   if (anker === "#werkzeuge") werkzeugFenster();

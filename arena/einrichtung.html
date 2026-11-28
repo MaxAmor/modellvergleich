@@ -49,7 +49,9 @@ h1{font-size:26px;margin:0;letter-spacing:-.02em}
 .mw-fuss{margin-top:auto}
 .knopf.mw-los{width:100%;justify-content:center;padding:8px}
 .mw-da{display:block;text-align:center;font-size:13.5px;font-weight:700;color:#0b7a44;padding:8px}
-.mw-prozent small{font-size:12.5px;color:var(--ink-2)}
+.mw-prozent small{font-size:12.5px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.fortschritt.wartet i{width:30% !important;background:rgba(42,120,214,.35);animation:dl-warte 1.6s ease-in-out infinite}
+@keyframes dl-warte{0%{margin-left:-30%}100%{margin-left:100%}}
 .hilfe{background:#fff;border:1px solid var(--kante);font-size:14.5px}
 .hilfe-schritt{display:flex;gap:12px;margin-top:12px}
 .hilfe-schritt b{font-size:14.5px}
@@ -223,14 +225,6 @@ async function api(pfad, body) {
   if (!r.ok) throw new Error(j.fehler || `Fehler ${r.status}`);
   return j;
 }
-async function stream(pfad, body, jeZeile) {
-  const r = await fetch(pfad, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-  if (!r.ok) throw new Error((await r.json().catch(() => ({}))).fehler || `Fehler ${r.status}`);
-  const leser = r.body.getReader(), dec = new TextDecoder(); let rest = "";
-  for (;;) { const { value, done } = await leser.read(); if (done) break; rest += dec.decode(value, { stream: true });
-    const zeilen = rest.split("\n"); rest = zeilen.pop(); for (const z of zeilen) if (z.trim()) jeZeile(JSON.parse(z)); }
-  if (rest.trim()) jeZeile(JSON.parse(rest));
-}
 const speichere = (d) => api("/api/einstellungen", d).then((e) => Object.assign(E, e));
 
 let E = {}, SUCHE = null, SCHRITT = 0;
@@ -393,6 +387,23 @@ const GRAFIK_ART = {
   "intel-karte": "eine Intel-Grafikkarte mit eigenem Speicher. Im Container nutzt Ollama sie nicht; mit Ollama direkt auf dem Rechner je nach Version möglich.",
   "andere": "eine Grafik, die Ollama im Container nicht nutzt.",
 };
+/* Downloads laufen auf dem Server im Hintergrund – hier nur den Stand abfragen */
+const DLW = { liste: [], hoerer: new Set() };
+let dlwTimer = null;
+function dlwPlanen(ms) { clearTimeout(dlwTimer); dlwTimer = setTimeout(dlwAktualisieren, ms); }
+async function dlwAktualisieren() {
+  try { DLW.liste = (await api("/api/downloads")).downloads; } catch {}
+  DLW.hoerer.forEach((f) => f());
+  dlwPlanen(DLW.liste.some((d) => d.status === "laeuft" || d.status === "wartet") ? 1000 : 5000);
+}
+function dlwText(d) {
+  if (d.status === "wartet") return "wartet – höchstens zwei Downloads gleichzeitig";
+  if (!d.total) return "startet …";
+  const rest = d.rest_s ? ` · noch ${d.rest_s >= 90 ? Math.round(d.rest_s / 60) + " min" : d.rest_s + " s"}` : "";
+  return `${Math.round(d.anteil * 100)} % · ${zahl(d.completed / 1e9)} von ${zahl(d.total / 1e9)} GB` + (d.tempo ? ` · ${zahl(d.tempo / 1e6)} MB/s` : "") + rest;
+}
+dlwAktualisieren();
+
 /* Anleitung mit Knöpfen: Ollama direkt auf dem Rechner installieren, verbinden, GPU testen */
 function grafikHilfe(art) {
   const ua = navigator.userAgent, os = /Windows/i.test(ua) ? "win" : /Mac/i.test(ua) ? "mac" : "linux";
@@ -487,26 +498,29 @@ function modelle(k) {
   const zeile = (r) => {
     const da = istDa(r), passt = r.passt !== false;
     const fuss = el("div", { class: "mw-fuss" });
+    let fehler = null;
     const knopf = el("button", { class: "knopf install mw-los", onclick: async () => {
-      const balken = el("div", { class: "fortschritt" }, el("i")), text = el("small", {}, "startet …");
-      fuss.replaceChildren(el("div", { class: "mw-prozent" }, text, balken));
-      const fortschritt = (j) => {
-        if (j.error || j.fehler) throw new Error(j.error || j.fehler);
-        if (j.total) { const pz = Math.round(100 * (j.completed || 0) / j.total); balken.firstChild.style.width = pz + "%"; text.textContent = `${pz} % · ${zahl((j.completed || 0) / 1e9)} von ${zahl(j.total / 1e9)} GB`; }
-        else if (j.status) text.textContent = j.status;
-        if (j.fertig) { installiert.add(j.modell); merke(); fuss.replaceChildren(el("span", { class: "mw-da" }, "✓ installiert")); karte.classList.add("da"); }
-      };
+      knopf.disabled = true; fehler = null;
       try {
-        if (r.basis) await stream("/api/einrichtung/pull", { modell: r.id }, fortschritt);
-        else {
-          let quant = r.quant;
-          if (!quant) { const d = await api("/api/hf/dateien?repo=" + encodeURIComponent(r.id)); const f = d.dateien.find((x) => /^Q4_K_M$/i.test(x.quant)) || d.dateien.find((x) => /Q4/i.test(x.quant)) || d.dateien[d.dateien.length - 1]; if (!f) throw new Error("keine passende Datei"); quant = f.quant; }
-          await stream("/api/hf/laden", { repo: r.id, quant }, fortschritt);
-        }
-      } catch (e) { fuss.replaceChildren(el("div", { class: "box fehler", style: "font-size:13px;padding:8px 10px" }, e.message), knopf); }
+        let quant = r.quant;
+        if (!r.basis && !quant) { const d = await api("/api/hf/dateien?repo=" + encodeURIComponent(r.id)); const f = d.dateien.find((x) => /^Q4_K_M$/i.test(x.quant)) || d.dateien.find((x) => /Q4/i.test(x.quant)) || d.dateien[d.dateien.length - 1]; if (!f) throw new Error("keine passende Datei"); quant = f.quant; }
+        const j = r.basis ? await api("/api/einrichtung/pull", { modell: r.id, titel: r.titel }) : await api("/api/hf/laden", { repo: r.id, quant, titel: r.titel });
+        DLW.liste = [j, ...DLW.liste.filter((x) => x.modell !== j.modell)]; dlwPlanen(400);
+      } catch (e) { fehler = e.message; }
+      knopf.disabled = false; aktualisiere();
     } }, "Installieren");
-    fuss.append(da ? el("span", { class: "mw-da" }, "✓ installiert") : knopf);
-    const karte = el("div", { class: "mw-karte" + (da ? " da" : "") },
+    const aktualisiere = () => {   // Stand vom Server – der Download läuft dort weiter, auch wenn der Assistent geschlossen wird
+      const d = DLW.liste.find((x) => x.modell === r.id || (!r.basis && x.modell.toLowerCase().startsWith(`hf.co/${r.id}:`.toLowerCase())));
+      if (d?.status === "fertig" && !istDa(r)) { installiert.add(d.modell); merke(); }
+      if (istDa(r)) { fuss.replaceChildren(el("span", { class: "mw-da" }, "✓ installiert")); karte?.classList.add("da"); }
+      else if (d && (d.status === "laeuft" || d.status === "wartet")) fuss.replaceChildren(el("div", { class: "mw-prozent" }, el("small", {}, dlwText(d)),
+        el("div", { class: "fortschritt" + (d.status === "wartet" ? " wartet" : "") }, el("i", { style: `width:${Math.round(d.anteil * 100)}%` }))));
+      else fuss.replaceChildren(...(fehler || d?.status === "fehler" ? [el("div", { class: "box fehler", style: "font-size:13px;padding:8px 10px;margin-bottom:6px" }, fehler || d.fehler)] : []), knopf);
+    };
+    let karte = null;
+    const hoer = () => { if (!fuss.isConnected && fuss.dataset.gesehen) DLW.hoerer.delete(hoer); else { if (fuss.isConnected) fuss.dataset.gesehen = 1; aktualisiere(); } };
+    DLW.hoerer.add(hoer); aktualisiere();
+    karte = el("div", { class: "mw-karte" + (da ? " da" : "") },
       el("div", { class: "mw-kopf" }, avatar(r.hersteller || r.titel, farbeVon(r.id)),
         el("div", { class: "mw-name" }, el("b", {}, r.titel), el("small", {}, r.hersteller || r.id)),
         r.basis ? el("span", { class: "mw-marke" }, "Im Vergleich") : ""),
@@ -539,7 +553,7 @@ function modelle(k) {
   q.onkeydown = (ev) => { if (ev.key === "Enter") suche(); };
   q.oninput = () => { if (!q.value.trim()) zeigeStart(); };
   k.append(el("div", { class: "zeile hf-titel" }, el("span", { class: "hf", "aria-hidden": "true" }, "🤗"), q, el("button", { class: "knopf", onclick: suche }, "Suchen")),
-    el("p", { class: "klein", style: "margin:6px 0 0" }, `Es erscheinen nur Modelle, die mit Kontext in ${zahl(maxGb())} GB passen (4-Bit-Version). Download einmalig, je Modell ca. 2–10 GB.`),
+    el("p", { class: "klein", style: "margin:6px 0 0" }, `Es erscheinen nur Modelle, die mit Kontext in ${zahl(maxGb())} GB passen (4-Bit-Version). Download einmalig, je Modell ca. 2–10 GB – läuft im Hintergrund weiter, auch wenn du den Assistenten schließt.`),
     liste);
   zeigeStart();
   if (E.modelle_verwalten) api("/api/hf/vorschlaege").then((v) => { vorschlaege = v.map((x) => ({ id: x.id, titel: (x.id.split("/")[1] || x.id).replace(/-GGUF$/i, "").replace(/[-_]/g, " "), hersteller: x.hersteller, warum: x.warum, quant: x.q4?.quant,

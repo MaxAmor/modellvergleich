@@ -383,7 +383,7 @@ class Handler(BaseHTTPRequestHandler):
 
     server_version = "Modellvergleich/1.0"
 
-    RUHIG = ("/api/status", "/api/gpu", "/api/einstellungen", "/api/arena", "/api/standard-system")
+    RUHIG = ("/api/downloads", "/api/status", "/api/gpu", "/api/einstellungen", "/api/arena", "/api/standard-system")
 
     def log_message(self, fmt, *args):
         # Routine-Abfragen der Oberfläche (alle paar Sekunden) nicht protokollieren, Fehler schon
@@ -488,6 +488,9 @@ class Handler(BaseHTTPRequestHandler):
             from arena import werkzeuge as wz
             return self._json(200, {**einstellungen.oeffentlich(), "modelle_basis": kern.MODELLE, "max_modell_gb": max_gb(), "erkannt": hardware_erkennen(),
                                     "sympy_verfuegbar": wz.sympy_verfuegbar()})
+        if pfad == "/api/downloads":
+            from arena import downloads
+            return self._json(200, {"downloads": downloads.liste()})
         if pfad == "/api/einrichtung/suche":
             return self._json(200, ollama_suche())
         if pfad == "/api/gpu":
@@ -544,7 +547,7 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(400, {"fehler": str(fehler)})
         modell = daten.get("modell")
         pfad = self.path.split("?")[0]
-        if pfad.startswith("/api/einrichtung/") or pfad == "/api/einstellungen":
+        if pfad.startswith(("/api/einrichtung/", "/api/download/")) or pfad == "/api/einstellungen":
             return self._einrichtung(pfad, daten)
         if pfad.startswith("/api/arena"):
             return self._arena(pfad, daten)
@@ -861,7 +864,15 @@ class Handler(BaseHTTPRequestHandler):
             m = str(d.get("modell", ""))
             if m not in ERLAUBT:
                 return self._json(400, {"fehler": "Im Assistenten lassen sich nur die Basismodelle laden."})
-            return self._pull(m)
+            from arena import downloads
+            return self._json(200, downloads.starte(m, str(d.get("titel") or "")[:80]))
+        if pfad == "/api/download/abbrechen":
+            from arena import downloads
+            return self._json(200, {"ok": downloads.abbrechen(str(d.get("modell", "")))})
+        if pfad == "/api/download/entfernen":
+            from arena import downloads
+            downloads.entfernen(str(d.get("modell", "")))
+            return self._json(200, {"ok": True})
         if pfad == "/api/einrichtung/gpu-test":
             m = str(d.get("modell", ""))
             if m not in (ollama_status().get("modelle") or []):
@@ -923,24 +934,8 @@ class Handler(BaseHTTPRequestHandler):
         if not datei or not datei["passt"]:
             return self._json(400, {"fehler": f"Zu groß für deine Grafikkarte (max. {max_gb():g} GB, siehe Einrichtung)."})
         name = f"hf.co/{repo}" + (f":{quant}" if quant else "")
-        self._pull(name)
-
-    def _pull(self, name):
-        req = urllib.request.Request(kern.ollama_url() + "/api/pull", data=json.dumps({"model": name, "stream": True}).encode(), headers={"Content-Type": "application/json"})
-        self.send_response(200)
-        self.send_header("Content-Type", "application/x-ndjson")
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        try:
-            with urllib.request.urlopen(req, timeout=3600) as r:
-                for zeile in r:
-                    self.wfile.write(zeile)
-                    self.wfile.flush()
-            status_neu()
-            self.wfile.write((json.dumps({"fertig": True, "modell": name}) + "\n").encode())
-        except Exception as fehler:
-            self.wfile.write((json.dumps({"error": str(fehler)}) + "\n").encode())
-        self.wfile.flush()
+        from arena import downloads
+        return self._json(200, downloads.starte(name, str(d.get("titel") or "")[:80]))
 
     # ------------------------------------------------------------------ Chat (frei, live)
     def _chat(self, modell, d):
@@ -1123,5 +1118,7 @@ if __name__ == "__main__":
         ctypes.CDLL(None).prctl(4, 0, 0, 0, 0)   # PR_SET_DUMPABLE = 0
     except Exception:
         pass
+    from arena import downloads
+    downloads._nach_fertig.append(status_neu)   # nach jedem fertigen Download die Modellliste neu holen
     threading.Thread(target=hardware_erkennen, daemon=True).start()   # Grafikkarte schon beim Start erkennen
     ThreadingHTTPServer((HOST, PORT), Handler).serve_forever()

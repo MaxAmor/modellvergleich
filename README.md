@@ -67,7 +67,7 @@ Der Schritt **GPU-Test** im Assistenten prüft, ob die Modelle wirklich auf der 
 |---|---|
 | **Vergleich** | Modelle und einen oder mehrere Datensätze wählen, Modi wählen, antreten lassen. Rangliste je Datensatz oder Gesamt-Rangliste über mehrere. Läufe setzen nach Abbruch fort, schon Gerechnetes wird übersprungen. |
 | **Chat** | Frei chatten oder eine Frage/Aufgabe aus dem Datensatz stellen – ein Modell oder mehrere nebeneinander. Rechts der Ablauf Schritt für Schritt. |
-| **Modelle** | Installierte Modelle mit Größe, Kontext, Fähigkeiten und Ergebnis; neue Modelle suchen und installieren (Ollama-Bibliothek, Hugging Face). |
+| **Modelle** | Installierte Modelle mit Größe, Kontext, Fähigkeiten und Ergebnis; neue Modelle suchen und installieren (Ollama-Bibliothek, Hugging Face). Downloads laufen im Hintergrund weiter (höchstens zwei gleichzeitig), den Fortschritt zeigt das Download-Symbol oben rechts. |
 | **Daten** | Datensätze ansehen, laden, einzelne Einträge auswählen und löschen (mit Rückgängig). |
 
 Oben: Auslastung der Grafikkarte und der Schalter **Demo**: an = Demo-Datensatz sichtbar, aus = nur eigene Datensätze.
