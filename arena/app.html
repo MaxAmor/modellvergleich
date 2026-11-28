@@ -341,6 +341,25 @@ main{padding-bottom:20px}
 .ma-text{display:flex;flex-direction:column;min-width:0;flex:1}
 .ma-text b{font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ma-text small{font-size:12px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ma-kann{display:flex;gap:3px;flex:none}
+.ma-kann span{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;background:rgba(42,120,214,.09);color:var(--c1)}
+.ma-kann svg{width:12.5px;height:12.5px}
+.ar-rechts{display:flex;flex-direction:column;gap:12px;min-width:0}
+#ar-lauf{position:sticky;top:10px;z-index:5}
+.al-karte{padding:16px 18px;border-radius:22px;display:flex;flex-direction:column;gap:10px;box-shadow:0 10px 30px rgba(20,30,70,.10)}
+.al-kopf{display:flex;align-items:center;gap:12px}
+.al-puls{width:10px;height:10px;border-radius:50%;background:var(--c1);flex:none;animation:al-puls 1.6s ease-in-out infinite}
+@keyframes al-puls{0%,100%{box-shadow:0 0 0 0 rgba(42,120,214,.45)}50%{box-shadow:0 0 0 7px rgba(42,120,214,0)}}
+.al-titel{display:flex;flex-direction:column;min-width:0;flex:1}
+.al-titel b{font-size:16px}.al-titel span{font-size:13px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.al-prozent{display:flex;flex-direction:column;align-items:flex-end;flex:none}
+.al-prozent b{font-size:22px;font-variant-numeric:tabular-nums;line-height:1.1}.al-prozent small{font-size:12px;color:var(--ink-3)}
+.al-balken{height:10px;margin-top:0}.al-balken i{background:linear-gradient(90deg,var(--c1),#4f9cf0)}
+.al-fuss{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.al-schritt{display:flex;flex-direction:column}
+.al-schritt small{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.al-schritt b{font-size:14px;font-variant-numeric:tabular-nums}
+.al-stopp{margin-left:auto}
 .ma-stand{flex:none;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:rgba(20,30,60,.06);color:var(--ink-2);font-variant-numeric:tabular-nums}
 .ma-stand.fertig{background:var(--good-bg);color:#0b7a44}
 .ma-neu{display:flex;align-items:center;gap:10px;padding:9px 12px 9px 10px;border-radius:14px;border:1.5px dashed rgba(42,120,214,.35);background:transparent;color:var(--c1);font:inherit;font-size:14px;font-weight:600;cursor:pointer;text-align:left}
@@ -603,7 +622,7 @@ main{padding-bottom:20px}
 </div></header>
 <main class="wrap">
   <section class="seite" id="s-vergleich" data-titel="Vergleich">
-    <div class="zwei"><div class="panel glas" id="ar-links"></div><div class="panel glas" id="ar-rang" style="overflow-x:auto"></div></div>
+    <div class="zwei"><div class="panel glas" id="ar-links"></div><div class="ar-rechts"><div id="ar-lauf" hidden></div><div class="panel glas" id="ar-rang" style="overflow-x:auto"></div></div></div>
   </section>
   <section class="seite" id="s-chat" data-titel="Chat">
     <div class="drei">
@@ -764,6 +783,7 @@ function ladeModellInfo(inst) {
   api("api/modelle").then((j) => { j.modelle.forEach((m) => MINFO[m.tag] = m); if (S.tab === "s-vergleich") zeichneArena(); })
     .catch(() => {}).finally(() => { MINFO_LAEDT = false; inst.forEach((t) => MINFO[t] ||= {}); });
 }
+const FAEHIG = [["vision", "bild", "liest Bilder"], ["thinking", "gehirn", "kann denken (Reasoning)"], ["tools", "werkzeug", "kann Werkzeuge aufrufen"]];
 function zeichneArena() {
   clearTimeout(AR.timer);
   const J = S.arena || {}, job = J.job || {}, sichtDs = sichtbareDs();
@@ -791,6 +811,8 @@ function zeichneArena() {
         el("button", { onclick: () => { inst.forEach((t) => AR.auswahl.add(t)); merke(); } }, "Alle"),
         el("button", { onclick: () => { AR.auswahl.clear(); merke(); } }, "Keine"))));
     const stand = (tag) => {
+      if (job.laeuft && job.modell === tag) return { text: "läuft", fertig: false };
+      if (job.laeuft && (job.modelle || []).includes(tag) && (job.modelle || []).indexOf(tag) > (job.nr || 1) - 1) return { text: "wartet", fertig: false };
       if (mehrere) {   // über alle gewählten Datensätze
         if (AR.mehr.schluessel === "") return null;
         const k = gewDs.filter((d) => (AR.mehr.daten[d.id]?.ergebnisse || []).some((x) => x.modell === tag && x.fertig)).length;
@@ -807,7 +829,8 @@ function zeichneArena() {
         el("span", { class: "ma-haken", html: ic("check") }),
         el("span", { class: "ma-av", style: `--farbe:${farbe(tag)}` }, name(tag).replace(/[^A-Za-z0-9]/g, "").slice(0, 2).toUpperCase()),
         el("span", { class: "ma-text" }, el("b", {}, name(tag)),
-          el("small", {}, [info.datei_gb && zahl(info.datei_gb) + " GB", info.parameter, f.includes("vision") && "liest Bilder"].filter(Boolean).join(" · ") || tag)),
+          el("small", {}, [info.datei_gb && zahl(info.datei_gb) + " GB", info.parameter].filter(Boolean).join(" · ") || tag)),
+        f.length ? el("span", { class: "ma-kann" }, FAEHIG.filter(([k]) => f.includes(k)).map(([, icon, titel]) => el("span", { title: titel, html: ic(icon) }))) : "",
         st ? el("span", { class: "ma-stand" + (st.fertig ? " fertig" : ""), title: st.fertig ? "In diesem Datensatz schon gerechnet – wird übersprungen" : "Teilweise gerechnet – es geht dort weiter" }, st.fertig ? "✓ fertig" : st.text) : "");
     }), job.laeuft ? "" : el("button", { class: "ma-neu", onclick: modellFenster }, el("span", {}, "+"), "Modell hinzufügen")));
   }
@@ -852,13 +875,9 @@ function zeichneArena() {
     el("span", { class: "ma-alle" }, el("button", { onclick: werkzeugFenster, title: "Was die Modelle im Modus „Mit Werkzeugen“ benutzen dürfen" }, "Werkzeuge ›"))));
   if (mitFragen) { if (mitBew) L.push(el("div", { class: "mo-gruppe" }, "Fragen beantworten")); L.push(modusKarten(FRAGEN_MODI, AR.fmodi, "mv-fmodi")); }
   if (mitBew) { if (mitFragen) L.push(el("div", { class: "mo-gruppe" }, "Antworten bewerten")); L.push(modusKarten(BEW_MODI, AR.modi, null)); }
+  zeichneLauf(job);
   if (job.laeuft) {
-    const p = job.n ? job.i / job.n : 0;
-    L.push(el("div", { class: "etikett" }, "Läuft"), el("div", { class: "box info" },
-      (job.datensaetze || []).length > 1 ? el("div", { class: "klein" }, `Datensatz ${job.ds_nr} von ${job.datensaetze.length}: ${S.datensaetze.find((d) => d.id === job.datensatz)?.name || job.datensatz}`) : "",
-      el("b", {}, `Modell ${job.nr} von ${job.modelle.length}: ${name(job.modell)}`), el("div", {}, (job.modus ? MODI[job.modus].name : "startet …") + ` · ${job.i} von ${job.n}` + (job.rest_s ? ` · noch ca. ${Math.max(1, Math.round(job.rest_s / 60))} min` : "")),
-      el("div", { class: "fortschritt" }, el("i", { style: `width:${p * 100}%` })),
-      el("button", { class: "knopf klein", style: "margin-top:8px", onclick: async () => { await api("api/arena/stopp", {}); await ladeDatensaetze(); zeichneArena(); } }, "Anhalten (bisherige Ergebnisse bleiben)")));
+    L.push(el("div", { class: "ma-summe", style: "margin-top:16px" }, "Läuft gerade – den Fortschritt siehst du oben rechts."));
   } else {
     const n = AR.auswahl.size, fr = !mitBew, modiN = fr ? AR.fmodi.size : AR.modi.size;
     const anz = gewDs.reduce((a, d) => a + n * (istFragen(d) ? AR.fmodi.size : AR.modi.size) * d.antworten, 0);
@@ -874,6 +893,28 @@ function zeichneArena() {
   }
   $("#ar-links").replaceChildren(...L);
   if (mehrere) zeichneRanglisteMehrere(gewDs); else zeichneRangliste(ds);
+}
+
+/* Fortschritt eines laufenden Vergleichs – oben über der Rangliste, bleibt beim Scrollen sichtbar */
+function restText(s) { return s >= 5400 ? `noch ca. ${zahl(s / 3600)} h` : s >= 90 ? `noch ca. ${Math.round(s / 60)} min` : `noch ca. ${Math.max(1, s)} s`; }
+function zeichneLauf(job) {
+  const box = $("#ar-lauf");
+  box.hidden = !job.laeuft;
+  if (!job.laeuft) { box.replaceChildren(); return; }
+  const p = job.n ? job.i / job.n : 0, mehrDs = (job.datensaetze || []).length > 1;
+  const schritt = (nr, von, text) => el("div", { class: "al-schritt" }, el("small", {}, text), el("b", {}, `${nr} von ${von}`));
+  box.replaceChildren(el("div", { class: "al-karte glas" },
+    el("div", { class: "al-kopf" },
+      el("span", { class: "al-puls" }),
+      el("div", { class: "al-titel" }, el("b", {}, "Vergleich läuft"),
+        el("span", {}, `${name(job.modell)} · ${job.modus ? MODI[job.modus].name : "startet …"}`)),
+      el("div", { class: "al-prozent" }, el("b", {}, Math.floor(p * 100) + " %"), el("small", {}, job.rest_s ? restText(job.rest_s) : "Restzeit wird berechnet …"))),
+    el("div", { class: "fortschritt al-balken" }, el("i", { style: `width:${p * 100}%` })),
+    el("div", { class: "al-fuss" },
+      schritt(job.nr, job.modelle.length, "Modell"),
+      mehrDs ? schritt(job.ds_nr, job.datensaetze.length, "Datensatz") : "",
+      el("div", { class: "al-schritt" }, el("small", {}, "Antworten"), el("b", {}, `${(job.i || 0).toLocaleString("de-DE")} von ${(job.n || 0).toLocaleString("de-DE")}`)),
+      el("button", { class: "knopf klein al-stopp", title: "Bisherige Ergebnisse bleiben erhalten", onclick: async () => { await api("api/arena/stopp", {}); await ladeDatensaetze(); zeichneArena(); } }, "Anhalten"))));
 }
 
 /* Gesamt-Rangliste über mehrere Datensätze: je Datensatz die Trefferquote, dazu der Durchschnitt */
@@ -1087,7 +1128,6 @@ async function zeichneModelleTab() {
     if (!x) return null; const w = Object.values(x.modi).map((m) => m.gesamt?.treffer).filter((v) => v != null); return w.length ? { wert: w.reduce((a, b) => a + b, 0) / w.length } : null; };
   const ds = aktuellerDs();
   const kopf = el("div", { class: "md-zeile md-titel" }, ["Modell", "Größe", "Kontext", "Kann", "Treffer" + (ds ? " · " + ds.name : ""), ""].map((t) => el("span", {}, t)));
-  const faehig = [["vision", "bild", "liest Bilder"], ["thinking", "gehirn", "kann denken (Thinking)"], ["tools", "werkzeug", "kann Werkzeuge aufrufen"]];
   $("#md-liste").replaceChildren(kopf, ...liste.map((m) => {
     const f = m.faehigkeiten || [], e = ergebnis(m.tag), g = m.geladen;
     const aktion = (icon, titel, fn, klasse = "") => el("button", { class: "md-ak " + klasse, title: titel, "aria-label": titel, html: ic(icon), onclick: fn });
@@ -1097,7 +1137,7 @@ async function zeichneModelleTab() {
           g ? el("small", { class: "md-aktiv" }, el("i"), "aktiv · " + (g.vram_gb ? `${zahl(g.vram_gb)} GB GPU` : `${zahl(g.gesamt_gb)} GB CPU`)) : el("small", {}, m.tag))),
       el("div", { class: "md-zahl" }, el("b", {}, m.datei_gb ? zahl(m.datei_gb) + " GB" : "–"), el("small", {}, [m.parameter, m.quantisierung].filter(Boolean).join(" · "))),
       el("div", { class: "md-zahl" }, el("b", {}, m.kontext ? Math.round(m.kontext / 1024) + "k" : "–"), el("small", {}, "Token")),
-      el("div", { class: "md-kann" }, faehig.map(([k, icon, titel]) => el("span", { class: f.includes(k) ? "an" : "", title: (f.includes(k) ? "" : "nicht: ") + titel, html: ic(icon) }))),
+      el("div", { class: "md-kann" }, FAEHIG.map(([k, icon, titel]) => el("span", { class: f.includes(k) ? "an" : "", title: (f.includes(k) ? "" : "nicht: ") + titel, html: ic(icon) }))),
       el("div", { class: "md-treffer" }, e ? [el("span", { class: "balken" }, el("i", { style: `width:${Math.round(e.wert * 70)}px` }), el("b", {}, pz(e.wert)))]
         : el("small", { class: "leer" }, "noch nicht angetreten")),
       el("div", { class: "md-aktionen" },
