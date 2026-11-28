@@ -1010,6 +1010,7 @@ function dlText(d) {
   if (d.status === "fertig") return "✓ installiert";
   if (d.status === "fehler") return "Fehler: " + (d.fehler || "unbekannt");
   if (d.status === "abgebrochen") return "abgebrochen";
+  if (d.schritt && d.schritt.startsWith("Verbindung unterbrochen")) return d.schritt;
   if (!d.total) return d.schritt ? "bereitet vor …" : "startet …";
   const rest = d.rest_s ? ` · noch ${d.rest_s >= 90 ? Math.round(d.rest_s / 60) + " min" : d.rest_s + " s"}` : "";
   return `${Math.round(d.anteil * 100)} % · ${gbT(d.completed)} von ${gbT(d.total)} GB` + (d.tempo ? ` · ${zahl(d.tempo / 1e6)} MB/s` : "") + rest;
@@ -1050,7 +1051,7 @@ function dlZeile(d, kompakt) {
   const aktiv = aktivDl(d);
   return el("div", { class: "dl-zeile " + d.status },
     el("span", { class: "mw-av", style: `--farbe:${farbe(d.modell)}` }, (d.titel || "?").replace(/[^A-Za-zÄÖÜ]/g, "").slice(0, 2).toUpperCase() || "KI"),
-    el("div", { class: "dl-info" }, el("b", { title: d.modell }, d.titel), el("small", {}, dlText(d)),
+    el("div", { class: "dl-info" }, el("b", { title: d.modell }, d.titel), el("small", { title: d.detail || "" }, dlText(d)),
       aktiv ? el("div", { class: "fortschritt" + (d.status === "wartet" ? " wartet" : "") }, el("i", { style: `width:${Math.round(d.anteil * 100)}%` })) : ""),
     aktiv ? el("button", { class: "dl-x", title: "Abbrechen", html: ic("x"), onclick: async () => { await api("api/download/abbrechen", { modell: d.modell }); dlPlanen(200); } })
       : d.status === "fehler" || d.status === "abgebrochen"
@@ -1136,7 +1137,7 @@ function modellFenster() {
     const aktualisiere = () => {   // Stand vom Server: Download läuft weiter, auch nach Schließen des Fensters
       const d = dlFuer(r.basis ? r.id : null, r.basis ? null : r.id), jetztDa = da || inst().has(r.id) || d?.status === "fertig";
       if (jetztDa) fuss.replaceChildren(el("span", { class: "mw-da" }, "✓ installiert"));
-      else if (aktivDl(d)) fuss.replaceChildren(el("div", { class: "mw-prozent" }, el("small", {}, dlText(d)), el("div", { class: "fortschritt" + (d.status === "wartet" ? " wartet" : "") }, el("i", { style: `width:${Math.round(d.anteil * 100)}%` }))));
+      else if (aktivDl(d)) fuss.replaceChildren(el("div", { class: "mw-prozent" }, el("small", { title: d.detail || "" }, dlText(d)), el("div", { class: "fortschritt" + (d.status === "wartet" ? " wartet" : "") }, el("i", { style: `width:${Math.round(d.anteil * 100)}%` }))));
       else fuss.replaceChildren(...(fehler || d?.status === "fehler" ? [el("div", { class: "box fehler", style: "font-size:13px;margin-bottom:6px" }, fehler || d.fehler)] : []), knopf);
     };
     const hoer = () => { if (!fuss.isConnected && fuss.dataset.gesehen) DLS.hoerer.delete(hoer); else { if (fuss.isConnected) fuss.dataset.gesehen = 1; aktualisiere(); } };

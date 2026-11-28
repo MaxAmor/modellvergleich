@@ -78,50 +78,89 @@ def _gesamtgroesse(name: str) -> int:
         return 0
 
 
+NETZ = ("lookup", "dial tcp", "timeout", "timed out", "connection reset", "connection refused", "eof", "tls", "temporary failure",
+        "network is unreachable", "no route to host", "i/o timeout", "remote end closed")
+
+
+def _verstaendlich(roh: str) -> str:
+    """Rohe Ollama-/Netzwerk-Fehler in einen kurzen Satz übersetzen."""
+    t = roh.lower()
+    if any(k in t for k in NETZ):
+        return "Keine Verbindung zum Download-Server – Internet prüfen und erneut versuchen."
+    if "no space" in t or "disk full" in t:
+        return "Kein Speicherplatz mehr frei."
+    if "file does not exist" in t or "not found" in t or "manifest unknown" in t or "404" in t:
+        return "Modell oder Variante nicht gefunden."
+    if "unauthorized" in t or "401" in t or "403" in t:
+        return "Kein Zugriff – das Modell ist geschützt oder privat."
+    return roh
+
+
 def _lauf(d: dict):
     with _platz:
         if d["abbrechen"]:
             return
         d["status"] = "laeuft"
         d["voll"] = _gesamtgroesse(d["modell"])
-        req = urllib.request.Request(kern.ollama_url() + "/api/pull", data=json.dumps({"model": d["modell"], "stream": True}).encode(),
-                                     headers={"Content-Type": "application/json"})
-        try:
-            with urllib.request.urlopen(req, timeout=3600) as r:
-                for zeile in r:
-                    if d["abbrechen"]:
-                        d.update(status="abgebrochen", ende=time.time())
-                        return   # Verbindung schließen → Ollama bricht ab; geladene Teile bleiben für einen neuen Versuch
-                    try:
-                        j = json.loads(zeile)
-                    except ValueError:
-                        continue
-                    if j.get("error"):
-                        raise RuntimeError(j["error"])
-                    if j.get("digest") and j.get("total"):
-                        d["teile"][j["digest"]] = (j.get("completed") or 0, j["total"])
-                        d["completed"] = sum(c for c, _ in d["teile"].values())
-                        d["total"] = max(d.get("voll") or 0, sum(t for _, t in d["teile"].values()))
-                        jetzt = time.time()   # Tempo geglättet, damit Restzeit und Anzeige nicht springen
-                        if d["_t"] is None:
-                            d["_t"], d["_c"] = jetzt, d["completed"]
-                        elif jetzt - d["_t"] >= 1:
-                            neu = max(0.0, (d["completed"] - d["_c"]) / (jetzt - d["_t"]))
-                            d["tempo"] = neu if not d["tempo"] else 0.8 * d["tempo"] + 0.2 * neu
-                            d["_t"], d["_c"] = jetzt, d["completed"]
-                    d["schritt"] = j.get("status")
-            d.update(status="fertig", ende=time.time(), completed=d["total"] or d["completed"])
-            for f in _nach_fertig:
-                f()
-        except Exception as fehler:
-            text = getattr(fehler, "read", None)
-            text = text().decode(errors="replace")[:200] if text else str(fehler)[:200]
-            d.update(status="abgebrochen" if d["abbrechen"] else "fehler", fehler=None if d["abbrechen"] else text, ende=time.time())
+        for versuch in range(3):   # Netzaussetzer: bis zu zwei weitere Versuche, Ollama setzt angefangene Teile fort
+            try:
+                _hole(d)
+                if d["status"] == "abgebrochen":
+                    return
+                d.update(status="fertig", ende=time.time(), completed=d["total"] or d["completed"], fehler=None, detail=None)
+                for f in _nach_fertig:
+                    f()
+                return
+            except Exception as fehler:
+                text = getattr(fehler, "read", None)
+                roh = text().decode(errors="replace")[:300] if text else str(fehler)[:300]
+                if d["abbrechen"]:
+                    d.update(status="abgebrochen", ende=time.time())
+                    return
+                if versuch < 2 and any(k in roh.lower() for k in NETZ):
+                    d["schritt"] = f"Verbindung unterbrochen – neuer Versuch ({versuch + 2}/3) …"
+                    for _ in range(5 * (versuch + 1)):
+                        if d["abbrechen"]:
+                            d.update(status="abgebrochen", ende=time.time())
+                            return
+                        time.sleep(1)
+                    continue
+                d.update(status="fehler", fehler=_verstaendlich(roh), detail=roh, ende=time.time())
+                return
+
+
+def _hole(d: dict):
+    req = urllib.request.Request(kern.ollama_url() + "/api/pull", data=json.dumps({"model": d["modell"], "stream": True}).encode(),
+                                 headers={"Content-Type": "application/json"})
+    d["_t"] = None
+    with urllib.request.urlopen(req, timeout=3600) as r:
+        for zeile in r:
+            if d["abbrechen"]:
+                d.update(status="abgebrochen", ende=time.time())
+                return   # Verbindung schließen → Ollama bricht ab; geladene Teile bleiben für einen neuen Versuch
+            try:
+                j = json.loads(zeile)
+            except ValueError:
+                continue
+            if j.get("error"):
+                raise RuntimeError(j["error"])
+            if j.get("digest") and j.get("total"):
+                d["teile"][j["digest"]] = (j.get("completed") or 0, j["total"])
+                d["completed"] = sum(c for c, _ in d["teile"].values())
+                d["total"] = max(d.get("voll") or 0, sum(t for _, t in d["teile"].values()))
+                jetzt = time.time()   # Tempo geglättet, damit Restzeit und Anzeige nicht springen
+                if d["_t"] is None:
+                    d["_t"], d["_c"] = jetzt, d["completed"]
+                elif jetzt - d["_t"] >= 1:
+                    neu = max(0.0, (d["completed"] - d["_c"]) / (jetzt - d["_t"]))
+                    d["tempo"] = neu if not d["tempo"] else 0.8 * d["tempo"] + 0.2 * neu
+                    d["_t"], d["_c"] = jetzt, d["completed"]
+            d["schritt"] = j.get("status")
 
 
 def oeffentlich(d: dict) -> dict:
     rest = (d["total"] - d["completed"]) / d["tempo"] if d["tempo"] > 0 and d["total"] else None
-    return {k: d[k] for k in ("modell", "titel", "status", "completed", "total", "fehler", "gestartet", "ende")} | \
+    return {k: d[k] for k in ("modell", "titel", "status", "completed", "total", "fehler", "gestartet", "ende")} | {"detail": d.get("detail")} | \
            {"anteil": round(d["completed"] / d["total"], 4) if d["total"] else 0, "tempo": round(d["tempo"]), "rest_s": round(rest) if rest else None,
             "schritt": d.get("schritt")}
 

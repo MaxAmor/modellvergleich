@@ -398,6 +398,7 @@ async function dlwAktualisieren() {
 }
 function dlwText(d) {
   if (d.status === "wartet") return "wartet – höchstens zwei Downloads gleichzeitig";
+  if (d.schritt && d.schritt.startsWith("Verbindung unterbrochen")) return d.schritt;
   if (!d.total) return "startet …";
   const rest = d.rest_s ? ` · noch ${d.rest_s >= 90 ? Math.round(d.rest_s / 60) + " min" : d.rest_s + " s"}` : "";
   return `${Math.round(d.anteil * 100)} % · ${zahl(d.completed / 1e9)} von ${zahl(d.total / 1e9)} GB` + (d.tempo ? ` · ${zahl(d.tempo / 1e6)} MB/s` : "") + rest;
